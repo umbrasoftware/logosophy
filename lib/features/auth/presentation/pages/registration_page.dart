@@ -44,10 +44,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Register'),
-        backgroundColor: Colors.deepOrange,
-      ),
+      appBar: AppBar(title: const Text('Register')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -57,7 +54,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             children: <Widget>[
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: textDecorator('Email'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
@@ -71,7 +68,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
+                decoration: textDecorator('Password'),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -103,55 +100,48 @@ class _RegistrationPageState extends State<RegistrationPage> {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _register,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepOrangeAccent,
-                ),
-                child: const Text(
-                  'Register',
-                  style: TextStyle(color: Colors.white),
-                ),
+
+                child: const Text('Register'),
               ),
               const SizedBox(height: 64),
               ElevatedButton.icon(
                 icon: const Icon(
                   Icons.g_mobiledata,
                 ), // Replace with actual Google icon if available
-                label: const Text(
-                  'Register with Google',
-                  style: TextStyle(color: Colors.black87),
-                ),
+                label: const Text('Register with Google'),
                 onPressed: _registerWithGoogle,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white70,
-                ),
               ),
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 icon: const Icon(
                   Icons.apple,
                 ), // Replace with actual Apple icon if available
-                label: const Text(
-                  'Register with Apple',
-                  style: TextStyle(color: Colors.black87),
-                ),
+                label: const Text('Register with Apple'),
                 onPressed: _registerWithApple,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white70,
-                ),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop(); // Go back to LoginPage
                 },
-                child: const Text(
-                  'Already have an account? Login',
-                  style: TextStyle(color: Colors.deepOrange),
-                ),
+                child: const Text('Already have an account? Login'),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  InputDecoration textDecorator(String hintText) {
+    return InputDecoration(
+      enabledBorder: const OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+      ),
+      filled: true,
+      hintText: hintText,
     );
   }
 }

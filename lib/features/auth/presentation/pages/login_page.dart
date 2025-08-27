@@ -46,10 +46,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-        backgroundColor: Colors.deepOrange,
-      ),
+      appBar: AppBar(title: const Text('Login')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -83,16 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                 },
               ),
               const SizedBox(height: 64),
-              ElevatedButton(
-                onPressed: _login,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepOrangeAccent,
-                ),
-                child: const Text(
-                  'Login',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
+              ElevatedButton(onPressed: _login, child: const Text('Login')),
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 icon: const Icon(
@@ -103,23 +91,15 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextStyle(color: Colors.black87),
                 ),
                 onPressed: _loginWithGoogle,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white70,
-                ),
               ),
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 icon: const Icon(
                   Icons.apple,
                 ), // Replace with actual Apple icon if available
-                label: const Text(
-                  'Login with Apple',
-                  style: TextStyle(color: Colors.black87),
-                ),
+                label: const Text('Login with Apple'),
                 onPressed: _loginWithApple,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white70,
-                ),
+                style: ElevatedButton.styleFrom(),
               ),
               TextButton(
                 onPressed: () {
@@ -128,10 +108,7 @@ class _LoginPageState extends State<LoginPage> {
                   );
                   print("TODO: Navigate to RegistrationPage");
                 },
-                child: const Text(
-                  'Don\'t have an account? Register',
-                  style: TextStyle(color: Colors.deepOrange),
-                ),
+                child: const Text('Don\'t have an account? Register'),
               ),
             ],
           ),
@@ -143,17 +120,13 @@ class _LoginPageState extends State<LoginPage> {
   InputDecoration textDecorator(String hintText) {
     return InputDecoration(
       enabledBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.white),
         borderRadius: BorderRadius.all(Radius.circular(8.0)),
       ),
       focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.orange.shade100),
         borderRadius: BorderRadius.all(Radius.circular(8.0)),
       ),
-      fillColor: Colors.orange.shade100,
       filled: true,
       hintText: hintText,
-      hintStyle: TextStyle(color: Colors.orange[900]),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:logosophy/features/auth/presentation/pages/splash_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,9 +23,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
-      ),
+      theme: FlexThemeData.light(scheme: FlexScheme.amber),
+      darkTheme: FlexThemeData.dark(scheme: FlexScheme.amber),
+      themeMode: ThemeMode.system, // Força o tema claro
       home: const SplashPage(),
     );
   }
