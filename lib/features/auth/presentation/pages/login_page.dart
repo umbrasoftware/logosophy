@@ -1,0 +1,159 @@
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'registration_page.dart';
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final supabase = Supabase.instance.client;
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    if (_formKey.currentState!.validate()) {
+      // TODO: Implement Supabase login logic
+      print('Email: ${_emailController.text}');
+      print('Password: ${_passwordController.text}');
+      // Example: final response = await supabase.auth.signInWithPassword(email: _emailController.text, password: _passwordController.text);
+      // Handle response
+    }
+  }
+
+  void _loginWithGoogle() {
+    // TODO: Implement Google Sign-In
+    print('Login with Google');
+  }
+
+  void _loginWithApple() {
+    // TODO: Implement Apple Sign-In
+    print('Login with Apple');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Login'),
+        backgroundColor: Colors.deepOrange,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              TextFormField(
+                controller: _emailController,
+                decoration: textDecorator('Email'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your email';
+                  }
+                  if (!value.contains('@')) {
+                    return 'Please enter a valid email';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _passwordController,
+                decoration: textDecorator('Password'),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 64),
+              ElevatedButton(
+                onPressed: _login,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepOrangeAccent,
+                ),
+                child: const Text(
+                  'Login',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                icon: const Icon(
+                  Icons.g_mobiledata,
+                ), // Replace with actual Google icon if available
+                label: const Text(
+                  'Login with Google',
+                  style: TextStyle(color: Colors.black87),
+                ),
+                onPressed: _loginWithGoogle,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white70,
+                ),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton.icon(
+                icon: const Icon(
+                  Icons.apple,
+                ), // Replace with actual Apple icon if available
+                label: const Text(
+                  'Login with Apple',
+                  style: TextStyle(color: Colors.black87),
+                ),
+                onPressed: _loginWithApple,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white70,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const RegistrationPage()),
+                  );
+                  print("TODO: Navigate to RegistrationPage");
+                },
+                child: const Text(
+                  'Don\'t have an account? Register',
+                  style: TextStyle(color: Colors.deepOrange),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  InputDecoration textDecorator(String hintText) {
+    return InputDecoration(
+      enabledBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.white),
+        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.orange.shade100),
+        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+      ),
+      fillColor: Colors.orange.shade100,
+      filled: true,
+      hintText: hintText,
+      hintStyle: TextStyle(color: Colors.orange[900]),
+    );
+  }
+}
