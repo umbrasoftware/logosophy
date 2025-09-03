@@ -24,24 +24,12 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _login() async {
-    if (_formKey.currentState!.validate()) {
-      // TODO: Implement Supabase login logic
-      print('Email: ${_emailController.text}');
-      print('Password: ${_passwordController.text}');
-      // Example: final response = await supabase.auth.signInWithPassword(email: _emailController.text, password: _passwordController.text);
-      // Handle response
-    }
+    if (_formKey.currentState!.validate()) {}
   }
 
-  void _loginWithGoogle() {
-    // TODO: Implement Google Sign-In
-    print('Login with Google');
-  }
+  void _loginWithGoogle() {}
 
-  void _loginWithApple() {
-    // TODO: Implement Apple Sign-In
-    print('Login with Apple');
-  }
+  void _loginWithApple() {}
 
   @override
   Widget build(BuildContext context) {
@@ -104,9 +92,8 @@ class _LoginPageState extends State<LoginPage> {
               TextButton(
                 onPressed: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const RegistrationPage()),
+                    MaterialPageRoute(builder: (_) => const RegisterPage()),
                   );
-                  print("TODO: Navigate to RegistrationPage");
                 },
                 child: const Text('Don\'t have an account? Register'),
               ),

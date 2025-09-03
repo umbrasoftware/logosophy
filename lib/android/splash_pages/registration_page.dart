@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:logosophy/android/utils/auth_utils.dart';
 
-class RegistrationPage extends StatefulWidget {
-  const RegistrationPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<RegistrationPage> createState() => _RegistrationPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegistrationPageState extends State<RegistrationPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -19,26 +21,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
-  }
-
-  Future<void> _register() async {
-    if (_formKey.currentState!.validate()) {
-      // TODO: Implement Supabase registration logic
-      print('Email: ${_emailController.text}');
-      print('Password: ${_passwordController.text}');
-      // Example: final response = await supabase.auth.signUp(email: _emailController.text, password: _passwordController.text);
-      // Handle response
-    }
-  }
-
-  void _registerWithGoogle() {
-    // TODO: Implement Google Sign-Up
-    print('Register with Google');
-  }
-
-  void _registerWithApple() {
-    // TODO: Implement Apple Sign-Up
-    print('Register with Apple');
   }
 
   @override
@@ -83,9 +65,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _confirmPasswordController,
-                decoration: const InputDecoration(
-                  labelText: 'Confirm Password',
-                ),
+                decoration: textDecorator('Confirm Password'),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -99,29 +79,29 @@ class _RegistrationPageState extends State<RegistrationPage> {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: _register,
-
+                onPressed: () async {
+                  await AuthUtils().registerWithEmail(
+                    _emailController.text,
+                    _passwordController.text,
+                  );
+                },
                 child: const Text('Register'),
               ),
               const SizedBox(height: 64),
               ElevatedButton.icon(
-                icon: const Icon(
-                  Icons.g_mobiledata,
-                ), // Replace with actual Google icon if available
+                icon: const Icon(Icons.g_mobiledata),
                 label: const Text('Register with Google'),
-                onPressed: _registerWithGoogle,
+                onPressed: null,
               ),
               const SizedBox(height: 8),
               ElevatedButton.icon(
-                icon: const Icon(
-                  Icons.apple,
-                ), // Replace with actual Apple icon if available
+                icon: const Icon(Icons.apple),
                 label: const Text('Register with Apple'),
-                onPressed: _registerWithApple,
+                onPressed: null,
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(); // Go back to LoginPage
+                  GoRouter.of(context).go('/login');
                 },
                 child: const Text('Already have an account? Login'),
               ),

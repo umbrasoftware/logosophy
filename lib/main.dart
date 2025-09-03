@@ -1,32 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:logosophy/features/auth/presentation/pages/splash_page.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logosophy/gen/strings.g.dart';
+import 'package:logosophy/providers/database/database.dart';
+import 'package:logosophy/router.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
-
   final supabaseUrl = dotenv.env['SUPABASE_URL']!;
   final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY']!;
 
-  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+  await initSupabase(supabaseUrl, supabaseAnonKey);
 
-  runApp(MyApp());
+  runApp(ProviderScope(child: TranslationProvider(child: App())));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class App extends StatelessWidget {
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Flutter Demo',
       theme: FlexThemeData.light(scheme: FlexScheme.amber),
       darkTheme: FlexThemeData.dark(scheme: FlexScheme.amber),
-      themeMode: ThemeMode.system, // Força o tema claro
-      home: const SplashPage(),
+      themeMode: ThemeMode.system,
+      locale: TranslationProvider.of(context).flutterLocale,
+      supportedLocales: AppLocaleUtils.supportedLocales,
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      routerConfig: router,
     );
   }
 }

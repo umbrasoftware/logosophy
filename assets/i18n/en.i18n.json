@@ -1,0 +1,40 @@
+{
+    "btnActions": {
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "authenticate": "Authenticate",
+        "register": "Register",
+        "password": "Password",
+        "logIn": "Login",
+        "backToLogin": "Back to login page",
+        "changeFont": "Change font"
+    },
+    "authMessages": {
+        "prompt": {
+            "askPassword": "Enter password",
+            "askAuthenticate": "Please authenticate to enter the app.",
+            "retypePassword": "Retype your password",
+            "forgotPassword": "Forgot your password?"
+        },
+        "success": {},
+        "error": {
+            "unknown": "An unknown error occurred. Please contact the support team.",
+            "emailAddressInvalid": "Invalid email. Try again, please.",
+            "emailExists": "This email is already in use.",
+            "emailNotConfirmed": "Confirm your account by clicking in the link sent to your email.",
+            "invalidCredentials": "Your email or password is incorrect.",
+            "passwordMismatch": "The passwords are not the same.",
+            "passwordTooShort": "Your password needs to have at least 8 characters.",
+            "samePassword": "You cannot use the same password as before.",
+            "weakPassword": "Your password needs to have at least 1 upper case character, 1 lowercase, 1 number and 1 special character.",
+            "overRequestRateLimit": "You are making too many requests. Please try again later.",
+            "wrongPassword": "Wrong password",
+            "nameTooLong": "Your name cannot be bigger than 100 characters.",
+            "noConnection": "No internet connection",
+            "unprocessableEntity": "The server could not satisfy your request. Please try again later.",
+            "tooManyRequests": "Servers are overloaded right now. Please try again later.",
+            "internalServerError": "There was an error processing your request. Please try again later.",
+            "tryLoginAgain": "An error occurred. Please try to login again."
+        }
+    }
+}
