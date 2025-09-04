@@ -72,7 +72,7 @@ class AuthUtils {
 
   /// Signs in a user with their email and password.
   /// Returns `null` on success, or an error message string on failure.
-  static Future<String?> signInWithEmail(String email, String password) async {
+  static Future<String?> signInWithEmailAndPassword(String email, String password) async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,

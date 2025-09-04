@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logosophy/gen/strings.g.dart';
-
-import 'registration_page.dart';
+import 'package:logosophy/utils/auth_utils.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,6 +14,7 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -23,12 +24,37 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _login() async {
-    if (_formKey.currentState!.validate()) {}
+    // First, validate the form before proceeding.
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    // Use the static AuthUtils class and handle the result.
+    final errorMessage = await AuthUtils.signInWithEmailAndPassword(
+      _emailController.text,
+      _passwordController.text,
+    );
+
+    // Check if the widget is still in the tree before updating the state.
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    if (errorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    } else {
+      // Success: Navigate to home or dashboard
+      // You might want to replace this with your home route
+      GoRouter.of(context).go('/home');
+    }
   }
-
-  void _loginWithGoogle() {}
-
-  void _loginWithApple() {}
 
   @override
   Widget build(BuildContext context) {
@@ -44,11 +70,12 @@ class _LoginPageState extends State<LoginPage> {
               TextFormField(
                 controller: _emailController,
                 decoration: textDecorator(t.btnActions.email),
+                keyboardType: TextInputType.emailAddress,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return t.authMessages.prompt.askEmail;
                   }
-                  if (!value.contains('@')) {
+                  if (!AuthUtils.isEmailValid(value)) {
                     return t.authMessages.error.emailAddressInvalid;
                   }
                   return null;
@@ -68,8 +95,10 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 64),
               ElevatedButton(
-                onPressed: _login,
-                child: Text(t.btnActions.logIn),
+                onPressed: _isLoading ? null : _login,
+                child: _isLoading
+                    ? const CircularProgressIndicator()
+                    : Text(t.btnActions.logIn),
               ),
               const SizedBox(height: 16),
               ElevatedButton.icon(
@@ -80,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                   'Login with Google',
                   style: TextStyle(color: Colors.black87),
                 ),
-                onPressed: _loginWithGoogle,
+                onPressed: null,
               ),
               const SizedBox(height: 8),
               ElevatedButton.icon(
@@ -88,15 +117,13 @@ class _LoginPageState extends State<LoginPage> {
                   Icons.apple,
                 ), // Replace with actual Apple icon if available
                 label: const Text('Login with Apple'),
-                onPressed: _loginWithApple,
+                onPressed: null,
                 style: ElevatedButton.styleFrom(),
               ),
               TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const RegisterPage()),
-                  );
-                },
+                onPressed: _isLoading
+                    ? null
+                    : () => GoRouter.of(context).go('/register'),
                 child: Text(t.authMessages.prompt.dontHaveAccount),
               ),
             ],
@@ -106,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  InputDecoration textDecorator(String hintText) {
+  InputDecoration textDecorator(String labelText) {
     return InputDecoration(
       enabledBorder: const OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -115,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
         borderRadius: BorderRadius.all(Radius.circular(8.0)),
       ),
       filled: true,
-      hintText: hintText,
+      labelText: labelText,
     );
   }
 }

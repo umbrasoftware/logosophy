@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Regra padrão para negar acesso a tudo, a menos que especificado
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Regras específicas para a coleção 'users'
+    match /users/{userId} {
+      // Permite que um usuário crie um documento APENAS se:
+      // 1. Ele estiver autenticado (request.auth não é nulo)
+      // 2. O ID do documento que ele está tentando criar (userId) seja o mesmo que o UID dele
+      allow create: if request.auth != null && request.auth.uid == userId;
+
+      // Permite que um usuário leia, atualize ou delete um documento APENAS se:
+      // 1. Ele estiver autenticado
+      // 2. O ID do documento que ele está tentando acessar (userId) seja o mesmo que o UID dele
+      allow read, update, delete: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

@@ -3,15 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:logosophy/android/splash_pages/login_page.dart';
-import 'package:logosophy/android/splash_pages/registration_page.dart';
-import 'package:logosophy/android/splash_pages/splash_page.dart';
+import 'package:logosophy/pages/splash_pages/login_page.dart';
+import 'package:logosophy/pages/splash_pages/registration_page.dart';
+import 'package:logosophy/pages/splash_pages/splash_page.dart';
 
-import 'android/books_tab/books_page.dart';
-import 'android/home_tab/home_page.dart';
-import 'android/notes_tab/notes_page.dart';
-import 'android/search_tab/search_page.dart';
-import 'android/settings_tab/settings_page.dart';
+import 'pages/books_tab/books_page.dart';
+import 'pages/home_tab/home_page.dart';
+import 'pages/notes_tab/notes_page.dart';
+import 'pages/search_tab/search_page.dart';
+import 'pages/settings_tab/settings_page.dart';
 import 'package:logosophy/gen/strings.g.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();

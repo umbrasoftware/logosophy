@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:logosophy/android/splash_pages/animated_logo.dart';
+import 'package:logosophy/pages/splash_pages/animated_logo.dart';
 
 /// A simple splash page that displays a loading indicator.
 ///

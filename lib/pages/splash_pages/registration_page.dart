@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:logosophy/android/utils/auth_utils.dart';
+import 'package:logosophy/utils/auth_utils.dart';
 import 'package:logosophy/gen/strings.g.dart';
 
 class RegisterPage extends StatefulWidget {
