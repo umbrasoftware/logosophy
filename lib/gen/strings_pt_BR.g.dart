@@ -37,6 +37,7 @@ class TranslationsPtBr implements Translations {
 
 	// Translations
 	@override late final _TranslationsBtnActionsPtBr btnActions = _TranslationsBtnActionsPtBr._(_root);
+	@override late final _TranslationsNavBarPtBr navBar = _TranslationsNavBarPtBr._(_root);
 	@override late final _TranslationsAuthMessagesPtBr authMessages = _TranslationsAuthMessagesPtBr._(_root);
 }
 
@@ -51,10 +52,28 @@ class _TranslationsBtnActionsPtBr implements TranslationsBtnActionsEn {
 	@override String get cancel => 'Cancelar';
 	@override String get authenticate => 'Autenticar';
 	@override String get register => 'Registrar';
+	@override String get registrationSuccess => 'Registro bem-sucedido! Você pode fazer login agora.';
+	@override String get registerWithGoogle => 'Registrar com Google';
+	@override String get registerWithApple => 'Registrar com Apple';
 	@override String get password => 'Senha';
+	@override String get email => 'Email';
 	@override String get logIn => 'Entrar';
 	@override String get backToLogin => 'Voltar para a página de login';
 	@override String get changeFont => 'Mudar fonte';
+}
+
+// Path: navBar
+class _TranslationsNavBarPtBr implements TranslationsNavBarEn {
+	_TranslationsNavBarPtBr._(this._root);
+
+	final TranslationsPtBr _root; // ignore: unused_field
+
+	// Translations
+	@override String get home => 'Início';
+	@override String get books => 'Livros';
+	@override String get search => 'Pesquisar';
+	@override String get notes => 'Notas';
+	@override String get settings => 'Configurações';
 }
 
 // Path: authMessages
@@ -76,9 +95,12 @@ class _TranslationsAuthMessagesPromptPtBr implements TranslationsAuthMessagesPro
 
 	// Translations
 	@override String get askPassword => 'Digite a senha';
+	@override String get askEmail => 'Digite seu email';
 	@override String get askAuthenticate => 'Por favor, se autentique para entrar no aplicativo.';
 	@override String get retypePassword => 'Digite a senha novamente';
 	@override String get forgotPassword => 'Esqueceu sua senha?';
+	@override String get alreadyHaveAccount => 'Já tem uma conta? Faça login.';
+	@override String get dontHaveAccount => 'Não tem uma conta? Cadastre-se.';
 }
 
 // Path: authMessages.error
@@ -116,14 +138,26 @@ extension on TranslationsPtBr {
 			case 'btnActions.cancel': return 'Cancelar';
 			case 'btnActions.authenticate': return 'Autenticar';
 			case 'btnActions.register': return 'Registrar';
+			case 'btnActions.registrationSuccess': return 'Registro bem-sucedido! Você pode fazer login agora.';
+			case 'btnActions.registerWithGoogle': return 'Registrar com Google';
+			case 'btnActions.registerWithApple': return 'Registrar com Apple';
 			case 'btnActions.password': return 'Senha';
+			case 'btnActions.email': return 'Email';
 			case 'btnActions.logIn': return 'Entrar';
 			case 'btnActions.backToLogin': return 'Voltar para a página de login';
 			case 'btnActions.changeFont': return 'Mudar fonte';
+			case 'navBar.home': return 'Início';
+			case 'navBar.books': return 'Livros';
+			case 'navBar.search': return 'Pesquisar';
+			case 'navBar.notes': return 'Notas';
+			case 'navBar.settings': return 'Configurações';
 			case 'authMessages.prompt.askPassword': return 'Digite a senha';
+			case 'authMessages.prompt.askEmail': return 'Digite seu email';
 			case 'authMessages.prompt.askAuthenticate': return 'Por favor, se autentique para entrar no aplicativo.';
 			case 'authMessages.prompt.retypePassword': return 'Digite a senha novamente';
 			case 'authMessages.prompt.forgotPassword': return 'Esqueceu sua senha?';
+			case 'authMessages.prompt.alreadyHaveAccount': return 'Já tem uma conta? Faça login.';
+			case 'authMessages.prompt.dontHaveAccount': return 'Não tem uma conta? Cadastre-se.';
 			case 'authMessages.error.unknown': return 'Um erro desconhecido ocorreu. Por favor, entre em contato com a equipe de suporte.';
 			case 'authMessages.error.emailAddressInvalid': return 'Email inválido. Tente novamente, por favor.';
 			case 'authMessages.error.emailExists': return 'Este email já está em uso.';

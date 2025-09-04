@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:logosophy/gen/strings.g.dart';
 
 import 'registration_page.dart';
 
@@ -11,7 +11,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final supabase = Supabase.instance.client;
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -34,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(title: Text(t.btnActions.logIn)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -44,13 +43,13 @@ class _LoginPageState extends State<LoginPage> {
             children: <Widget>[
               TextFormField(
                 controller: _emailController,
-                decoration: textDecorator('Email'),
+                decoration: textDecorator(t.btnActions.email),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
+                    return t.authMessages.prompt.askEmail;
                   }
                   if (!value.contains('@')) {
-                    return 'Please enter a valid email';
+                    return t.authMessages.error.emailAddressInvalid;
                   }
                   return null;
                 },
@@ -58,17 +57,20 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
-                decoration: textDecorator('Password'),
+                decoration: textDecorator(t.btnActions.password),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
+                    return t.authMessages.prompt.askPassword;
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 64),
-              ElevatedButton(onPressed: _login, child: const Text('Login')),
+              ElevatedButton(
+                onPressed: _login,
+                child: Text(t.btnActions.logIn),
+              ),
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 icon: const Icon(
@@ -95,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
                     MaterialPageRoute(builder: (_) => const RegisterPage()),
                   );
                 },
-                child: const Text('Don\'t have an account? Register'),
+                child: Text(t.authMessages.prompt.dontHaveAccount),
               ),
             ],
           ),

@@ -1,58 +1,15 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:logging/logging.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logosophy/android/splash_pages/animated_logo.dart';
 
-import 'animated_logo.dart';
-
-class SplashPage extends ConsumerStatefulWidget {
+/// A simple splash page that displays a loading indicator.
+///
+/// The redirection logic is now handled by the `redirect` function
+/// in the GoRouter configuration, making this widget purely visual.
+class SplashPage extends StatelessWidget {
   const SplashPage({super.key});
 
   @override
-  ConsumerState<SplashPage> createState() => _SplashPageState();
-}
-
-class _SplashPageState extends ConsumerState<SplashPage> {
-  final _logger = Logger('SplashPage');
-
-  @override
-  void initState() {
-    super.initState();
-    _redirect();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const BreathingLogo(),
-            const SizedBox(height: 24),
-            Text(
-              'Logosophy',
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _redirect() async {
-    _logger.info('Entered redirect.');
-    await Future.delayed(Duration.zero);
-
-    final session = Supabase.instance.client.auth.currentSession;
-    if (session != null) {
-      _logger.info('Logged in.');
-      GoRouter.of(context).go('/home');
-    } else {
-      _logger.info('Not logged in.');
-      GoRouter.of(context).go('/home');
-    }
+    return const Scaffold(body: Center(child: BreathingLogo()));
   }
 }

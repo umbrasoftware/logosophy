@@ -4,17 +4,31 @@
         "cancel": "Cancel",
         "authenticate": "Authenticate",
         "register": "Register",
+        "registrationSuccess": "Registration successful! You can now log in.",
+        "registerWithGoogle": "Register with Google",
+        "registerWithApple": "Register with Apple",
         "password": "Password",
+        "email": "Email",
         "logIn": "Login",
         "backToLogin": "Back to login page",
         "changeFont": "Change font"
     },
+    "navBar": {
+        "home": "Home",
+        "books": "Books",
+        "search": "Search",
+        "notes": "Notes",
+        "settings": "Settings"
+    },
     "authMessages": {
         "prompt": {
             "askPassword": "Enter password",
+            "askEmail": "Enter email",
             "askAuthenticate": "Please authenticate to enter the app.",
             "retypePassword": "Retype your password",
-            "forgotPassword": "Forgot your password?"
+            "forgotPassword": "Forgot your password?",
+            "alreadyHaveAccount": "Already have an account? Log in.",
+            "dontHaveAccount": "Don't have an account? Sign up."
         },
         "success": {},
         "error": {

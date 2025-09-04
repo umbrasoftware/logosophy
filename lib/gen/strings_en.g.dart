@@ -40,6 +40,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 
 	// Translations
 	late final TranslationsBtnActionsEn btnActions = TranslationsBtnActionsEn._(_root);
+	late final TranslationsNavBarEn navBar = TranslationsNavBarEn._(_root);
 	late final TranslationsAuthMessagesEn authMessages = TranslationsAuthMessagesEn._(_root);
 }
 
@@ -63,8 +64,20 @@ class TranslationsBtnActionsEn {
 	/// en: 'Register'
 	String get register => 'Register';
 
+	/// en: 'Registration successful! You can now log in.'
+	String get registrationSuccess => 'Registration successful! You can now log in.';
+
+	/// en: 'Register with Google'
+	String get registerWithGoogle => 'Register with Google';
+
+	/// en: 'Register with Apple'
+	String get registerWithApple => 'Register with Apple';
+
 	/// en: 'Password'
 	String get password => 'Password';
+
+	/// en: 'Email'
+	String get email => 'Email';
 
 	/// en: 'Login'
 	String get logIn => 'Login';
@@ -74,6 +87,30 @@ class TranslationsBtnActionsEn {
 
 	/// en: 'Change font'
 	String get changeFont => 'Change font';
+}
+
+// Path: navBar
+class TranslationsNavBarEn {
+	TranslationsNavBarEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Home'
+	String get home => 'Home';
+
+	/// en: 'Books'
+	String get books => 'Books';
+
+	/// en: 'Search'
+	String get search => 'Search';
+
+	/// en: 'Notes'
+	String get notes => 'Notes';
+
+	/// en: 'Settings'
+	String get settings => 'Settings';
 }
 
 // Path: authMessages
@@ -98,6 +135,9 @@ class TranslationsAuthMessagesPromptEn {
 	/// en: 'Enter password'
 	String get askPassword => 'Enter password';
 
+	/// en: 'Enter email'
+	String get askEmail => 'Enter email';
+
 	/// en: 'Please authenticate to enter the app.'
 	String get askAuthenticate => 'Please authenticate to enter the app.';
 
@@ -106,6 +146,12 @@ class TranslationsAuthMessagesPromptEn {
 
 	/// en: 'Forgot your password?'
 	String get forgotPassword => 'Forgot your password?';
+
+	/// en: 'Already have an account? Log in.'
+	String get alreadyHaveAccount => 'Already have an account? Log in.';
+
+	/// en: 'Don't have an account? Sign up.'
+	String get dontHaveAccount => 'Don\'t have an account? Sign up.';
 }
 
 // Path: authMessages.error
@@ -177,14 +223,26 @@ extension on Translations {
 			case 'btnActions.cancel': return 'Cancel';
 			case 'btnActions.authenticate': return 'Authenticate';
 			case 'btnActions.register': return 'Register';
+			case 'btnActions.registrationSuccess': return 'Registration successful! You can now log in.';
+			case 'btnActions.registerWithGoogle': return 'Register with Google';
+			case 'btnActions.registerWithApple': return 'Register with Apple';
 			case 'btnActions.password': return 'Password';
+			case 'btnActions.email': return 'Email';
 			case 'btnActions.logIn': return 'Login';
 			case 'btnActions.backToLogin': return 'Back to login page';
 			case 'btnActions.changeFont': return 'Change font';
+			case 'navBar.home': return 'Home';
+			case 'navBar.books': return 'Books';
+			case 'navBar.search': return 'Search';
+			case 'navBar.notes': return 'Notes';
+			case 'navBar.settings': return 'Settings';
 			case 'authMessages.prompt.askPassword': return 'Enter password';
+			case 'authMessages.prompt.askEmail': return 'Enter email';
 			case 'authMessages.prompt.askAuthenticate': return 'Please authenticate to enter the app.';
 			case 'authMessages.prompt.retypePassword': return 'Retype your password';
 			case 'authMessages.prompt.forgotPassword': return 'Forgot your password?';
+			case 'authMessages.prompt.alreadyHaveAccount': return 'Already have an account? Log in.';
+			case 'authMessages.prompt.dontHaveAccount': return 'Don\'t have an account? Sign up.';
 			case 'authMessages.error.unknown': return 'An unknown error occurred. Please contact the support team.';
 			case 'authMessages.error.emailAddressInvalid': return 'Invalid email. Try again, please.';
 			case 'authMessages.error.emailExists': return 'This email is already in use.';

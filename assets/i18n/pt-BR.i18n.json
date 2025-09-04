@@ -4,17 +4,31 @@
         "cancel": "Cancelar",
         "authenticate": "Autenticar",
         "register": "Registrar",
+        "registrationSuccess": "Registro bem-sucedido! Você pode fazer login agora.",
+        "registerWithGoogle": "Registrar com Google",
+        "registerWithApple": "Registrar com Apple",
         "password": "Senha",
+        "email": "Email",
         "logIn": "Entrar",
         "backToLogin": "Voltar para a página de login",
         "changeFont": "Mudar fonte"
     },
+    "navBar": {
+        "home": "Início",
+        "books": "Livros",
+        "search": "Pesquisar",
+        "notes": "Notas",
+        "settings": "Configurações"
+    },
     "authMessages": {
         "prompt": {
             "askPassword": "Digite a senha",
+            "askEmail": "Digite seu email",
             "askAuthenticate": "Por favor, se autentique para entrar no aplicativo.",
             "retypePassword": "Digite a senha novamente",
-            "forgotPassword": "Esqueceu sua senha?"
+            "forgotPassword": "Esqueceu sua senha?",
+            "alreadyHaveAccount": "Já tem uma conta? Faça login.",
+            "dontHaveAccount": "Não tem uma conta? Cadastre-se."
         },
         "success": {},
         "error": {
