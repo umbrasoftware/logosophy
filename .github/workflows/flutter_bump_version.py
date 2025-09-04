@@ -26,7 +26,7 @@ class Version:
         """Performs the class initialization.
         """        
 
-        self.filename = '../../pubspec.yaml' 
+        self.filename = 'pubspec.yaml' 
         self.bump_type : VersionType | None
         self.file_lines = self._get_file_lines()
         self.index = self._get_version_line_index()
