@@ -24,17 +24,19 @@ class AuthUtils {
       }
       return t.authMessages.error.unknown;
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        logger.info('The password provided is too weak.');
-        return t.authMessages.error.weakPassword;
-      } else if (e.code == 'email-already-in-use') {
-        logger.info('The account already exists for that email.');
-        return t.authMessages.error.emailExists;
+      switch (e.code) {
+        case 'weak-password':
+          logger.info('The password provided is too weak.');
+          return t.authMessages.error.weakPassword;
+        case 'email-already-in-use':
+          logger.info('The account already exists for that email.');
+          return t.authMessages.error.emailExists;
+        default:
+          logger.severe(
+            'Unhandled FirebaseAuthException during registration: ${e.code}',
+          );
+          return t.authMessages.error.unknown;
       }
-      logger.severe(
-        'Unhandled FirebaseAuthException during registration: ${e.code}',
-      );
-      return t.authMessages.error.unknown;
     } catch (e) {
       logger.severe('Error occurred during registration: $e');
       return t.authMessages.error.unknown;
@@ -72,7 +74,10 @@ class AuthUtils {
 
   /// Signs in a user with their email and password.
   /// Returns `null` on success, or an error message string on failure.
-  static Future<String?> signInWithEmailAndPassword(String email, String password) async {
+  static Future<String?> signInWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,

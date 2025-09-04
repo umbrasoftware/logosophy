@@ -7,9 +7,12 @@
 .buildlog/
 .history
 .env
-firebase_options.dart
 books/
 output.json
+firebase_options.dart
+firebase.json
+firestore.rules
+firestore.indexes.json
 
 
 # Flutter repo-specific
