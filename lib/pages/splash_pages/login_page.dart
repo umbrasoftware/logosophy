@@ -49,10 +49,6 @@ class _LoginPageState extends State<LoginPage> {
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
-    } else {
-      // Success: Navigate to home or dashboard
-      // You might want to replace this with your home route
-      GoRouter.of(context).go('/home');
     }
   }
 
@@ -105,8 +101,8 @@ class _LoginPageState extends State<LoginPage> {
                 icon: const Icon(
                   Icons.g_mobiledata,
                 ), // Replace with actual Google icon if available
-                label: const Text(
-                  'Login with Google',
+                label: Text(
+                  t.btnActions.registerWithGoogle,
                   style: TextStyle(color: Colors.black87),
                 ),
                 onPressed: null,
@@ -116,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                 icon: const Icon(
                   Icons.apple,
                 ), // Replace with actual Apple icon if available
-                label: const Text('Login with Apple'),
+                label: Text(t.btnActions.registerWithApple),
                 onPressed: null,
                 style: ElevatedButton.styleFrom(),
               ),

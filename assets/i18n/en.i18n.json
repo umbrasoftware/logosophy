@@ -11,7 +11,15 @@
         "email": "Email",
         "logIn": "Login",
         "backToLogin": "Back to login page",
-        "changeFont": "Change font"
+        "changeFont": "Change font",
+        "continueAction": "Continue"
+    },
+    "setup": {
+        "noBooks": "It seems you don't have any books yet. Please select a language for the books below to start using the app!",
+        "starting": "Starting download",
+        "downloadingBooks": "Downloading books",
+        "downloadProgress": "Downloading $filename\n($current of $total)",
+        "downloadComplete": "Download complete!"
     },
     "navBar": {
         "home": "Home",

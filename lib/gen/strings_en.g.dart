@@ -40,6 +40,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 
 	// Translations
 	late final TranslationsBtnActionsEn btnActions = TranslationsBtnActionsEn._(_root);
+	late final TranslationsSetupEn setup = TranslationsSetupEn._(_root);
 	late final TranslationsNavBarEn navBar = TranslationsNavBarEn._(_root);
 	late final TranslationsAuthMessagesEn authMessages = TranslationsAuthMessagesEn._(_root);
 }
@@ -87,6 +88,33 @@ class TranslationsBtnActionsEn {
 
 	/// en: 'Change font'
 	String get changeFont => 'Change font';
+
+	/// en: 'Continue'
+	String get continueAction => 'Continue';
+}
+
+// Path: setup
+class TranslationsSetupEn {
+	TranslationsSetupEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'It seems you don't have any books yet. Please select a language for the books below to start using the app!'
+	String get noBooks => 'It seems you don\'t have any books yet. Please select a language for the books below to start using the app!';
+
+	/// en: 'Starting download'
+	String get starting => 'Starting download';
+
+	/// en: 'Downloading books'
+	String get downloadingBooks => 'Downloading books';
+
+	/// en: 'Downloading $filename ($current of $total)'
+	String downloadProgress({required Object filename, required Object current, required Object total}) => 'Downloading ${filename}\n(${current} of ${total})';
+
+	/// en: 'Download complete!'
+	String get downloadComplete => 'Download complete!';
 }
 
 // Path: navBar
@@ -231,6 +259,12 @@ extension on Translations {
 			case 'btnActions.logIn': return 'Login';
 			case 'btnActions.backToLogin': return 'Back to login page';
 			case 'btnActions.changeFont': return 'Change font';
+			case 'btnActions.continueAction': return 'Continue';
+			case 'setup.noBooks': return 'It seems you don\'t have any books yet. Please select a language for the books below to start using the app!';
+			case 'setup.starting': return 'Starting download';
+			case 'setup.downloadingBooks': return 'Downloading books';
+			case 'setup.downloadProgress': return ({required Object filename, required Object current, required Object total}) => 'Downloading ${filename}\n(${current} of ${total})';
+			case 'setup.downloadComplete': return 'Download complete!';
 			case 'navBar.home': return 'Home';
 			case 'navBar.books': return 'Books';
 			case 'navBar.search': return 'Search';

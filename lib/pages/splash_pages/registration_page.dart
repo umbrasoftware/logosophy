@@ -52,11 +52,10 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       );
     } else {
-      // Success: Show confirmation and navigate. You will need to add this key.
+      // Success: Show confirmation message.
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(t.btnActions.registrationSuccess)));
-      GoRouter.of(context).go('/login');
     }
   }
 

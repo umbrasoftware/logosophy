@@ -37,6 +37,7 @@ class TranslationsPtBr implements Translations {
 
 	// Translations
 	@override late final _TranslationsBtnActionsPtBr btnActions = _TranslationsBtnActionsPtBr._(_root);
+	@override late final _TranslationsSetupPtBr setup = _TranslationsSetupPtBr._(_root);
 	@override late final _TranslationsNavBarPtBr navBar = _TranslationsNavBarPtBr._(_root);
 	@override late final _TranslationsAuthMessagesPtBr authMessages = _TranslationsAuthMessagesPtBr._(_root);
 }
@@ -60,6 +61,21 @@ class _TranslationsBtnActionsPtBr implements TranslationsBtnActionsEn {
 	@override String get logIn => 'Entrar';
 	@override String get backToLogin => 'Voltar para a página de login';
 	@override String get changeFont => 'Mudar fonte';
+	@override String get continueAction => 'Continuar';
+}
+
+// Path: setup
+class _TranslationsSetupPtBr implements TranslationsSetupEn {
+	_TranslationsSetupPtBr._(this._root);
+
+	final TranslationsPtBr _root; // ignore: unused_field
+
+	// Translations
+	@override String get noBooks => 'Parece que você não tem nenhum livro ainda. Por favor, selecione uma língua para os livros abaixo para começar a usar o aplicativo!';
+	@override String get starting => 'Iniciando download';
+	@override String get downloadingBooks => 'Baixando livros';
+	@override String downloadProgress({required Object filename, required Object current, required Object total}) => 'Baixando ${filename}\n(${current} de ${total})';
+	@override String get downloadComplete => 'Download concluído!';
 }
 
 // Path: navBar
@@ -146,6 +162,12 @@ extension on TranslationsPtBr {
 			case 'btnActions.logIn': return 'Entrar';
 			case 'btnActions.backToLogin': return 'Voltar para a página de login';
 			case 'btnActions.changeFont': return 'Mudar fonte';
+			case 'btnActions.continueAction': return 'Continuar';
+			case 'setup.noBooks': return 'Parece que você não tem nenhum livro ainda. Por favor, selecione uma língua para os livros abaixo para começar a usar o aplicativo!';
+			case 'setup.starting': return 'Iniciando download';
+			case 'setup.downloadingBooks': return 'Baixando livros';
+			case 'setup.downloadProgress': return ({required Object filename, required Object current, required Object total}) => 'Baixando ${filename}\n(${current} de ${total})';
+			case 'setup.downloadComplete': return 'Download concluído!';
 			case 'navBar.home': return 'Início';
 			case 'navBar.books': return 'Livros';
 			case 'navBar.search': return 'Pesquisar';

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:logosophy/pages/splash_pages/setup_page.dart';
 import 'package:logosophy/pages/splash_pages/login_page.dart';
 import 'package:logosophy/pages/splash_pages/registration_page.dart';
 import 'package:logosophy/pages/splash_pages/splash_page.dart';
@@ -40,38 +41,34 @@ final GoRouter router = GoRouter(
   ),
   redirect: (BuildContext context, GoRouterState state) {
     final bool loggedIn = FirebaseAuth.instance.currentUser != null;
-    bool onAuthRoute =
-        state.matchedLocation == '/' ||
-        state.matchedLocation == '/login' ||
-        state.matchedLocation == '/register';
 
-    // Se o usuário não estiver logado, ele só pode acessar as rotas de autenticação.
-    // Se tentar acessar qualquer outra, será redirecionado para /login.
+    // If the user is not logged in, they can only access the login and
+    // register pages. Any other attempt will redirect them to the login page.
     if (!loggedIn) {
       final bool isGoingToLogin = state.matchedLocation == '/login';
       final bool isGoingToRegister = state.matchedLocation == '/register';
 
-      // Permite o acesso apenas às telas de login e registro.
-      // Redireciona para /login em qualquer outro caso (incluindo a splash '/').
+      // Allow access only to login and register screens.
+      // Redirect to /login in any other case (including the splash screen '/').
       return isGoingToLogin || isGoingToRegister ? null : '/login';
     }
 
-    // Usuário está logado.
-    onAuthRoute =
+    // If a logged-in user is on an auth route, redirect them to the loading page
+    // to perform one-time checks before proceeding to the main app.
+    final onAuthRoute =
         state.matchedLocation == '/' ||
         state.matchedLocation == '/login' ||
         state.matchedLocation == '/register';
 
-    // Se estiver em uma rota de autenticação, redireciona para a home.
     if (onAuthRoute) {
-      return '/home';
+      return '/loading';
     }
 
-    // Nenhum redirecionamento necessário.
     return null;
   },
   routes: [
     GoRoute(path: '/', builder: (context, state) => const SplashPage()),
+    GoRoute(path: '/loading', builder: (context, state) => const SetupPage()),
     GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
     GoRoute(
       path: '/register',
