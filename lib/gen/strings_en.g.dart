@@ -101,8 +101,8 @@ class TranslationsSetupEn {
 
 	// Translations
 
-	/// en: 'It seems you don't have any books yet. Please select a language for the books below to start using the app!'
-	String get noBooks => 'It seems you don\'t have any books yet. Please select a language for the books below to start using the app!';
+	/// en: 'It seems you don't have any books yet. Please select a language for the books to start using the app!'
+	String get noBooks => 'It seems you don\'t have any books yet. Please select a language for the books to start using the app!';
 
 	/// en: 'Starting download'
 	String get starting => 'Starting download';
@@ -260,7 +260,7 @@ extension on Translations {
 			case 'btnActions.backToLogin': return 'Back to login page';
 			case 'btnActions.changeFont': return 'Change font';
 			case 'btnActions.continueAction': return 'Continue';
-			case 'setup.noBooks': return 'It seems you don\'t have any books yet. Please select a language for the books below to start using the app!';
+			case 'setup.noBooks': return 'It seems you don\'t have any books yet. Please select a language for the books to start using the app!';
 			case 'setup.starting': return 'Starting download';
 			case 'setup.downloadingBooks': return 'Downloading books';
 			case 'setup.downloadProgress': return ({required Object filename, required Object current, required Object total}) => 'Downloading ${filename}\n(${current} of ${total})';

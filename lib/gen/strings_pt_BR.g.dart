@@ -71,7 +71,7 @@ class _TranslationsSetupPtBr implements TranslationsSetupEn {
 	final TranslationsPtBr _root; // ignore: unused_field
 
 	// Translations
-	@override String get noBooks => 'Parece que você não tem nenhum livro ainda. Por favor, selecione uma língua para os livros abaixo para começar a usar o aplicativo!';
+	@override String get noBooks => 'Parece que você não tem nenhum livro ainda. Por favor, selecione uma língua para os livros para começar a usar o aplicativo!';
 	@override String get starting => 'Iniciando download';
 	@override String get downloadingBooks => 'Baixando livros';
 	@override String downloadProgress({required Object filename, required Object current, required Object total}) => 'Baixando ${filename}\n(${current} de ${total})';
@@ -163,7 +163,7 @@ extension on TranslationsPtBr {
 			case 'btnActions.backToLogin': return 'Voltar para a página de login';
 			case 'btnActions.changeFont': return 'Mudar fonte';
 			case 'btnActions.continueAction': return 'Continuar';
-			case 'setup.noBooks': return 'Parece que você não tem nenhum livro ainda. Por favor, selecione uma língua para os livros abaixo para começar a usar o aplicativo!';
+			case 'setup.noBooks': return 'Parece que você não tem nenhum livro ainda. Por favor, selecione uma língua para os livros para começar a usar o aplicativo!';
 			case 'setup.starting': return 'Iniciando download';
 			case 'setup.downloadingBooks': return 'Baixando livros';
 			case 'setup.downloadProgress': return ({required Object filename, required Object current, required Object total}) => 'Baixando ${filename}\n(${current} de ${total})';

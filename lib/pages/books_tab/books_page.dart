@@ -78,9 +78,6 @@ class _BooksPageState extends State<BooksPage> {
       logger.warning('Language directory not found: ${langDir.path}');
     }
 
-    // Sort books alphabetically by title
-    booksData.sort((a, b) => a.title.compareTo(b.title));
-
     return booksData;
   }
 

@@ -15,7 +15,7 @@
         "continueAction": "Continuar"
     },
     "setup": {
-        "noBooks": "Parece que você não tem nenhum livro ainda. Por favor, selecione uma língua para os livros abaixo para começar a usar o aplicativo!",
+        "noBooks": "Parece que você não tem nenhum livro ainda. Por favor, selecione uma língua para os livros para começar a usar o aplicativo!",
         "starting": "Iniciando download",
         "downloadingBooks": "Baixando livros",
         "downloadProgress": "Baixando $filename\n($current de $total)",

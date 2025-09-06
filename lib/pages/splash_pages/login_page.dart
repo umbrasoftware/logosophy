@@ -58,71 +58,74 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(title: Text(t.btnActions.logIn)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              TextFormField(
-                controller: _emailController,
-                decoration: textDecorator(t.btnActions.email),
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return t.authMessages.prompt.askEmail;
-                  }
-                  if (!AuthUtils.isEmailValid(value)) {
-                    return t.authMessages.error.emailAddressInvalid;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _passwordController,
-                decoration: textDecorator(t.btnActions.password),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return t.authMessages.prompt.askPassword;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 64),
-              ElevatedButton(
-                onPressed: _isLoading ? null : _login,
-                child: _isLoading
-                    ? const CircularProgressIndicator()
-                    : Text(t.btnActions.logIn),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                icon: const Icon(
-                  Icons.g_mobiledata,
-                ), // Replace with actual Google icon if available
-                label: Text(
-                  t.btnActions.registerWithGoogle,
-                  style: TextStyle(color: Colors.black87),
+        // Use SingleChildScrollView to prevent overflow when the keyboard appears.
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                TextFormField(
+                  controller: _emailController,
+                  decoration: textDecorator(t.btnActions.email),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return t.authMessages.prompt.askEmail;
+                    }
+                    if (!AuthUtils.isEmailValid(value)) {
+                      return t.authMessages.error.emailAddressInvalid;
+                    }
+                    return null;
+                  },
                 ),
-                onPressed: null,
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton.icon(
-                icon: const Icon(
-                  Icons.apple,
-                ), // Replace with actual Apple icon if available
-                label: Text(t.btnActions.registerWithApple),
-                onPressed: null,
-                style: ElevatedButton.styleFrom(),
-              ),
-              TextButton(
-                onPressed: _isLoading
-                    ? null
-                    : () => GoRouter.of(context).go('/register'),
-                child: Text(t.authMessages.prompt.dontHaveAccount),
-              ),
-            ],
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: textDecorator(t.btnActions.password),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return t.authMessages.prompt.askPassword;
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 64),
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _login,
+                  child: _isLoading
+                      ? const CircularProgressIndicator()
+                      : Text(t.btnActions.logIn),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  icon: const Icon(
+                    Icons.g_mobiledata,
+                  ), // Replace with actual Google icon if available
+                  label: Text(
+                    t.btnActions.registerWithGoogle,
+                    style: TextStyle(color: Colors.black87),
+                  ),
+                  onPressed: null,
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton.icon(
+                  icon: const Icon(
+                    Icons.apple,
+                  ), // Replace with actual Apple icon if available
+                  label: Text(t.btnActions.registerWithApple),
+                  onPressed: null,
+                  style: ElevatedButton.styleFrom(),
+                ),
+                TextButton(
+                  onPressed: _isLoading
+                      ? null
+                      : () => GoRouter.of(context).go('/register'),
+                  child: Text(t.authMessages.prompt.dontHaveAccount),
+                ),
+              ],
+            ),
           ),
         ),
       ),
