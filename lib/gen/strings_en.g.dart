@@ -42,6 +42,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final TranslationsBtnActionsEn btnActions = TranslationsBtnActionsEn._(_root);
 	late final TranslationsSetupEn setup = TranslationsSetupEn._(_root);
 	late final TranslationsNavBarEn navBar = TranslationsNavBarEn._(_root);
+	late final TranslationsBookPageEn bookPage = TranslationsBookPageEn._(_root);
 	late final TranslationsAuthMessagesEn authMessages = TranslationsAuthMessagesEn._(_root);
 }
 
@@ -139,6 +140,54 @@ class TranslationsNavBarEn {
 
 	/// en: 'Settings'
 	String get settings => 'Settings';
+}
+
+// Path: bookPage
+class TranslationsBookPageEn {
+	TranslationsBookPageEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Find...'
+	String get find => 'Find...';
+
+	/// en: 'Clear text'
+	String get clearText => 'Clear text';
+
+	/// en: 'Search Result'
+	String get searchResult => 'Search Result';
+
+	/// en: 'No result'
+	String get noResult => 'No result';
+
+	/// en: 'Cancel search'
+	String get cancelSearch => 'Cancel search';
+
+	/// en: 'No more occurrences found. Would you like to continue to search from the beginning?'
+	String get noMoreResults => 'No more occurrences found. Would you like to continue to search from the beginning?';
+
+	/// en: 'YES'
+	String get YES => 'YES';
+
+	/// en: 'NO'
+	String get NO => 'NO';
+
+	/// en: 'Previous'
+	String get previous => 'Previous';
+
+	/// en: 'Next'
+	String get next => 'Next';
+
+	/// en: 'Previous instance'
+	String get previousInstance => 'Previous instance';
+
+	/// en: 'Next instance'
+	String get nextInstance => 'Next instance';
+
+	/// en: 'of'
+	String get of => 'of';
 }
 
 // Path: authMessages
@@ -270,6 +319,19 @@ extension on Translations {
 			case 'navBar.search': return 'Search';
 			case 'navBar.notes': return 'Notes';
 			case 'navBar.settings': return 'Settings';
+			case 'bookPage.find': return 'Find...';
+			case 'bookPage.clearText': return 'Clear text';
+			case 'bookPage.searchResult': return 'Search Result';
+			case 'bookPage.noResult': return 'No result';
+			case 'bookPage.cancelSearch': return 'Cancel search';
+			case 'bookPage.noMoreResults': return 'No more occurrences found. Would you like to continue to search from the beginning?';
+			case 'bookPage.YES': return 'YES';
+			case 'bookPage.NO': return 'NO';
+			case 'bookPage.previous': return 'Previous';
+			case 'bookPage.next': return 'Next';
+			case 'bookPage.previousInstance': return 'Previous instance';
+			case 'bookPage.nextInstance': return 'Next instance';
+			case 'bookPage.of': return 'of';
 			case 'authMessages.prompt.askPassword': return 'Enter password';
 			case 'authMessages.prompt.askEmail': return 'Enter email';
 			case 'authMessages.prompt.askAuthenticate': return 'Please authenticate to enter the app.';

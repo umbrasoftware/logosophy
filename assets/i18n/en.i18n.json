@@ -28,6 +28,21 @@
         "notes": "Notes",
         "settings": "Settings"
     },
+    "bookPage": {
+        "find": "Find...",
+        "clearText": "Clear text",
+        "searchResult": "Search Result",
+        "noResult": "No result",
+        "cancelSearch": "Cancel search",
+        "noMoreResults": "No more occurrences found. Would you like to continue to search from the beginning?",
+        "YES": "YES",
+        "NO": "NO",
+        "previous": "Previous",
+        "next": "Next",
+        "previousInstance": "Previous instance",
+        "nextInstance": "Next instance",
+        "of": "of"
+    },
     "authMessages": {
         "prompt": {
             "askPassword": "Enter password",

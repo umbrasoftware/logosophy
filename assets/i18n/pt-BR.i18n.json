@@ -28,6 +28,21 @@
         "notes": "Notas",
         "settings": "Configurações"
     },
+    "bookPage": {
+        "find": "Procurar...",
+        "clearText": "Limpar texto",
+        "searchResult": "Resultado da pesquisa",
+        "noResult": "Nenhum resultado",
+        "cancelSearch": "Cancelar pesquisa",
+        "noMoreResults": "Nenhuma outra ocorrência encontrada. Gostaria de continuar a pesquisa desde o início?",
+        "YES": "SIM",
+        "NO": "NÃO",
+        "previous": "Anterior",
+        "next": "Próximo",
+        "previousInstance": "Instância anterior",
+        "nextInstance": "Próxima instância",
+        "of": "de"
+    },
     "authMessages": {
         "prompt": {
             "askPassword": "Digite a senha",

@@ -35,6 +35,7 @@ dependencies:
   country_flags: ^3.3.0
   firebase_app_check: ^0.4.0+1
   syncfusion_flutter_pdfviewer: ^31.1.17
+  syncfusion_flutter_pdf: ^31.1.17
 
 
 dev_dependencies:

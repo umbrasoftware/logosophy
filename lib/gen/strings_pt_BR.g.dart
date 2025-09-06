@@ -39,6 +39,7 @@ class TranslationsPtBr implements Translations {
 	@override late final _TranslationsBtnActionsPtBr btnActions = _TranslationsBtnActionsPtBr._(_root);
 	@override late final _TranslationsSetupPtBr setup = _TranslationsSetupPtBr._(_root);
 	@override late final _TranslationsNavBarPtBr navBar = _TranslationsNavBarPtBr._(_root);
+	@override late final _TranslationsBookPagePtBr bookPage = _TranslationsBookPagePtBr._(_root);
 	@override late final _TranslationsAuthMessagesPtBr authMessages = _TranslationsAuthMessagesPtBr._(_root);
 }
 
@@ -90,6 +91,28 @@ class _TranslationsNavBarPtBr implements TranslationsNavBarEn {
 	@override String get search => 'Pesquisar';
 	@override String get notes => 'Notas';
 	@override String get settings => 'Configurações';
+}
+
+// Path: bookPage
+class _TranslationsBookPagePtBr implements TranslationsBookPageEn {
+	_TranslationsBookPagePtBr._(this._root);
+
+	final TranslationsPtBr _root; // ignore: unused_field
+
+	// Translations
+	@override String get find => 'Procurar...';
+	@override String get clearText => 'Limpar texto';
+	@override String get searchResult => 'Resultado da pesquisa';
+	@override String get noResult => 'Nenhum resultado';
+	@override String get cancelSearch => 'Cancelar pesquisa';
+	@override String get noMoreResults => 'Nenhuma outra ocorrência encontrada. Gostaria de continuar a pesquisa desde o início?';
+	@override String get YES => 'SIM';
+	@override String get NO => 'NÃO';
+	@override String get previous => 'Anterior';
+	@override String get next => 'Próximo';
+	@override String get previousInstance => 'Instância anterior';
+	@override String get nextInstance => 'Próxima instância';
+	@override String get of => 'de';
 }
 
 // Path: authMessages
@@ -173,6 +196,19 @@ extension on TranslationsPtBr {
 			case 'navBar.search': return 'Pesquisar';
 			case 'navBar.notes': return 'Notas';
 			case 'navBar.settings': return 'Configurações';
+			case 'bookPage.find': return 'Procurar...';
+			case 'bookPage.clearText': return 'Limpar texto';
+			case 'bookPage.searchResult': return 'Resultado da pesquisa';
+			case 'bookPage.noResult': return 'Nenhum resultado';
+			case 'bookPage.cancelSearch': return 'Cancelar pesquisa';
+			case 'bookPage.noMoreResults': return 'Nenhuma outra ocorrência encontrada. Gostaria de continuar a pesquisa desde o início?';
+			case 'bookPage.YES': return 'SIM';
+			case 'bookPage.NO': return 'NÃO';
+			case 'bookPage.previous': return 'Anterior';
+			case 'bookPage.next': return 'Próximo';
+			case 'bookPage.previousInstance': return 'Instância anterior';
+			case 'bookPage.nextInstance': return 'Próxima instância';
+			case 'bookPage.of': return 'de';
 			case 'authMessages.prompt.askPassword': return 'Digite a senha';
 			case 'authMessages.prompt.askEmail': return 'Digite seu email';
 			case 'authMessages.prompt.askAuthenticate': return 'Por favor, se autentique para entrar no aplicativo.';
