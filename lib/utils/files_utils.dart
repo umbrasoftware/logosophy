@@ -33,8 +33,9 @@ class FilesUtils {
     }
   }
 
-  /// Given a language String, like 'pt-BR', goes to the books/language folder
-  /// in Firestore and download all pdf books there.
+  /// Given a language String, like 'pt-BR', goes to the books/language folder in
+  /// Firestore and downloads all PDF books and their cover images (files ending
+  /// in `_cover.png`).
   static Future<void> downloadBooksForLanguage(
     String languageCode, {
     void Function(int current, int total, String filename)? onBookProgress,
@@ -55,6 +56,12 @@ class FilesUtils {
           .where((item) => item.name.toLowerCase().endsWith('.pdf'))
           .toList();
 
+      // Filter for cover images, which are expected to end with '_cover.png'.
+      // This is case-insensitive.
+      final coverItems = listResult.items
+          .where((item) => item.name.toLowerCase().endsWith('_cover.png'))
+          .toList();
+
       final totalFiles = pdfItems.length;
       var currentFile = 0;
 
@@ -63,15 +70,15 @@ class FilesUtils {
       final langDir = Directory(join(appDir.path, 'books', languageCode));
       await langDir.create(recursive: true);
 
-      for (final item in pdfItems) {
+      for (final pdfItem in pdfItems) {
         currentFile++;
-        onBookProgress?.call(currentFile, totalFiles, item.name);
+        onBookProgress?.call(currentFile, totalFiles, pdfItem.name);
 
-        _logger.info('Downloading ${item.name}...');
-        final localFile = File(join(langDir.path, item.name));
+        _logger.info('Downloading ${pdfItem.name}...');
+        final localFile = File(join(langDir.path, pdfItem.name));
 
         // Download the file from Firebase Storage to the local file system.
-        final downloadTask = item.writeToFile(localFile);
+        final downloadTask = pdfItem.writeToFile(localFile);
 
         // Listen to the download task to get progress updates for the current file.
         downloadTask.snapshotEvents.listen((taskSnapshot) {
@@ -82,8 +89,25 @@ class FilesUtils {
 
         await downloadTask; // Wait for the download to complete.
         _logger.info(
-          'Successfully downloaded ${item.name} to ${localFile.path}',
+          'Successfully downloaded ${pdfItem.name} to ${localFile.path}',
         );
+
+        // Find and download the corresponding cover image alongside the book.
+        final pdfBaseName = basenameWithoutExtension(pdfItem.name);
+        final expectedCoverName = '${pdfBaseName}_cover.png'.toLowerCase();
+
+        try {
+          final coverItem = coverItems.firstWhere(
+            (cover) => cover.name.toLowerCase() == expectedCoverName,
+          );
+
+          _logger.info('Downloading cover: ${coverItem.name}');
+          final localCoverFile = File(join(langDir.path, coverItem.name));
+          await coverItem.writeToFile(localCoverFile);
+        } on StateError {
+          // This is thrown by firstWhere if no element is found.
+          _logger.warning('Cover image not found for ${pdfItem.name}');
+        }
       }
     } on FirebaseException catch (e) {
       _logger.severe('Error downloading books for $languageCode: $e');

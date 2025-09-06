@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:logosophy/pages/books_tab/pdf_viewer.dart';
 import 'package:logosophy/pages/splash_pages/setup_page.dart';
 import 'package:logosophy/pages/splash_pages/login_page.dart';
 import 'package:logosophy/pages/splash_pages/registration_page.dart';
@@ -120,6 +122,10 @@ final GoRouter router = GoRouter(
           ],
         ),
       ],
+    ),
+    GoRoute(
+      path: '/pdfviewer',
+      builder: (context, state) => PdfViewer(file: state.extra as File),
     ),
   ],
 );

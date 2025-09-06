@@ -34,7 +34,7 @@ class _SetupPageState extends State<SetupPage> {
   }
 
   Future<void> _performChecksAndNavigate() async {
-    await FilesUtils.deleteDownloadedBooks(); // For testing purposes
+    // await FilesUtils.deleteDownloadedBooks(); // For testing purposes
 
     // Create a storage reference from our app
     final storageRef = FirebaseStorage.instance.ref();
