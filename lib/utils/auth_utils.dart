@@ -19,8 +19,8 @@ class AuthUtils {
         password: password,
       );
       if (res.user != null) {
-        await createUserProfileInFirestore(res.user!);
-        return null;
+        final success = await createUserProfileInFirestore(res.user!);
+        return success ? null : t.authMessages.error.unknown;
       }
       return t.authMessages.error.unknown;
     } on FirebaseAuthException catch (e) {
@@ -50,25 +50,48 @@ class AuthUtils {
   /// Creates a user profile document in Firestore after registration.
   static Future<bool> createUserProfileInFirestore(User user) async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
-
     final userRef = firestore.collection('users').doc(user.uid);
-
     final docSnapshot = await userRef.get();
 
     if (!docSnapshot.exists) {
-      await userRef.set({
-        'uid': user.uid,
-        'email': user.email,
-        'displayName': user.displayName ?? '',
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-      logger.info('Documents created for user with UID: ${user.uid}');
-      return true;
+      try {
+        // Use a batch write to perform multiple operations atomically. This ensures
+        // that both the user profile and their initial book data are created
+        // together, or not at all, preventing inconsistent states.
+        final batch = firestore.batch();
+
+        // 1. Create the main user document.
+        batch.set(userRef, {
+          'uid': user.uid,
+          'email': user.email,
+          'displayName': user.displayName ?? '',
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        // 2. Create the initial books documents in the 'books' subcollection.
+        // This correctly creates a document at `users/{uid}/books/...`.
+        for (int i = 1; i <= 17; i++) {
+          final bookId = i.toString().padLeft(3, '0');
+          final bookRef = userRef.collection('books').doc(bookId);
+          batch.set(bookRef, {"notes": {}, "selections": {}});
+        }
+
+        // Commit the batch.
+        await batch.commit();
+
+        logger.info(
+          'User profile and initial book created for user with UID: ${user.uid}',
+        );
+        return true;
+      } catch (e) {
+        logger.severe(
+          'Failed to create user profile and books for ${user.uid}: $e',
+        );
+        return false;
+      }
     } else {
       logger.info('User document already exists for UID: ${user.uid}');
       return false;
-      // Optional: you can update fields if desired
-      // await userRef.update({'lastSignIn': FieldValue.serverTimestamp()});
     }
   }
 

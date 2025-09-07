@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,6 +15,12 @@ class _ProfilePageState extends ConsumerState<SettingsPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: const Center(child: Text('Settings Page')),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await FirebaseAuth.instance.signOut();
+        },
+        child: const Icon(Icons.logout),
+      ),
     );
   }
 }
