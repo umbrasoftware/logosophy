@@ -1,7 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:logging/logging.dart';
 import 'package:logosophy/gen/strings.g.dart';
+import 'package:logosophy/utils/pdf_utils.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class PdfViewer extends StatefulWidget {
@@ -14,8 +17,12 @@ class PdfViewer extends StatefulWidget {
 }
 
 class _PdfViewerState extends State<PdfViewer> {
+  final logger = Logger('PDF Viewer');
+
   final PdfViewerController _pdfViewerController = PdfViewerController();
   final GlobalKey<SearchToolbarState> _textSearchKey = GlobalKey();
+  final GlobalKey<SfPdfViewerState> _pdfViewerKey = GlobalKey();
+  OverlayEntry? _overlayEntry;
   late bool _showToolbar;
   late bool _showScrollHead;
 
@@ -103,9 +110,20 @@ class _PdfViewerState extends State<PdfViewer> {
       body: Stack(
         children: [
           SfPdfViewer.file(
+            key: _pdfViewerKey,
             widget.file,
             controller: _pdfViewerController,
+            canShowTextSelectionMenu: false,
             canShowScrollHead: _showScrollHead,
+            onTextSelectionChanged: (PdfTextSelectionChangedDetails details) {
+              if (details.selectedText == null && _overlayEntry != null) {
+                _overlayEntry!.remove();
+                _overlayEntry = null;
+              } else if (details.selectedText != null &&
+                  _overlayEntry == null) {
+                _showContextMenu(context, details);
+              }
+            },
           ),
           Visibility(
             visible: _textSearchKey.currentState?._showToast ?? false,
@@ -114,7 +132,7 @@ class _PdfViewerState extends State<PdfViewer> {
               child: Flex(
                 direction: Axis.horizontal,
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
+                children: [
                   Container(
                     padding: EdgeInsets.only(
                       left: 15,
@@ -138,6 +156,170 @@ class _PdfViewerState extends State<PdfViewer> {
         ],
       ),
     );
+  }
+
+  void _showContextMenu(
+    BuildContext context,
+    PdfTextSelectionChangedDetails details,
+  ) {
+    const double height = 250;
+    const double width = 150;
+    final OverlayState overlayState = Overlay.of(context);
+    final Size screenSize = MediaQuery.of(context).size;
+
+    double top = details.globalSelectedRegion!.top >= screenSize.height / 2
+        ? details.globalSelectedRegion!.top - height - 10
+        : details.globalSelectedRegion!.bottom + 20;
+    top = top < 0 ? 20 : top;
+    top = top + height > screenSize.height
+        ? screenSize.height - height - 10
+        : top;
+
+    double left = details.globalSelectedRegion!.bottomLeft.dx;
+    left = left < 0 ? 10 : left;
+    left = left + width > screenSize.width
+        ? screenSize.width - width - 10
+        : left;
+    _overlayEntry = OverlayEntry(
+      builder: (BuildContext context) => Positioned(
+        top: top,
+        left: left,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(4),
+            boxShadow: const <BoxShadow>[
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 4,
+                offset: Offset(2, 2),
+              ),
+            ],
+          ),
+          constraints: const BoxConstraints.tightFor(
+            width: width,
+            height: height,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              TextButton(
+                onPressed: () {
+                  if (details.selectedText != null) {
+                    Clipboard.setData(
+                      ClipboardData(text: details.selectedText!),
+                    );
+                    logger.info(
+                      'Text copied to clipboard: ${details.selectedText}',
+                    );
+                    _pdfViewerController.clearSelection();
+                  }
+                },
+                child: const Text('Copy', style: TextStyle(fontSize: 15)),
+              ),
+              TextButton(
+                onPressed: () {
+                  final List<PdfTextLine>? textLines = _pdfViewerKey
+                      .currentState
+                      ?.getSelectedTextLines();
+                  if (textLines != null && textLines.isNotEmpty) {
+                    final HighlightAnnotation highlightAnnotation =
+                        HighlightAnnotation(textBoundsCollection: textLines);
+                    _pdfViewerController.addAnnotation(highlightAnnotation);
+
+                    final firebaseSelection = PDFUtils.getFirebaseSelection(
+                      'highlight',
+                      details.selectedText!,
+                      details.globalSelectedRegion!,
+                      _pdfViewerController.pageNumber,
+                      highlightAnnotation.color,
+                      highlightAnnotation.opacity,
+                    );
+                    logger.info('Highlight added: \n$firebaseSelection');
+                  }
+                },
+                child: const Text('Highlight', style: TextStyle(fontSize: 15)),
+              ),
+              TextButton(
+                onPressed: () {
+                  final List<PdfTextLine>? textLines = _pdfViewerKey
+                      .currentState
+                      ?.getSelectedTextLines();
+                  if (textLines != null && textLines.isNotEmpty) {
+                    final UnderlineAnnotation underLineAnnotation =
+                        UnderlineAnnotation(textBoundsCollection: textLines);
+                    _pdfViewerController.addAnnotation(underLineAnnotation);
+
+                    final firebaseSelection = PDFUtils.getFirebaseSelection(
+                      'underline',
+                      details.selectedText!,
+                      details.globalSelectedRegion!,
+                      _pdfViewerController.pageNumber,
+                      underLineAnnotation.color,
+                      underLineAnnotation.opacity,
+                    );
+                    logger.info('Underline added: \n$firebaseSelection');
+                  }
+                },
+                child: const Text('Underline', style: TextStyle(fontSize: 15)),
+              ),
+              TextButton(
+                onPressed: () {
+                  final List<PdfTextLine>? textLines = _pdfViewerKey
+                      .currentState
+                      ?.getSelectedTextLines();
+                  if (textLines != null && textLines.isNotEmpty) {
+                    final StrikethroughAnnotation strikethroughAnnotation =
+                        StrikethroughAnnotation(
+                          textBoundsCollection: textLines,
+                        );
+                    _pdfViewerController.addAnnotation(strikethroughAnnotation);
+
+                    final firebaseSelection = PDFUtils.getFirebaseSelection(
+                      'strikethrough',
+                      details.selectedText!,
+                      details.globalSelectedRegion!,
+                      _pdfViewerController.pageNumber,
+                      strikethroughAnnotation.color,
+                      strikethroughAnnotation.opacity,
+                    );
+                    logger.info('Strikethrough added: \n$firebaseSelection');
+                  }
+                },
+                child: const Text(
+                  'Strikethrough',
+                  style: TextStyle(fontSize: 15),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  final List<PdfTextLine>? textLines = _pdfViewerKey
+                      .currentState
+                      ?.getSelectedTextLines();
+                  if (textLines != null && textLines.isNotEmpty) {
+                    final SquigglyAnnotation squigglyAnnotation =
+                        SquigglyAnnotation(textBoundsCollection: textLines);
+                    _pdfViewerController.addAnnotation(squigglyAnnotation);
+
+                    final firebaseSelection = PDFUtils.getFirebaseSelection(
+                      'squiggly',
+                      details.selectedText!,
+                      details.globalSelectedRegion!,
+                      _pdfViewerController.pageNumber,
+                      squigglyAnnotation.color,
+                      squigglyAnnotation.opacity,
+                    );
+                    logger.info('Squiggly added: \n$firebaseSelection');
+                  }
+                },
+                child: const Text('Squiggly', style: TextStyle(fontSize: 15)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    overlayState.insert(_overlayEntry!);
   }
 }
 
@@ -217,7 +399,7 @@ class SearchToolbarState extends State<SearchToolbar> {
             width: 328.0,
             child: Text(t.bookPage.noMoreResults),
           ),
-          actions: <Widget>[
+          actions: [
             TextButton(
               onPressed: () {
                 setState(() {
@@ -264,7 +446,7 @@ class SearchToolbarState extends State<SearchToolbar> {
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: <Widget>[
+      children: [
         Material(
           child: IconButton(
             icon: Icon(Icons.arrow_back, size: 24),
