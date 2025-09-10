@@ -3,21 +3,23 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
-import 'package:logosophy/database/selection/selections_classes.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logosophy/database/books/book_selections.dart';
+import 'package:logosophy/database/books/selection_span.dart';
+import 'package:logosophy/database/books/books_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
-import 'package:logosophy/utils/pdf_utils.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
-class PdfViewer extends StatefulWidget {
+class PdfViewer extends ConsumerStatefulWidget {
   const PdfViewer({super.key, required this.file});
 
   final File file;
 
   @override
-  State<PdfViewer> createState() => _PdfViewerState();
+  ConsumerState<PdfViewer> createState() => _PdfViewerState();
 }
 
-class _PdfViewerState extends State<PdfViewer> {
+class _PdfViewerState extends ConsumerState<PdfViewer> {
   final logger = Logger('PDF Viewer');
 
   final PdfViewerController _pdfViewerController = PdfViewerController();
@@ -27,6 +29,8 @@ class _PdfViewerState extends State<PdfViewer> {
   late bool _showToolbar;
   late bool _showScrollHead;
   late String bookId;
+  late SelectionsNotifier selectionProvider;
+  late Books? selections;
 
   /// Ensure the entry history of Text search.
   LocalHistoryEntry? _historyEntry;
@@ -36,6 +40,7 @@ class _PdfViewerState extends State<PdfViewer> {
     bookId = widget.file.path.split('/').last.split('.').first;
     _showToolbar = false;
     _showScrollHead = true;
+    selectionProvider = ref.read(selectionsNotifierProvider.notifier);
     super.initState();
   }
 
@@ -119,8 +124,10 @@ class _PdfViewerState extends State<PdfViewer> {
             canShowTextSelectionMenu: false,
             canShowScrollHead: _showScrollHead,
             onDocumentLoaded: (details) async {
-              final selects = await PDFUtils.getSelections(bookId);
-              applySelections(selects);
+              selections = await selectionProvider.getBookSelections(bookId);
+              if (selections != null) {
+                applySelections(selections!);
+              }
             },
             onTextSelectionChanged: (PdfTextSelectionChangedDetails details) {
               if (details.selectedText == null && _overlayEntry != null) {
@@ -165,55 +172,63 @@ class _PdfViewerState extends State<PdfViewer> {
     );
   }
 
-  void applySelections(List<SelectionSpan> selections) {
-    for (final span in selections) {
+  void applySelections(Books selections) {
+    selections.bookSelections.forEach((pageNumber, spans) {
       List<PdfTextLine> textLines = [];
 
-      for (final line in span.textLines) {
-        final rect = Rect.fromLTRB(
-          line.bounds.left,
-          line.bounds.top,
-          line.bounds.right,
-          line.bounds.bottom,
-        );
-        textLines.add(PdfTextLine(rect, line.text, span.pageNumber));
+      for (final selectionSpan in spans) {
+        for (final textLine in selectionSpan.textLines) {
+          final rect = Rect.fromLTRB(
+            textLine.bounds.left,
+            textLine.bounds.top,
+            textLine.bounds.right,
+            textLine.bounds.bottom,
+          );
+          textLines.add(
+            PdfTextLine(rect, textLine.text, int.parse(pageNumber)),
+          );
+        }
       }
 
-      switch (span.type) {
-        case 'highlight':
-          final highlight = HighlightAnnotation(
-            textBoundsCollection: textLines,
-          );
-          highlight.color = Color(span.color);
-          highlight.opacity = span.opacity;
-          _pdfViewerController.addAnnotation(highlight);
-          break;
-        case 'underline':
-          final underline = UnderlineAnnotation(
-            textBoundsCollection: textLines,
-          );
-          underline.color = Color(span.color);
-          underline.opacity = span.opacity;
-          _pdfViewerController.addAnnotation(underline);
-          break;
-        case 'strikethrough':
-          final strikethrough = StrikethroughAnnotation(
-            textBoundsCollection: textLines,
-          );
-          strikethrough.color = Color(span.color);
-          strikethrough.opacity = span.opacity;
-          _pdfViewerController.addAnnotation(strikethrough);
-          break;
-        case 'squiggly':
-          final squiggly = SquigglyAnnotation(textBoundsCollection: textLines);
-          squiggly.color = Color(span.color);
-          squiggly.opacity = span.opacity;
-          _pdfViewerController.addAnnotation(squiggly);
-          break;
-        default:
-          break;
+      for (final span in spans) {
+        switch (span.type) {
+          case 'highlight':
+            final highlight = HighlightAnnotation(
+              textBoundsCollection: textLines,
+            );
+            highlight.color = Color(span.color);
+            highlight.opacity = span.opacity;
+            _pdfViewerController.addAnnotation(highlight);
+            break;
+          case 'underline':
+            final underline = UnderlineAnnotation(
+              textBoundsCollection: textLines,
+            );
+            underline.color = Color(span.color);
+            underline.opacity = span.opacity;
+            _pdfViewerController.addAnnotation(underline);
+            break;
+          case 'strikethrough':
+            final strikethrough = StrikethroughAnnotation(
+              textBoundsCollection: textLines,
+            );
+            strikethrough.color = Color(span.color);
+            strikethrough.opacity = span.opacity;
+            _pdfViewerController.addAnnotation(strikethrough);
+            break;
+          case 'squiggly':
+            final squiggly = SquigglyAnnotation(
+              textBoundsCollection: textLines,
+            );
+            squiggly.color = Color(span.color);
+            squiggly.opacity = span.opacity;
+            _pdfViewerController.addAnnotation(squiggly);
+            break;
+          default:
+            break;
+        }
       }
-    }
+    });
   }
 
   void _showContextMenu(
@@ -282,14 +297,17 @@ class _PdfViewerState extends State<PdfViewer> {
                         HighlightAnnotation(textBoundsCollection: textLines);
                     _pdfViewerController.addAnnotation(highlightAnnotation);
 
-                    final selects = prepareSelectionSpan(
-                      textLines,
-                      'highlight',
-                      highlightAnnotation.color.toARGB32(),
-                      highlightAnnotation.opacity,
+                    final pageNumber = textLines.first.pageNumber;
+                    final selects = SelectionSpan(
+                      textLines: textLines,
+                      type: 'highlight',
+                      pageNumber: pageNumber,
+                      color: highlightAnnotation.color.toARGB32(),
+                      opacity: highlightAnnotation.opacity,
                     );
 
-                    PDFUtils.saveBookSelectionOnFirebase(bookId, selects);
+                    selectionProvider.addSpan(bookId, selects);
+                    selectionProvider.savePageSelections(bookId, pageNumber);
                   }
                 },
                 child: const Text('Highlight', style: TextStyle(fontSize: 15)),
@@ -304,14 +322,17 @@ class _PdfViewerState extends State<PdfViewer> {
                         UnderlineAnnotation(textBoundsCollection: textLines);
                     _pdfViewerController.addAnnotation(underLineAnnotation);
 
-                    final selects = prepareSelectionSpan(
-                      textLines,
-                      'underLine',
-                      underLineAnnotation.color.toARGB32(),
-                      underLineAnnotation.opacity,
+                    final pageNumber = textLines.first.pageNumber;
+                    final selects = SelectionSpan(
+                      textLines: textLines,
+                      type: 'underLine',
+                      pageNumber: pageNumber,
+                      color: underLineAnnotation.color.toARGB32(),
+                      opacity: underLineAnnotation.opacity,
                     );
 
-                    PDFUtils.saveBookSelectionOnFirebase(bookId, selects);
+                    selectionProvider.addSpan(bookId, selects);
+                    selectionProvider.savePageSelections(bookId, pageNumber);
                   }
                 },
                 child: const Text('Underline', style: TextStyle(fontSize: 15)),
@@ -328,14 +349,17 @@ class _PdfViewerState extends State<PdfViewer> {
                         );
                     _pdfViewerController.addAnnotation(strikethroughAnnotation);
 
-                    final selects = prepareSelectionSpan(
-                      textLines,
-                      'strikethrough',
-                      strikethroughAnnotation.color.toARGB32(),
-                      strikethroughAnnotation.opacity,
+                    final pageNumber = textLines.first.pageNumber;
+                    final selects = SelectionSpan(
+                      textLines: textLines,
+                      type: 'strikethrough',
+                      pageNumber: pageNumber,
+                      color: strikethroughAnnotation.color.toARGB32(),
+                      opacity: strikethroughAnnotation.opacity,
                     );
 
-                    PDFUtils.saveBookSelectionOnFirebase(bookId, selects);
+                    selectionProvider.addSpan(bookId, selects);
+                    selectionProvider.savePageSelections(bookId, pageNumber);
                   }
                 },
                 child: const Text(
@@ -353,14 +377,17 @@ class _PdfViewerState extends State<PdfViewer> {
                         SquigglyAnnotation(textBoundsCollection: textLines);
                     _pdfViewerController.addAnnotation(squigglyAnnotation);
 
-                    final selects = prepareSelectionSpan(
-                      textLines,
-                      'squiggly',
-                      squigglyAnnotation.color.toARGB32(),
-                      squigglyAnnotation.opacity,
+                    final pageNumber = textLines.first.pageNumber;
+                    final span = SelectionSpan(
+                      textLines: textLines,
+                      type: 'squiggly',
+                      pageNumber: pageNumber,
+                      color: squigglyAnnotation.color.toARGB32(),
+                      opacity: squigglyAnnotation.opacity,
                     );
 
-                    PDFUtils.saveBookSelectionOnFirebase(bookId, selects);
+                    selectionProvider.addSpan(bookId, span);
+                    selectionProvider.savePageSelections(bookId, pageNumber);
                   }
                 },
                 child: const Text('Squiggly', style: TextStyle(fontSize: 15)),
@@ -371,35 +398,6 @@ class _PdfViewerState extends State<PdfViewer> {
       ),
     );
     overlayState.insert(_overlayEntry!);
-  }
-
-  /// We are assuming that all text markings are on the same page.
-  SelectionSpan prepareSelectionSpan(
-    List<PdfTextLine> textLines,
-    String type,
-    int color,
-    double opacity,
-  ) {
-    List<PdfSelection> selections = [];
-    for (final line in textLines) {
-      final bounds = [
-        line.bounds.left,
-        line.bounds.top,
-        line.bounds.right,
-        line.bounds.bottom,
-      ];
-
-      final selection = PdfSelection(text: line.text, rect: bounds);
-      selections.add(selection);
-    }
-
-    return SelectionSpan(
-      textLines: selections,
-      type: type,
-      pageNumber: textLines.first.pageNumber,
-      color: color,
-      opacity: opacity,
-    );
   }
 }
 
