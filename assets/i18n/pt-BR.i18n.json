@@ -41,7 +41,8 @@
         "next": "Próximo",
         "previousInstance": "Instância anterior",
         "nextInstance": "Próxima instância",
-        "of": "de"
+        "of": "de",
+        "annotationSaveError": "Falha ao salvar anotação."
     },
     "authMessages": {
         "prompt": {

@@ -1,0 +1,9 @@
+# Este arquivo vai na raiz do seu projeto
+
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          # Gera chamadas .toJson() para objetos aninhados
+          explicit_to_json: true

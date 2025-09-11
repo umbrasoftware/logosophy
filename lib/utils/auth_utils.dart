@@ -73,7 +73,7 @@ class AuthUtils {
         for (int i = 1; i <= 17; i++) {
           final bookId = i.toString().padLeft(3, '0');
           final bookRef = userRef.collection('books').doc(bookId);
-          batch.set(bookRef, {"notes": {}, "selections": {}});
+          batch.set(bookRef, {"bookId": bookId, "notes": {}, "selections": {}});
         }
 
         // Commit the batch.

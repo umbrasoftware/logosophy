@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logosophy/database/books/book_selections.dart';
+import 'package:logosophy/database/books/book.dart';
+import 'package:logosophy/database/books/book_provider.dart';
+import 'package:logosophy/database/books/rect_converter.dart';
 import 'package:logosophy/database/books/selection_span.dart';
-import 'package:logosophy/database/books/books_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
@@ -29,8 +30,8 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
   late bool _showToolbar;
   late bool _showScrollHead;
   late String bookId;
-  late SelectionsNotifier selectionProvider;
-  late Books? selections;
+  late Book book;
+  late BookNotifier bookProvider;
 
   /// Ensure the entry history of Text search.
   LocalHistoryEntry? _historyEntry;
@@ -40,7 +41,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     bookId = widget.file.path.split('/').last.split('.').first;
     _showToolbar = false;
     _showScrollHead = true;
-    selectionProvider = ref.read(selectionsNotifierProvider.notifier);
+    bookProvider = ref.read(bookNotifierProvider.notifier);
     super.initState();
   }
 
@@ -124,10 +125,9 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
             canShowTextSelectionMenu: false,
             canShowScrollHead: _showScrollHead,
             onDocumentLoaded: (details) async {
-              selections = await selectionProvider.getBookSelections(bookId);
-              if (selections != null) {
-                applySelections(selections!);
-              }
+              await ref.read(bookNotifierProvider.notifier).getBook(bookId);
+              book = ref.read(bookNotifierProvider);
+              applySelections();
             },
             onTextSelectionChanged: (PdfTextSelectionChangedDetails details) {
               if (details.selectedText == null && _overlayEntry != null) {
@@ -172,25 +172,18 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     );
   }
 
-  void applySelections(Books selections) {
-    selections.bookSelections.forEach((pageNumber, spans) {
-      List<PdfTextLine> textLines = [];
+  void applySelections() {
+    for (final entry in book.selections.entries) {
+      final page = int.parse(entry.key);
+      final selectionSpan = entry.value;
 
-      for (final selectionSpan in spans) {
-        for (final textLine in selectionSpan.textLines) {
-          final rect = Rect.fromLTRB(
-            textLine.bounds.left,
-            textLine.bounds.top,
-            textLine.bounds.right,
-            textLine.bounds.bottom,
-          );
-          textLines.add(
-            PdfTextLine(rect, textLine.text, int.parse(pageNumber)),
-          );
+      // Begings processing for a page:
+      for (final span in selectionSpan) {
+        List<PdfTextLine> textLines = [];
+        for (final textLine in span.textLines) {
+          textLines.add(PdfTextLine(textLine.bounds, textLine.text, page));
         }
-      }
 
-      for (final span in spans) {
         switch (span.type) {
           case 'highlight':
             final highlight = HighlightAnnotation(
@@ -228,7 +221,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
             break;
         }
       }
-    });
+    }
   }
 
   void _showContextMenu(
@@ -298,16 +291,29 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
                     _pdfViewerController.addAnnotation(highlightAnnotation);
 
                     final pageNumber = textLines.first.pageNumber;
-                    final selects = SelectionSpan(
-                      textLines: textLines,
+                    // Convert PdfTextLine to a serializable Map.
+                    final span = SelectionSpan(
+                      textLines: textLines
+                          .map(
+                            (line) => SerializablePdfTextLine(
+                              text: line.text,
+                              bounds: line.bounds,
+                            ),
+                          )
+                          .toList(),
                       type: 'highlight',
                       pageNumber: pageNumber,
                       color: highlightAnnotation.color.toARGB32(),
                       opacity: highlightAnnotation.opacity,
                     );
 
-                    selectionProvider.addSpan(bookId, selects);
-                    selectionProvider.savePageSelections(bookId, pageNumber);
+                    final existingSpans =
+                        book.selections[pageNumber.toString()] ?? [];
+                    bookProvider.updateSelectionsForPage(pageNumber, [
+                      ...existingSpans,
+                      span,
+                    ]);
+                    _pdfViewerController.clearSelection();
                   }
                 },
                 child: const Text('Highlight', style: TextStyle(fontSize: 15)),
@@ -323,16 +329,29 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
                     _pdfViewerController.addAnnotation(underLineAnnotation);
 
                     final pageNumber = textLines.first.pageNumber;
-                    final selects = SelectionSpan(
-                      textLines: textLines,
-                      type: 'underLine',
+                    // Convert PdfTextLine to a serializable Map.
+                    final span = SelectionSpan(
+                      textLines: textLines
+                          .map(
+                            (line) => SerializablePdfTextLine(
+                              text: line.text,
+                              bounds: line.bounds,
+                            ),
+                          )
+                          .toList(),
+                      type: 'underline',
                       pageNumber: pageNumber,
                       color: underLineAnnotation.color.toARGB32(),
                       opacity: underLineAnnotation.opacity,
                     );
 
-                    selectionProvider.addSpan(bookId, selects);
-                    selectionProvider.savePageSelections(bookId, pageNumber);
+                    final existingSpans =
+                        book.selections[pageNumber.toString()] ?? [];
+                    bookProvider.updateSelectionsForPage(pageNumber, [
+                      ...existingSpans,
+                      span,
+                    ]);
+                    _pdfViewerController.clearSelection();
                   }
                 },
                 child: const Text('Underline', style: TextStyle(fontSize: 15)),
@@ -350,16 +369,29 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
                     _pdfViewerController.addAnnotation(strikethroughAnnotation);
 
                     final pageNumber = textLines.first.pageNumber;
-                    final selects = SelectionSpan(
-                      textLines: textLines,
+                    // Convert PdfTextLine to a serializable Map.
+                    final span = SelectionSpan(
+                      textLines: textLines
+                          .map(
+                            (line) => SerializablePdfTextLine(
+                              text: line.text,
+                              bounds: line.bounds,
+                            ),
+                          )
+                          .toList(),
                       type: 'strikethrough',
                       pageNumber: pageNumber,
                       color: strikethroughAnnotation.color.toARGB32(),
                       opacity: strikethroughAnnotation.opacity,
                     );
 
-                    selectionProvider.addSpan(bookId, selects);
-                    selectionProvider.savePageSelections(bookId, pageNumber);
+                    final existingSpans =
+                        book.selections[pageNumber.toString()] ?? [];
+                    bookProvider.updateSelectionsForPage(pageNumber, [
+                      ...existingSpans,
+                      span,
+                    ]);
+                    _pdfViewerController.clearSelection();
                   }
                 },
                 child: const Text(
@@ -378,16 +410,29 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
                     _pdfViewerController.addAnnotation(squigglyAnnotation);
 
                     final pageNumber = textLines.first.pageNumber;
+                    // Convert PdfTextLine to a serializable Map.
                     final span = SelectionSpan(
-                      textLines: textLines,
+                      textLines: textLines
+                          .map(
+                            (line) => SerializablePdfTextLine(
+                              text: line.text,
+                              bounds: line.bounds,
+                            ),
+                          )
+                          .toList(),
                       type: 'squiggly',
                       pageNumber: pageNumber,
                       color: squigglyAnnotation.color.toARGB32(),
                       opacity: squigglyAnnotation.opacity,
                     );
 
-                    selectionProvider.addSpan(bookId, span);
-                    selectionProvider.savePageSelections(bookId, pageNumber);
+                    final existingSpans =
+                        book.selections[pageNumber.toString()] ?? [];
+                    bookProvider.updateSelectionsForPage(pageNumber, [
+                      ...existingSpans,
+                      span,
+                    ]);
+                    _pdfViewerController.clearSelection();
                   }
                 },
                 child: const Text('Squiggly', style: TextStyle(fontSize: 15)),

@@ -113,6 +113,7 @@ class _TranslationsBookPagePtBr implements TranslationsBookPageEn {
 	@override String get previousInstance => 'Instância anterior';
 	@override String get nextInstance => 'Próxima instância';
 	@override String get of => 'de';
+	@override String get annotationSaveError => 'Falha ao salvar anotação.';
 }
 
 // Path: authMessages
@@ -209,6 +210,7 @@ extension on TranslationsPtBr {
 			case 'bookPage.previousInstance': return 'Instância anterior';
 			case 'bookPage.nextInstance': return 'Próxima instância';
 			case 'bookPage.of': return 'de';
+			case 'bookPage.annotationSaveError': return 'Falha ao salvar anotação.';
 			case 'authMessages.prompt.askPassword': return 'Digite a senha';
 			case 'authMessages.prompt.askEmail': return 'Digite seu email';
 			case 'authMessages.prompt.askAuthenticate': return 'Por favor, se autentique para entrar no aplicativo.';
