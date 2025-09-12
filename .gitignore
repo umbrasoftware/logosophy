@@ -7,7 +7,7 @@
 .buildlog/
 .history
 .env
-books/
+/books/
 output.json
 firebase_options.dart
 firebase.json
