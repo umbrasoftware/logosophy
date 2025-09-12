@@ -42,7 +42,11 @@
         "previousInstance": "Instância anterior",
         "nextInstance": "Próxima instância",
         "of": "de",
-        "annotationSaveError": "Falha ao salvar anotação."
+        "highlight": "Destacar",
+        "underline": "Sublinhar",
+        "strikethrough": "Riscar",
+        "squiggly": "Ondular",
+        "copy": "Copiar"
     },
     "authMessages": {
         "prompt": {

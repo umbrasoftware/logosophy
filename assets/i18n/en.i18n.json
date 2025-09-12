@@ -41,7 +41,12 @@
         "next": "Next",
         "previousInstance": "Previous instance",
         "nextInstance": "Next instance",
-        "of": "of"
+        "of": "of",
+        "highlight": "Highlight",
+        "underline": "Underline",
+        "strikethrough": "Strikethrough",
+        "squiggly": "Squiggly",
+        "copy": "Copy"
     },
     "authMessages": {
         "prompt": {

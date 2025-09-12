@@ -188,6 +188,21 @@ class TranslationsBookPageEn {
 
 	/// en: 'of'
 	String get of => 'of';
+
+	/// en: 'Highlight'
+	String get highlight => 'Highlight';
+
+	/// en: 'Underline'
+	String get underline => 'Underline';
+
+	/// en: 'Strikethrough'
+	String get strikethrough => 'Strikethrough';
+
+	/// en: 'Squiggly'
+	String get squiggly => 'Squiggly';
+
+	/// en: 'Copy'
+	String get copy => 'Copy';
 }
 
 // Path: authMessages
@@ -332,6 +347,11 @@ extension on Translations {
 			case 'bookPage.previousInstance': return 'Previous instance';
 			case 'bookPage.nextInstance': return 'Next instance';
 			case 'bookPage.of': return 'of';
+			case 'bookPage.highlight': return 'Highlight';
+			case 'bookPage.underline': return 'Underline';
+			case 'bookPage.strikethrough': return 'Strikethrough';
+			case 'bookPage.squiggly': return 'Squiggly';
+			case 'bookPage.copy': return 'Copy';
 			case 'authMessages.prompt.askPassword': return 'Enter password';
 			case 'authMessages.prompt.askEmail': return 'Enter email';
 			case 'authMessages.prompt.askAuthenticate': return 'Please authenticate to enter the app.';

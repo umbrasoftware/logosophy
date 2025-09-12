@@ -278,7 +278,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
                     _pdfViewerController.clearSelection();
                   }
                 },
-                child: const Text('Copy', style: TextStyle(fontSize: 15)),
+                child: Text(t.bookPage.copy, style: TextStyle(fontSize: 15)),
               ),
               TextButton(
                 onPressed: () {
@@ -316,7 +316,10 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
                     _pdfViewerController.clearSelection();
                   }
                 },
-                child: const Text('Highlight', style: TextStyle(fontSize: 15)),
+                child: Text(
+                  t.bookPage.highlight,
+                  style: TextStyle(fontSize: 15),
+                ),
               ),
               TextButton(
                 onPressed: () {
@@ -354,7 +357,10 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
                     _pdfViewerController.clearSelection();
                   }
                 },
-                child: const Text('Underline', style: TextStyle(fontSize: 15)),
+                child: Text(
+                  t.bookPage.underline,
+                  style: TextStyle(fontSize: 15),
+                ),
               ),
               TextButton(
                 onPressed: () {
@@ -394,8 +400,8 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
                     _pdfViewerController.clearSelection();
                   }
                 },
-                child: const Text(
-                  'Strikethrough',
+                child: Text(
+                  t.bookPage.strikethrough,
                   style: TextStyle(fontSize: 15),
                 ),
               ),
@@ -435,7 +441,10 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
                     _pdfViewerController.clearSelection();
                   }
                 },
-                child: const Text('Squiggly', style: TextStyle(fontSize: 15)),
+                child: Text(
+                  t.bookPage.squiggly,
+                  style: TextStyle(fontSize: 15),
+                ),
               ),
             ],
           ),
