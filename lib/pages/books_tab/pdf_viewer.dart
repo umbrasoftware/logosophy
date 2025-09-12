@@ -5,16 +5,19 @@ import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logosophy/database/books/book.dart';
+import 'package:logosophy/database/books/book_cache.dart';
 import 'package:logosophy/database/books/book_provider.dart';
 import 'package:logosophy/database/books/rect_converter.dart';
 import 'package:logosophy/database/books/selection_span.dart';
 import 'package:logosophy/gen/strings.g.dart';
+import 'package:logosophy/utils/pdf_utils.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class PdfViewer extends ConsumerStatefulWidget {
-  const PdfViewer({super.key, required this.file});
+  const PdfViewer({super.key, required this.file, this.page});
 
   final File file;
+  final int? page;
 
   @override
   ConsumerState<PdfViewer> createState() => _PdfViewerState();
@@ -125,10 +128,30 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
             canShowTextSelectionMenu: false,
             canShowScrollHead: _showScrollHead,
             onDocumentLoaded: (details) async {
+              if (widget.page != null) {
+                _pdfViewerController.jumpToPage(widget.page!);
+              } else {
+                final position = BookCache().getPosition(bookId);
+
+                Future.delayed(const Duration(milliseconds: 200), () {
+                  if (mounted) {
+                    _pdfViewerController.zoomLevel = position.zoom;
+                    _pdfViewerController.jumpTo(
+                      xOffset: position.offset.dx,
+                      yOffset: position.offset.dy,
+                    );
+                  }
+                });
+              }
+
               await ref.read(bookNotifierProvider.notifier).getBook(bookId);
               book = ref.read(bookNotifierProvider);
-              applySelections();
+              PDFUtils.applySelections(_pdfViewerController, book.selections);
             },
+            onPageChanged: (_) =>
+                PDFUtils.savePosition(bookId, _pdfViewerController),
+            onZoomLevelChanged: (_) =>
+                PDFUtils.savePosition(bookId, _pdfViewerController),
             onTextSelectionChanged: (PdfTextSelectionChangedDetails details) {
               if (details.selectedText == null && _overlayEntry != null) {
                 _overlayEntry!.remove();
@@ -170,58 +193,6 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
         ],
       ),
     );
-  }
-
-  void applySelections() {
-    for (final entry in book.selections.entries) {
-      final page = int.parse(entry.key);
-      final selectionSpan = entry.value;
-
-      // Begings processing for a page:
-      for (final span in selectionSpan) {
-        List<PdfTextLine> textLines = [];
-        for (final textLine in span.textLines) {
-          textLines.add(PdfTextLine(textLine.bounds, textLine.text, page));
-        }
-
-        switch (span.type) {
-          case 'highlight':
-            final highlight = HighlightAnnotation(
-              textBoundsCollection: textLines,
-            );
-            highlight.color = Color(span.color);
-            highlight.opacity = span.opacity;
-            _pdfViewerController.addAnnotation(highlight);
-            break;
-          case 'underline':
-            final underline = UnderlineAnnotation(
-              textBoundsCollection: textLines,
-            );
-            underline.color = Color(span.color);
-            underline.opacity = span.opacity;
-            _pdfViewerController.addAnnotation(underline);
-            break;
-          case 'strikethrough':
-            final strikethrough = StrikethroughAnnotation(
-              textBoundsCollection: textLines,
-            );
-            strikethrough.color = Color(span.color);
-            strikethrough.opacity = span.opacity;
-            _pdfViewerController.addAnnotation(strikethrough);
-            break;
-          case 'squiggly':
-            final squiggly = SquigglyAnnotation(
-              textBoundsCollection: textLines,
-            );
-            squiggly.color = Color(span.color);
-            squiggly.opacity = span.opacity;
-            _pdfViewerController.addAnnotation(squiggly);
-            break;
-          default:
-            break;
-        }
-      }
-    }
   }
 
   void _showContextMenu(

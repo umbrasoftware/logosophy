@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logosophy/database/books/book_cache.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/router.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
@@ -27,6 +28,8 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    BookCache().init();
+
     return MaterialApp.router(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,

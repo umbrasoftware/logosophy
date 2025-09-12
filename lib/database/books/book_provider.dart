@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logging/logging.dart';
 import 'package:logosophy/database/books/book.dart';
+import 'package:logosophy/database/books/book_cache.dart';
 import 'package:logosophy/database/books/notes.dart';
 import 'package:logosophy/database/books/selection_span.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -32,13 +33,20 @@ class BookNotifier extends _$BookNotifier {
         .collection('books')
         .doc(bookId);
 
-    final docSnapshot = await docRef.get();
+    final source = BookCache().isBookFresh(bookId)
+        ? Source.cache
+        : Source.server;
+
+    final docSnapshot = await docRef.get(GetOptions(source: source));
 
     if (docSnapshot.exists) {
       _logger.info('Got $bookId book from Firestore.');
       state = Book.fromJson(docSnapshot.data()!);
+
+      if (source == Source.server) {
+        BookCache().updateBook(bookId);
+      }
     }
-    return;
   }
 
   // Função para salvar o livro inteiro (sem alterações)
