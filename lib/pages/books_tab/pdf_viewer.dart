@@ -30,6 +30,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
   final GlobalKey<SearchToolbarState> _textSearchKey = GlobalKey();
   final GlobalKey<SfPdfViewerState> _pdfViewerKey = GlobalKey();
   OverlayEntry? _overlayEntry;
+  OverlayEntry? _annotationsOverlay;
   late bool _showToolbar;
   late bool _showScrollHead;
   late String bookId;
@@ -57,6 +58,11 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
         route.addLocalHistoryEntry(_historyEntry!);
       }
     }
+  }
+
+  void _hideAnnotationsOverlay() {
+    _annotationsOverlay?.remove();
+    _annotationsOverlay = null;
   }
 
   /// Remove history entry for text search.
@@ -105,6 +111,10 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
           : AppBar(
               actions: [
                 IconButton(icon: Icon(Icons.note_add_sharp), onPressed: () {}),
+                IconButton(
+                  icon: Icon(Icons.bookmark),
+                  onPressed: _showNotesOverlay,
+                ),
                 const Spacer(),
                 IconButton(
                   icon: Icon(Icons.search),
@@ -423,6 +433,113 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
       ),
     );
     overlayState.insert(_overlayEntry!);
+  }
+
+  // Dentro da classe _PdfViewerState
+
+  void _showNotesOverlay() {
+    // Previne a criação de múltiplos overlays
+    if (_annotationsOverlay != null) {
+      return;
+    }
+
+    final annotations = _pdfViewerController.getAnnotations();
+
+    if (annotations.isEmpty) {
+      _hideAnnotationsOverlay();
+      return;
+    }
+
+    final overlay = Overlay.of(context);
+
+    _annotationsOverlay = OverlayEntry(
+      builder: (context) {
+        // Usamos um GestureDetector para capturar toques fora do card e fechar o overlay
+        return GestureDetector(
+          onTap: _hideAnnotationsOverlay, // Chama a função para esconder
+          child: Container(
+            // Fundo semi-transparente para focar no overlay
+            color: Colors.black.withAlpha(126),
+            child: Center(
+              // Center alinha nosso card no meio da tela
+              child: GestureDetector(
+                onTap: () {}, // Impede que o toque no card feche o overlay
+                child: SizedBox(
+                  // Define o tamanho do nosso card
+                  width: MediaQuery.of(context).size.width * 0.85,
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  child: Material(
+                    elevation: 4.0,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Column(
+                      children: [
+                        // 1. CABEÇALHO (Não rolável)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Anotações do livro', // Ou qualquer título
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed:
+                                    _hideAnnotationsOverlay, // Botão para fechar
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Divider(height: 1),
+
+                        // 2. CORPO (Rolável)
+                        Expanded(
+                          child: ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: annotations.length,
+                            itemBuilder: (context, index) {
+                              return Card(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                child: ListTile(
+                                  trailing: IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _pdfViewerController.removeAnnotation(
+                                          annotations[index],
+                                        );
+                                      });
+                                    },
+                                    icon: Icon(
+                                      Icons.delete_outline,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                  title: Text(
+                                    'Página ${annotations[index].pageNumber}',
+                                  ),
+                                  subtitle: Text(
+                                    annotations[index].name ?? 'error',
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    // Insere o overlay na tela
+    overlay.insert(_annotationsOverlay!);
   }
 }
 
