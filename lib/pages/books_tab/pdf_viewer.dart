@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
@@ -7,11 +6,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logosophy/database/books/book.dart';
 import 'package:logosophy/database/books/book_cache.dart';
 import 'package:logosophy/database/books/book_provider.dart';
-import 'package:logosophy/database/books/rect_converter.dart';
-import 'package:logosophy/database/books/selection_span.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/utils/pdf_utils.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+
+// Imports para os novos arquivos de overlay
+import 'annotations_overlay.dart';
+import 'searchbar_overlay.dart';
 
 class PdfViewer extends ConsumerStatefulWidget {
   const PdfViewer({super.key, required this.file, this.page});
@@ -37,7 +38,6 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
   late Book book;
   late BookNotifier bookProvider;
 
-  /// Ensure the entry history of Text search.
   LocalHistoryEntry? _historyEntry;
 
   @override
@@ -49,7 +49,6 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     super.initState();
   }
 
-  /// Ensure the entry history of text search.
   void _ensureHistoryEntry() {
     if (_historyEntry == null) {
       final ModalRoute<dynamic>? route = ModalRoute.of(context);
@@ -65,7 +64,6 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     _annotationsOverlay = null;
   }
 
-  /// Remove history entry for text search.
   void _handleHistoryEntryRemoved() {
     _textSearchKey.currentState?.clearSearch();
     setState(() {
@@ -77,58 +75,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _showToolbar
-          ? AppBar(
-              flexibleSpace: SafeArea(
-                child: SearchToolbar(
-                  key: _textSearchKey,
-                  showTooltip: true,
-                  controller: _pdfViewerController,
-                  onTap: (Object toolbarItem) async {
-                    if (toolbarItem.toString() == t.bookPage.cancelSearch) {
-                      setState(() {
-                        _showToolbar = false;
-                        _showScrollHead = true;
-                        if (Navigator.canPop(context)) {
-                          Navigator.maybePop(context);
-                        }
-                      });
-                    }
-                    if (toolbarItem.toString() == 'noResultFound') {
-                      setState(() {
-                        _textSearchKey.currentState?._showToast = true;
-                      });
-                      await Future.delayed(Duration(seconds: 1));
-                      setState(() {
-                        _textSearchKey.currentState?._showToast = false;
-                      });
-                    }
-                  },
-                ),
-              ),
-              automaticallyImplyLeading: false,
-            )
-          : AppBar(
-              actions: [
-                IconButton(icon: Icon(Icons.note_add_sharp), onPressed: () {}),
-                IconButton(
-                  icon: Icon(Icons.bookmark),
-                  onPressed: _showNotesOverlay,
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: Icon(Icons.search),
-                  onPressed: () {
-                    setState(() {
-                      _showScrollHead = false;
-                      _showToolbar = true;
-                      _ensureHistoryEntry();
-                    });
-                  },
-                ),
-              ],
-              automaticallyImplyLeading: false,
-            ),
+      appBar: _showToolbar ? buildSearchToolbar(context) : buildAppBar(),
       body: Stack(
         children: [
           SfPdfViewer.file(
@@ -172,36 +119,89 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
               }
             },
           ),
-          Visibility(
-            visible: _textSearchKey.currentState?._showToast ?? false,
-            child: Align(
-              alignment: Alignment.center,
-              child: Flex(
-                direction: Axis.horizontal,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(
-                      left: 15,
-                      top: 7,
-                      right: 15,
-                      bottom: 7,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(16.0)),
-                    ),
-                    child: Text(
-                      t.bookPage.noResult,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontFamily: 'Roboto', fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          buildSearchVisibility(),
         ],
       ),
+    );
+  }
+
+  Visibility buildSearchVisibility() {
+    return Visibility(
+      visible: _textSearchKey.currentState?.showToast ?? false,
+      child: Align(
+        alignment: Alignment.center,
+        child: Flex(
+          direction: Axis.horizontal,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.only(left: 15, top: 7, right: 15, bottom: 7),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(16.0)),
+              ),
+              child: Text(
+                t.bookPage.noResult,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontFamily: 'Roboto', fontSize: 16),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  AppBar buildAppBar() {
+    return AppBar(
+      actions: [
+        IconButton(icon: Icon(Icons.note_add_sharp), onPressed: () {}),
+        IconButton(icon: Icon(Icons.bookmark), onPressed: _showNotesOverlay),
+        const Spacer(),
+        IconButton(
+          icon: Icon(Icons.search),
+          onPressed: () {
+            setState(() {
+              _showScrollHead = false;
+              _showToolbar = true;
+              _ensureHistoryEntry();
+            });
+          },
+        ),
+      ],
+      automaticallyImplyLeading: false,
+    );
+  }
+
+  AppBar buildSearchToolbar(BuildContext context) {
+    return AppBar(
+      flexibleSpace: SafeArea(
+        child: SearchToolbar(
+          key: _textSearchKey,
+          showTooltip: true,
+          controller: _pdfViewerController,
+          onTap: (Object toolbarItem) async {
+            if (toolbarItem.toString() == t.bookPage.cancelSearch) {
+              setState(() {
+                _showToolbar = false;
+                _showScrollHead = true;
+                if (Navigator.canPop(context)) {
+                  Navigator.maybePop(context);
+                }
+              });
+            }
+            if (toolbarItem.toString() == 'noResultFound') {
+              setState(() {
+                _textSearchKey.currentState?.showToast = true;
+              });
+              await Future.delayed(Duration(seconds: 1));
+              setState(() {
+                _textSearchKey.currentState?.showToast = false;
+              });
+            }
+          },
+        ),
+      ),
+      automaticallyImplyLeading: false,
     );
   }
 
@@ -262,166 +262,48 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
                 child: Text(t.bookPage.copy, style: TextStyle(fontSize: 15)),
               ),
               TextButton(
-                onPressed: () {
-                  final List<PdfTextLine>? textLines = _pdfViewerKey
-                      .currentState
-                      ?.getSelectedTextLines();
-                  if (textLines != null && textLines.isNotEmpty) {
-                    final HighlightAnnotation highlightAnnotation =
-                        HighlightAnnotation(textBoundsCollection: textLines);
-                    _pdfViewerController.addAnnotation(highlightAnnotation);
-
-                    final pageNumber = textLines.first.pageNumber;
-                    // Convert PdfTextLine to a serializable Map.
-                    final span = SelectionSpan(
-                      textLines: textLines
-                          .map(
-                            (line) => SerializablePdfTextLine(
-                              text: line.text,
-                              bounds: line.bounds,
-                            ),
-                          )
-                          .toList(),
-                      type: 'highlight',
-                      pageNumber: pageNumber,
-                      color: highlightAnnotation.color.toARGB32(),
-                      opacity: highlightAnnotation.opacity,
-                    );
-
-                    final existingSpans =
-                        book.selections[pageNumber.toString()] ?? [];
-                    bookProvider.updateSelectionsForPage(pageNumber, [
-                      ...existingSpans,
-                      span,
-                    ]);
-                    _pdfViewerController.clearSelection();
-                  }
-                },
+                onPressed: () => PDFUtils.onAddHighlight(
+                  _pdfViewerKey,
+                  _pdfViewerController,
+                  book,
+                  bookProvider,
+                ),
                 child: Text(
                   t.bookPage.highlight,
                   style: TextStyle(fontSize: 15),
                 ),
               ),
               TextButton(
-                onPressed: () {
-                  final List<PdfTextLine>? textLines = _pdfViewerKey
-                      .currentState
-                      ?.getSelectedTextLines();
-                  if (textLines != null && textLines.isNotEmpty) {
-                    final UnderlineAnnotation underLineAnnotation =
-                        UnderlineAnnotation(textBoundsCollection: textLines);
-                    _pdfViewerController.addAnnotation(underLineAnnotation);
-
-                    final pageNumber = textLines.first.pageNumber;
-                    // Convert PdfTextLine to a serializable Map.
-                    final span = SelectionSpan(
-                      textLines: textLines
-                          .map(
-                            (line) => SerializablePdfTextLine(
-                              text: line.text,
-                              bounds: line.bounds,
-                            ),
-                          )
-                          .toList(),
-                      type: 'underline',
-                      pageNumber: pageNumber,
-                      color: underLineAnnotation.color.toARGB32(),
-                      opacity: underLineAnnotation.opacity,
-                    );
-
-                    final existingSpans =
-                        book.selections[pageNumber.toString()] ?? [];
-                    bookProvider.updateSelectionsForPage(pageNumber, [
-                      ...existingSpans,
-                      span,
-                    ]);
-                    _pdfViewerController.clearSelection();
-                  }
-                },
+                onPressed: () => PDFUtils.onAddUnderline(
+                  _pdfViewerKey,
+                  _pdfViewerController,
+                  book,
+                  bookProvider,
+                ),
                 child: Text(
                   t.bookPage.underline,
                   style: TextStyle(fontSize: 15),
                 ),
               ),
               TextButton(
-                onPressed: () {
-                  final List<PdfTextLine>? textLines = _pdfViewerKey
-                      .currentState
-                      ?.getSelectedTextLines();
-                  if (textLines != null && textLines.isNotEmpty) {
-                    final StrikethroughAnnotation strikethroughAnnotation =
-                        StrikethroughAnnotation(
-                          textBoundsCollection: textLines,
-                        );
-                    _pdfViewerController.addAnnotation(strikethroughAnnotation);
-
-                    final pageNumber = textLines.first.pageNumber;
-                    // Convert PdfTextLine to a serializable Map.
-                    final span = SelectionSpan(
-                      textLines: textLines
-                          .map(
-                            (line) => SerializablePdfTextLine(
-                              text: line.text,
-                              bounds: line.bounds,
-                            ),
-                          )
-                          .toList(),
-                      type: 'strikethrough',
-                      pageNumber: pageNumber,
-                      color: strikethroughAnnotation.color.toARGB32(),
-                      opacity: strikethroughAnnotation.opacity,
-                    );
-
-                    final existingSpans =
-                        book.selections[pageNumber.toString()] ?? [];
-                    bookProvider.updateSelectionsForPage(pageNumber, [
-                      ...existingSpans,
-                      span,
-                    ]);
-                    _pdfViewerController.clearSelection();
-                  }
-                },
+                onPressed: () => PDFUtils.onAddStrikethrough(
+                  _pdfViewerKey,
+                  _pdfViewerController,
+                  book,
+                  bookProvider,
+                ),
                 child: Text(
                   t.bookPage.strikethrough,
                   style: TextStyle(fontSize: 15),
                 ),
               ),
               TextButton(
-                onPressed: () {
-                  final List<PdfTextLine>? textLines = _pdfViewerKey
-                      .currentState
-                      ?.getSelectedTextLines();
-                  if (textLines != null && textLines.isNotEmpty) {
-                    final SquigglyAnnotation squigglyAnnotation =
-                        SquigglyAnnotation(textBoundsCollection: textLines);
-                    _pdfViewerController.addAnnotation(squigglyAnnotation);
-
-                    final pageNumber = textLines.first.pageNumber;
-                    // Convert PdfTextLine to a serializable Map.
-                    final span = SelectionSpan(
-                      textLines: textLines
-                          .map(
-                            (line) => SerializablePdfTextLine(
-                              text: line.text,
-                              bounds: line.bounds,
-                            ),
-                          )
-                          .toList(),
-                      type: 'squiggly',
-                      pageNumber: pageNumber,
-                      color: squigglyAnnotation.color.toARGB32(),
-                      opacity: squigglyAnnotation.opacity,
-                    );
-
-                    final existingSpans =
-                        book.selections[pageNumber.toString()] ?? [];
-                    bookProvider.updateSelectionsForPage(pageNumber, [
-                      ...existingSpans,
-                      span,
-                    ]);
-                    _pdfViewerController.clearSelection();
-                  }
-                },
+                onPressed: () => PDFUtils.onAddSquiggly(
+                  _pdfViewerKey,
+                  _pdfViewerController,
+                  book,
+                  bookProvider,
+                ),
                 child: Text(
                   t.bookPage.squiggly,
                   style: TextStyle(fontSize: 15),
@@ -435,364 +317,32 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     overlayState.insert(_overlayEntry!);
   }
 
-  // Dentro da classe _PdfViewerState
-
+  // MÉTODO ATUALIZADO PARA USAR O NOVO WIDGET
   void _showNotesOverlay() {
-    // Previne a criação de múltiplos overlays
     if (_annotationsOverlay != null) {
       return;
     }
 
     final annotations = _pdfViewerController.getAnnotations();
-
     if (annotations.isEmpty) {
-      _hideAnnotationsOverlay();
+      // Opcional: Mostrar uma mensagem de que não há anotações
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nenhuma anotação encontrada.')),
+      );
       return;
     }
 
     final overlay = Overlay.of(context);
-
     _annotationsOverlay = OverlayEntry(
       builder: (context) {
-        // Usamos um GestureDetector para capturar toques fora do card e fechar o overlay
-        return GestureDetector(
-          onTap: _hideAnnotationsOverlay, // Chama a função para esconder
-          child: Container(
-            // Fundo semi-transparente para focar no overlay
-            color: Colors.black.withAlpha(126),
-            child: Center(
-              // Center alinha nosso card no meio da tela
-              child: GestureDetector(
-                onTap: () {}, // Impede que o toque no card feche o overlay
-                child: SizedBox(
-                  // Define o tamanho do nosso card
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  height: MediaQuery.of(context).size.height * 0.7,
-                  child: Material(
-                    elevation: 4.0,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Column(
-                      children: [
-                        // 1. CABEÇALHO (Não rolável)
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Anotações do livro', // Ou qualquer título
-                                style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.close),
-                                onPressed:
-                                    _hideAnnotationsOverlay, // Botão para fechar
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Divider(height: 1),
-
-                        // 2. CORPO (Rolável)
-                        Expanded(
-                          child: ListView.builder(
-                            padding: const EdgeInsets.all(16),
-                            itemCount: annotations.length,
-                            itemBuilder: (context, index) {
-                              return Card(
-                                margin: const EdgeInsets.only(bottom: 12),
-                                child: ListTile(
-                                  trailing: IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        _pdfViewerController.removeAnnotation(
-                                          annotations[index],
-                                        );
-                                      });
-                                    },
-                                    icon: Icon(
-                                      Icons.delete_outline,
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                  title: Text(
-                                    'Página ${annotations[index].pageNumber}',
-                                  ),
-                                  subtitle: Text(
-                                    annotations[index].name ?? 'error',
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+        // Agora apenas chamamos nosso widget encapsulado, passando o que ele precisa.
+        return AnnotationsOverlay(
+          controller: _pdfViewerController,
+          onClose: _hideAnnotationsOverlay,
         );
       },
     );
 
-    // Insere o overlay na tela
     overlay.insert(_annotationsOverlay!);
-  }
-}
-
-/// Signature for the [SearchToolbar.onTap] callback.
-typedef SearchTapCallback = void Function(Object item);
-
-/// SearchToolbar widget
-class SearchToolbar extends StatefulWidget {
-  ///it describe the search toolbar constructor
-  const SearchToolbar({
-    this.controller,
-    this.onTap,
-    this.showTooltip = true,
-    super.key,
-  });
-
-  /// Indicates whether the tooltip for the search toolbar items need to be shown or not.
-  final bool showTooltip;
-
-  /// An object that is used to control the [SfPdfViewer].
-  final PdfViewerController? controller;
-
-  /// Called when the search toolbar item is selected.
-  final SearchTapCallback? onTap;
-
-  @override
-  SearchToolbarState createState() => SearchToolbarState();
-}
-
-/// State for the SearchToolbar widget
-class SearchToolbarState extends State<SearchToolbar> {
-  /// Indicates whether search is initiated or not.
-  bool _isSearchInitiated = false;
-
-  /// Indicates whether search toast need to be shown or not.
-  bool _showToast = false;
-
-  ///An object that is used to retrieve the current value of the TextField.
-  final TextEditingController _editingController = TextEditingController();
-
-  /// An object that is used to retrieve the text search result.
-  PdfTextSearchResult _pdfTextSearchResult = PdfTextSearchResult();
-
-  ///An object that is used to obtain keyboard focus and to handle keyboard events.
-  FocusNode? focusNode;
-
-  @override
-  void initState() {
-    super.initState();
-    focusNode = FocusNode();
-    focusNode?.requestFocus();
-  }
-
-  @override
-  void dispose() {
-    // Clean up the focus node when the Form is disposed.
-    focusNode?.dispose();
-    _pdfTextSearchResult.removeListener(() {});
-    super.dispose();
-  }
-
-  ///Clear the text search result
-  void clearSearch() {
-    _isSearchInitiated = false;
-    _pdfTextSearchResult.clear();
-  }
-
-  ///Display the Alert dialog to search from the beginning
-  void _showSearchAlertDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          insetPadding: EdgeInsets.all(0),
-          title: Text(t.bookPage.searchResult),
-          content: SizedBox(
-            width: 328.0,
-            child: Text(t.bookPage.noMoreResults),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _pdfTextSearchResult.nextInstance();
-                });
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                t.bookPage.YES,
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                  fontStyle: FontStyle.normal,
-                  fontWeight: FontWeight.w500,
-                  decoration: TextDecoration.none,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _pdfTextSearchResult.clear();
-                  _editingController.clear();
-                  _isSearchInitiated = false;
-                  focusNode?.requestFocus();
-                });
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                t.bookPage.NO,
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                  fontStyle: FontStyle.normal,
-                  fontWeight: FontWeight.w500,
-                  decoration: TextDecoration.none,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Material(
-          child: IconButton(
-            icon: Icon(Icons.arrow_back, size: 24),
-            onPressed: () {
-              widget.onTap?.call(t.bookPage.cancelSearch);
-              _isSearchInitiated = false;
-              _editingController.clear();
-              _pdfTextSearchResult.clear();
-            },
-          ),
-        ),
-        Flexible(
-          child: TextFormField(
-            style: TextStyle(fontSize: 16),
-            enableInteractiveSelection: false,
-            focusNode: focusNode,
-            keyboardType: TextInputType.text,
-            textInputAction: TextInputAction.search,
-            controller: _editingController,
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: t.bookPage.find,
-            ),
-            onChanged: (text) {
-              if (_editingController.text.isNotEmpty) {
-                setState(() {});
-              }
-            },
-            onFieldSubmitted: (String value) {
-              _isSearchInitiated = true;
-              _pdfTextSearchResult = widget.controller!.searchText(
-                _editingController.text,
-              );
-              _pdfTextSearchResult.addListener(() {
-                if (super.mounted) {
-                  setState(() {});
-                }
-                if (!_pdfTextSearchResult.hasResult &&
-                    _pdfTextSearchResult.isSearchCompleted) {
-                  widget.onTap?.call('noResultFound');
-                }
-              });
-            },
-          ),
-        ),
-        Visibility(
-          visible: _editingController.text.isNotEmpty,
-          child: Material(
-            child: IconButton(
-              icon: Icon(Icons.clear, size: 24),
-              onPressed: () {
-                setState(() {
-                  _editingController.clear();
-                  _pdfTextSearchResult.clear();
-                  widget.controller!.clearSelection();
-                  _isSearchInitiated = false;
-                  focusNode!.requestFocus();
-                });
-                widget.onTap!.call(t.bookPage.clearText);
-              },
-              tooltip: widget.showTooltip ? t.bookPage.clearText : null,
-            ),
-          ),
-        ),
-        Visibility(
-          visible:
-              !_pdfTextSearchResult.isSearchCompleted && _isSearchInitiated,
-          child: Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(),
-            ),
-          ),
-        ),
-        Visibility(
-          visible: _pdfTextSearchResult.hasResult,
-          child: Row(
-            children: [
-              Text(
-                '${_pdfTextSearchResult.currentInstanceIndex}',
-                style: TextStyle(fontSize: 16),
-              ),
-              Text(' of ', style: TextStyle(fontSize: 16)),
-              Text(
-                '${_pdfTextSearchResult.totalInstanceCount}',
-                style: TextStyle(fontSize: 16),
-              ),
-              Material(
-                child: IconButton(
-                  icon: Icon(Icons.navigate_before, size: 24),
-                  onPressed: () {
-                    setState(() {
-                      _pdfTextSearchResult.previousInstance();
-                    });
-                    widget.onTap!.call(t.bookPage.previousInstance);
-                  },
-                  tooltip: widget.showTooltip ? t.bookPage.previous : null,
-                ),
-              ),
-              Material(
-                child: IconButton(
-                  icon: Icon(Icons.navigate_next, size: 24),
-                  onPressed: () {
-                    setState(() {
-                      if (_pdfTextSearchResult.currentInstanceIndex ==
-                              _pdfTextSearchResult.totalInstanceCount &&
-                          _pdfTextSearchResult.currentInstanceIndex != 0 &&
-                          _pdfTextSearchResult.totalInstanceCount != 0 &&
-                          _pdfTextSearchResult.isSearchCompleted) {
-                        _showSearchAlertDialog(context);
-                      } else {
-                        widget.controller!.clearSelection();
-                        _pdfTextSearchResult.nextInstance();
-                      }
-                    });
-                    widget.onTap!.call(t.bookPage.nextInstance);
-                  },
-                  tooltip: widget.showTooltip ? t.bookPage.next : null,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 }
