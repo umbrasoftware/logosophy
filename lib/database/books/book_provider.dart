@@ -122,9 +122,11 @@ class BookNotifier extends _$BookNotifier {
     }
   }
 
-  /// Atualiza as seleções para uma página específica usando a estrutura de Mapa.
+  /// Updates a selection for a specific page on Firebase.
+  /// The new selection should be all the selections for the page, not just the
+  /// want you want to be updated or inserted.
   Future<void> updateSelectionsForPage(
-    int pageNumber,
+    String pageNumber,
     List<SelectionSpan> newSelectionsForPage,
   ) async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
@@ -149,7 +151,7 @@ class BookNotifier extends _$BookNotifier {
 
         final updatedMap = Map<String, List<SelectionSpan>>.from(
           state.selections,
-        )..remove(pageNumber.toString());
+        )..remove(pageNumber);
         state = state.copyWith(selections: updatedMap);
         _logger.info(
           'Selections for page $pageNumber in book ${state.bookId} deleted.',
@@ -162,7 +164,8 @@ class BookNotifier extends _$BookNotifier {
 
         final updatedMap = Map<String, List<SelectionSpan>>.from(
           state.selections,
-        )..[pageNumber.toString()] = newSelectionsForPage;
+        );
+        updatedMap[pageNumber] = newSelectionsForPage;
         state = state.copyWith(selections: updatedMap);
         _logger.info(
           'Selections for page $pageNumber in book ${state.bookId} updated.',

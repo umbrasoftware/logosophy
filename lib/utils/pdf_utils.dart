@@ -32,36 +32,28 @@ class PDFUtils {
             final highlight = HighlightAnnotation(
               textBoundsCollection: textLines,
             );
-            highlight.color = Color(span.color);
-            highlight.opacity = span.opacity;
-            highlight.name = allText;
+            addAnnotationProperties(highlight, span, allText);
             pdfViewerController.addAnnotation(highlight);
             break;
           case 'underline':
             final underline = UnderlineAnnotation(
               textBoundsCollection: textLines,
             );
-            underline.color = Color(span.color);
-            underline.opacity = span.opacity;
-            underline.name = allText;
+            addAnnotationProperties(underline, span, allText);
             pdfViewerController.addAnnotation(underline);
             break;
           case 'strikethrough':
             final strikethrough = StrikethroughAnnotation(
               textBoundsCollection: textLines,
             );
-            strikethrough.color = Color(span.color);
-            strikethrough.opacity = span.opacity;
-            strikethrough.name = allText;
+            addAnnotationProperties(strikethrough, span, allText);
             pdfViewerController.addAnnotation(strikethrough);
             break;
           case 'squiggly':
             final squiggly = SquigglyAnnotation(
               textBoundsCollection: textLines,
             );
-            squiggly.color = Color(span.color);
-            squiggly.opacity = span.opacity;
-            squiggly.name = allText;
+            addAnnotationProperties(squiggly, span, allText);
             pdfViewerController.addAnnotation(squiggly);
             break;
           default:
@@ -69,6 +61,17 @@ class PDFUtils {
         }
       }
     }
+  }
+
+  /// Add some properties to a given abstract annotation.
+  static void addAnnotationProperties(
+    Annotation annotation,
+    SelectionSpan span,
+    String allText,
+  ) {
+    annotation.color = Color(span.color);
+    annotation.opacity = span.opacity;
+    annotation.name = allText;
   }
 
   static void savePosition(String bookId, PdfViewerController controller) {
@@ -79,36 +82,21 @@ class PDFUtils {
     );
   }
 
+  /// Add a squiggly annonation to the PDF and then updates it to Firebase.
   static void onAddSquiggly(
     GlobalKey<SfPdfViewerState> pdfViewerKey,
     PdfViewerController controller,
     Book book,
     BookNotifier bookProvider,
   ) {
-    final List<PdfTextLine>? textLines = pdfViewerKey.currentState
-        ?.getSelectedTextLines();
+    final textLines = pdfViewerKey.currentState?.getSelectedTextLines();
     if (textLines != null && textLines.isNotEmpty) {
-      final SquigglyAnnotation squigglyAnnotation = SquigglyAnnotation(
-        textBoundsCollection: textLines,
-      );
-      controller.addAnnotation(squigglyAnnotation);
+      final squigglyAnno = SquigglyAnnotation(textBoundsCollection: textLines);
+      controller.addAnnotation(squigglyAnno);
+      final span = makeSelectionSpan(textLines, 'squiggly', squigglyAnno);
 
-      final pageNumber = textLines.first.pageNumber;
-      // Convert PdfTextLine to a serializable Map.
-      final span = SelectionSpan(
-        textLines: textLines
-            .map(
-              (line) =>
-                  SerializablePdfTextLine(text: line.text, bounds: line.bounds),
-            )
-            .toList(),
-        type: 'squiggly',
-        pageNumber: pageNumber,
-        color: squigglyAnnotation.color.toARGB32(),
-        opacity: squigglyAnnotation.opacity,
-      );
-
-      final existingSpans = book.selections[pageNumber.toString()] ?? [];
+      final pageNumber = textLines.first.pageNumber.toString();
+      final existingSpans = book.selections[pageNumber] ?? [];
       bookProvider.updateSelectionsForPage(pageNumber, [
         ...existingSpans,
         span,
@@ -123,29 +111,16 @@ class PDFUtils {
     Book book,
     BookNotifier bookProvider,
   ) {
-    final List<PdfTextLine>? textLines = pdfViewerKey.currentState
-        ?.getSelectedTextLines();
+    final textLines = pdfViewerKey.currentState?.getSelectedTextLines();
     if (textLines != null && textLines.isNotEmpty) {
-      final StrikethroughAnnotation strikethroughAnnotation =
-          StrikethroughAnnotation(textBoundsCollection: textLines);
-      controller.addAnnotation(strikethroughAnnotation);
-
-      final pageNumber = textLines.first.pageNumber;
-      // Convert PdfTextLine to a serializable Map.
-      final span = SelectionSpan(
-        textLines: textLines
-            .map(
-              (line) =>
-                  SerializablePdfTextLine(text: line.text, bounds: line.bounds),
-            )
-            .toList(),
-        type: 'strikethrough',
-        pageNumber: pageNumber,
-        color: strikethroughAnnotation.color.toARGB32(),
-        opacity: strikethroughAnnotation.opacity,
+      final strikeAnno = StrikethroughAnnotation(
+        textBoundsCollection: textLines,
       );
+      controller.addAnnotation(strikeAnno);
+      final span = makeSelectionSpan(textLines, 'strikethrough', strikeAnno);
 
-      final existingSpans = book.selections[pageNumber.toString()] ?? [];
+      final pageNumber = textLines.first.pageNumber.toString();
+      final existingSpans = book.selections[pageNumber] ?? [];
       bookProvider.updateSelectionsForPage(pageNumber, [
         ...existingSpans,
         span,
@@ -160,30 +135,16 @@ class PDFUtils {
     Book book,
     BookNotifier bookProvider,
   ) {
-    final List<PdfTextLine>? textLines = pdfViewerKey.currentState
-        ?.getSelectedTextLines();
+    final textLines = pdfViewerKey.currentState?.getSelectedTextLines();
     if (textLines != null && textLines.isNotEmpty) {
-      final UnderlineAnnotation underLineAnnotation = UnderlineAnnotation(
+      final underLineAnno = UnderlineAnnotation(
         textBoundsCollection: textLines,
       );
-      controller.addAnnotation(underLineAnnotation);
+      controller.addAnnotation(underLineAnno);
+      final span = makeSelectionSpan(textLines, 'underline', underLineAnno);
 
-      final pageNumber = textLines.first.pageNumber;
-      // Convert PdfTextLine to a serializable Map.
-      final span = SelectionSpan(
-        textLines: textLines
-            .map(
-              (line) =>
-                  SerializablePdfTextLine(text: line.text, bounds: line.bounds),
-            )
-            .toList(),
-        type: 'underline',
-        pageNumber: pageNumber,
-        color: underLineAnnotation.color.toARGB32(),
-        opacity: underLineAnnotation.opacity,
-      );
-
-      final existingSpans = book.selections[pageNumber.toString()] ?? [];
+      final pageNumber = textLines.first.pageNumber.toString();
+      final existingSpans = book.selections[pageNumber] ?? [];
       bookProvider.updateSelectionsForPage(pageNumber, [
         ...existingSpans,
         span,
@@ -198,35 +159,41 @@ class PDFUtils {
     Book book,
     BookNotifier bookProvider,
   ) {
-    final List<PdfTextLine>? textLines = pdfViewerKey.currentState
-        ?.getSelectedTextLines();
+    final textLines = pdfViewerKey.currentState?.getSelectedTextLines();
     if (textLines != null && textLines.isNotEmpty) {
-      final HighlightAnnotation highlightAnnotation = HighlightAnnotation(
+      final highlightAnno = HighlightAnnotation(
         textBoundsCollection: textLines,
       );
-      controller.addAnnotation(highlightAnnotation);
+      controller.addAnnotation(highlightAnno);
+      final span = makeSelectionSpan(textLines, 'highlight', highlightAnno);
 
-      final pageNumber = textLines.first.pageNumber;
-      // Convert PdfTextLine to a serializable Map.
-      final span = SelectionSpan(
-        textLines: textLines
-            .map(
-              (line) =>
-                  SerializablePdfTextLine(text: line.text, bounds: line.bounds),
-            )
-            .toList(),
-        type: 'highlight',
-        pageNumber: pageNumber,
-        color: highlightAnnotation.color.toARGB32(),
-        opacity: highlightAnnotation.opacity,
-      );
-
-      final existingSpans = book.selections[pageNumber.toString()] ?? [];
+      final pageNumber = textLines.first.pageNumber.toString();
+      final existingSpans = book.selections[pageNumber] ?? [];
       bookProvider.updateSelectionsForPage(pageNumber, [
         ...existingSpans,
         span,
       ]);
       controller.clearSelection();
     }
+  }
+
+  /// Convert PdfTextLine to a serializable Map.
+  static SelectionSpan makeSelectionSpan(
+    List<PdfTextLine> textLines,
+    String type,
+    Annotation annotation,
+  ) {
+    return SelectionSpan(
+      textLines: textLines
+          .map(
+            (line) =>
+                SerializablePdfTextLine(text: line.text, bounds: line.bounds),
+          )
+          .toList(),
+      type: type,
+      pageNumber: textLines.first.pageNumber,
+      color: annotation.color.toARGB32(),
+      opacity: annotation.opacity,
+    );
   }
 }
