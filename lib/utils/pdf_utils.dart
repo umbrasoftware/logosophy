@@ -47,9 +47,11 @@ class PDFUtils {
       final spansToKeep = bookProvider.removeAnnotationFromBook(span);
       if (spansToKeep != null) {
         await bookProvider.updateSelectionsForPage(page, spansToKeep);
+        logger.info('Successfully removed annotation from PDF and Firebase');
         return true;
       }
     }
+    logger.warning('Could not find the associated annotation to remove.');
     return false;
   }
 
@@ -281,5 +283,37 @@ class PDFUtils {
       color: annotation.color.toARGB32(),
       opacity: annotation.opacity,
     );
+  }
+
+  static TextStyle getTextSyle(int color, String type) {
+    switch (type) {
+      case 'highlight':
+        return TextStyle(backgroundColor: Color(color));
+
+      case 'underline':
+        return TextStyle(
+          decoration: TextDecoration.underline,
+          decorationColor: Color(color),
+          decorationThickness: 2.0,
+        );
+
+      case 'strikethrough':
+        return TextStyle(
+          decoration: TextDecoration.lineThrough,
+          decorationColor: Color(color),
+          decorationThickness: 2.0,
+        );
+
+      case 'squiggly':
+        return TextStyle(
+          decoration: TextDecoration.underline,
+          decorationStyle: TextDecorationStyle.wavy,
+          decorationColor: Color(color),
+          decorationThickness: 2.0,
+        );
+
+      default:
+        return TextStyle();
+    }
   }
 }

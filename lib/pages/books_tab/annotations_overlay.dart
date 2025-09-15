@@ -73,15 +73,14 @@ class _AnnotationsOverlayState extends ConsumerState<AnnotationsOverlay> {
           child: ListTile(
             trailing: IconButton(
               onPressed: () async {
-                if (await PDFUtils.removeSelection(
+                PDFUtils.removeSelection(
                   spans[index],
                   widget.controller,
                   bookProvider,
-                )) {
-                  setState(() {
-                    spans.removeAt(index);
-                  });
-                }
+                );
+                setState(() {
+                  spans.removeAt(index);
+                });
               },
               icon: const Icon(Icons.delete_outline, color: Colors.red),
             ),
@@ -89,6 +88,10 @@ class _AnnotationsOverlayState extends ConsumerState<AnnotationsOverlay> {
             subtitle: Text(
               PDFUtils.getAllText(spans[index].textLines),
               overflow: TextOverflow.ellipsis,
+              style: PDFUtils.getTextSyle(
+                spans[index].color,
+                spans[index].type,
+              ),
             ),
           ),
         );
