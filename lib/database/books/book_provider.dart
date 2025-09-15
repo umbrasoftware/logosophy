@@ -5,6 +5,7 @@ import 'package:logosophy/database/books/book.dart';
 import 'package:logosophy/database/books/book_cache.dart';
 import 'package:logosophy/database/books/notes.dart';
 import 'package:logosophy/database/books/selection_span.dart';
+import 'package:logosophy/utils/pdf_utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'book_provider.g.dart';
@@ -68,6 +69,28 @@ class BookNotifier extends _$BookNotifier {
     state = book; // Atribui diretamente o objeto, não precisa converter de novo
 
     _logger.info('Book ${book.bookId} saved on Firebase.');
+  }
+
+  /// Removes a [SelectionSpan] from the current book state. If sucessuful,
+  /// returns the new list of spans without the `spanToRemove`. Otherwise,
+  /// returns null.
+  List<SelectionSpan>? removeAnnotationFromBook(SelectionSpan spanToRemove) {
+    final page = spanToRemove.pageNumber.toString();
+    final selections = state.selections[page];
+    if (selections == null) return null;
+
+    final List<SelectionSpan> spansToKeep = [];
+    for (final span in selections) {
+      if (!PDFUtils.compareSelectionSpans(spanToRemove, span)) {
+        spansToKeep.add(span);
+      }
+    }
+
+    final spans = Map<String, List<SelectionSpan>>.from(state.selections);
+    spans[page] = spansToKeep;
+    state = state.copyWith(selections: spans);
+
+    return spansToKeep;
   }
 
   /// Atualiza as anotações para uma página específica usando a estrutura de Mapa.

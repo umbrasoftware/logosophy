@@ -14,53 +14,139 @@ class PDFUtils {
     PdfViewerController pdfViewerController,
     Map<String, List<SelectionSpan>> selections,
   ) {
-    for (final entry in selections.entries) {
-      final page = int.parse(entry.key);
-      final selectionSpan = entry.value;
-
-      // Begings processing for a page:
+    for (final selectionSpan in selections.values) {
       for (final span in selectionSpan) {
-        List<PdfTextLine> textLines = [];
-        String allText = '';
-        for (final textLine in span.textLines) {
-          textLines.add(PdfTextLine(textLine.bounds, textLine.text, page));
-          allText += '${textLine.text} ';
-        }
-
-        switch (span.type) {
-          case 'highlight':
-            final highlight = HighlightAnnotation(
-              textBoundsCollection: textLines,
-            );
-            addAnnotationProperties(highlight, span, allText);
-            pdfViewerController.addAnnotation(highlight);
-            break;
-          case 'underline':
-            final underline = UnderlineAnnotation(
-              textBoundsCollection: textLines,
-            );
-            addAnnotationProperties(underline, span, allText);
-            pdfViewerController.addAnnotation(underline);
-            break;
-          case 'strikethrough':
-            final strikethrough = StrikethroughAnnotation(
-              textBoundsCollection: textLines,
-            );
-            addAnnotationProperties(strikethrough, span, allText);
-            pdfViewerController.addAnnotation(strikethrough);
-            break;
-          case 'squiggly':
-            final squiggly = SquigglyAnnotation(
-              textBoundsCollection: textLines,
-            );
-            addAnnotationProperties(squiggly, span, allText);
-            pdfViewerController.addAnnotation(squiggly);
-            break;
-          default:
-            break;
-        }
+        final annotation = getAnnotationFromSpan(span);
+        pdfViewerController.addAnnotation(annotation);
       }
     }
+  }
+
+  /// This function delete the exact selection instance from the PDF and
+  /// Firebase, if a match is found. It compares against the current annotations
+  /// in place. The comparisson is made using the pageNumber and the text of the
+  /// selection itself, that is on the variable `annontation.name`.
+  ///  Returns true in case of success.
+  static Future<bool> removeSelection(
+    SelectionSpan span,
+    PdfViewerController controller,
+    BookNotifier bookProvider,
+  ) async {
+    Annotation? annotationObjectToRemove;
+    final List<Annotation> allAnnotations = controller.getAnnotations();
+
+    for (final currentAnnotation in allAnnotations) {
+      if (compareSpanAgainstAnnotation(span, currentAnnotation)) {
+        annotationObjectToRemove = currentAnnotation;
+      }
+    }
+
+    if (annotationObjectToRemove != null) {
+      final page = span.pageNumber.toString();
+      controller.removeAnnotation(annotationObjectToRemove);
+      final spansToKeep = bookProvider.removeAnnotationFromBook(span);
+      if (spansToKeep != null) {
+        await bookProvider.updateSelectionsForPage(page, spansToKeep);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Compares [SelectionSpan] against a [Annotation] and returns if they are
+  /// the same.
+  ///
+  /// CAUTION: The values used to compare are the `annotation.name`, which
+  /// should be all the text combined and the pageNumber.
+  static bool compareSpanAgainstAnnotation(
+    SelectionSpan span,
+    Annotation annotation,
+  ) {
+    String spanText = '';
+    for (final span in span.textLines) {
+      spanText += span.text;
+    }
+
+    if (annotation.name == spanText &&
+        annotation.pageNumber == span.pageNumber) {
+      return true;
+    }
+    return false;
+  }
+
+  static bool compareSelectionSpans(SelectionSpan s1, SelectionSpan s2) {
+    if (s1.textLines.length != s2.textLines.length) return false;
+    if (s1.pageNumber != s2.pageNumber) return false;
+
+    String s1Text = '';
+    String s2Text = '';
+    for (final textLine in s1.textLines) {
+      s1Text += textLine.text;
+    }
+    for (final textLine in s2.textLines) {
+      s2Text += textLine.text;
+    }
+    if (s1Text != s2Text) return false;
+
+    return true;
+  }
+
+  static List<SelectionSpan> getSpans(
+    Map<String, List<SelectionSpan>> selections,
+  ) {
+    final selects = selections.entries.toList();
+    selects.sort((k1, k2) => k1.key.compareTo(k2.key));
+
+    final List<SelectionSpan> out = [];
+    for (var map in selects) {
+      for (var spans in map.value) {
+        out.add(spans);
+      }
+    }
+
+    return out;
+  }
+
+  static String getAllText(List<SerializablePdfTextLine> textLines) {
+    String combinedText = '';
+    for (final text in textLines) {
+      combinedText += text.text;
+    }
+
+    return combinedText;
+  }
+
+  static Annotation getAnnotationFromSpan(SelectionSpan span) {
+    List<PdfTextLine> textLines = [];
+    late Annotation annotation;
+    String allText = '';
+    for (final textLine in span.textLines) {
+      textLines.add(
+        PdfTextLine(textLine.bounds, textLine.text, span.pageNumber),
+      );
+      allText += textLine.text;
+    }
+
+    switch (span.type) {
+      case 'highlight':
+        annotation = HighlightAnnotation(textBoundsCollection: textLines);
+        addAnnotationProperties(annotation, span, allText);
+        break;
+      case 'underline':
+        annotation = UnderlineAnnotation(textBoundsCollection: textLines);
+        addAnnotationProperties(annotation, span, allText);
+        break;
+      case 'strikethrough':
+        annotation = StrikethroughAnnotation(textBoundsCollection: textLines);
+        addAnnotationProperties(annotation, span, allText);
+        break;
+      case 'squiggly':
+        annotation = SquigglyAnnotation(textBoundsCollection: textLines);
+        addAnnotationProperties(annotation, span, allText);
+        break;
+    }
+
+    return annotation;
   }
 
   /// Add some properties to a given abstract annotation.
