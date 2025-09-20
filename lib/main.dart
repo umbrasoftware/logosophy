@@ -3,7 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logosophy/database/books/book_cache.dart';
+import 'package:logosophy/database/cache/annotations_cache.dart';
+import 'package:logosophy/database/cache/book_cache.dart';
+import 'package:logosophy/database/cache/notes_cache.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/router.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
@@ -28,7 +30,7 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BookCache().init();
+    initCaches();
 
     return MaterialApp.router(
       title: 'Flutter Demo',
@@ -52,4 +54,10 @@ void setupLogging() {
     // ignore: avoid_print
     print('${record.level.name}: ${record.loggerName}: ${record.message}');
   });
+}
+
+void initCaches() {
+  AnnotationsCache().init();
+  BookCache().init();
+  NotesCache().init();
 }

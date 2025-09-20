@@ -15,7 +15,6 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SelectionSpan {
 
-// 2. Usamos a nossa classe serializável aqui!
  List<SerializablePdfTextLine> get textLines; String get type; int get pageNumber; int get color; double get opacity;
 /// Create a copy of SelectionSpan
 /// with the given fields replaced by the non-null parameter values.
@@ -217,9 +216,7 @@ class _SelectionSpan implements SelectionSpan {
    _SelectionSpan({required final  List<SerializablePdfTextLine> textLines, required this.type, required this.pageNumber, required this.color, required this.opacity}): _textLines = textLines;
   factory _SelectionSpan.fromJson(Map<String, dynamic> json) => _$SelectionSpanFromJson(json);
 
-// 2. Usamos a nossa classe serializável aqui!
  final  List<SerializablePdfTextLine> _textLines;
-// 2. Usamos a nossa classe serializável aqui!
 @override List<SerializablePdfTextLine> get textLines {
   if (_textLines is EqualUnmodifiableListView) return _textLines;
   // ignore: implicit_dynamic_type

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Notes {
 
- DateTime get time; int get page; String get notes;
+ DateTime get time; String get bookId; int get page; String get note;
 /// Create a copy of Notes
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $NotesCopyWith<Notes> get copyWith => _$NotesCopyWithImpl<Notes>(this as Notes, 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Notes&&(identical(other.time, time) || other.time == time)&&(identical(other.page, page) || other.page == page)&&(identical(other.notes, notes) || other.notes == notes));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Notes&&(identical(other.time, time) || other.time == time)&&(identical(other.bookId, bookId) || other.bookId == bookId)&&(identical(other.page, page) || other.page == page)&&(identical(other.note, note) || other.note == note));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,time,page,notes);
+int get hashCode => Object.hash(runtimeType,time,bookId,page,note);
 
 @override
 String toString() {
-  return 'Notes(time: $time, page: $page, notes: $notes)';
+  return 'Notes(time: $time, bookId: $bookId, page: $page, note: $note)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $NotesCopyWith<$Res>  {
   factory $NotesCopyWith(Notes value, $Res Function(Notes) _then) = _$NotesCopyWithImpl;
 @useResult
 $Res call({
- DateTime time, int page, String notes
+ DateTime time, String bookId, int page, String note
 });
 
 
@@ -65,11 +65,12 @@ class _$NotesCopyWithImpl<$Res>
 
 /// Create a copy of Notes
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? time = null,Object? page = null,Object? notes = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? time = null,Object? bookId = null,Object? page = null,Object? note = null,}) {
   return _then(_self.copyWith(
 time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
-as DateTime,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
-as int,notes: null == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as DateTime,bookId: null == bookId ? _self.bookId : bookId // ignore: cast_nullable_to_non_nullable
+as String,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
+as int,note: null == note ? _self.note : note // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( DateTime time,  int page,  String notes)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( DateTime time,  String bookId,  int page,  String note)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Notes() when $default != null:
-return $default(_that.time,_that.page,_that.notes);case _:
+return $default(_that.time,_that.bookId,_that.page,_that.note);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.time,_that.page,_that.notes);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( DateTime time,  int page,  String notes)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( DateTime time,  String bookId,  int page,  String note)  $default,) {final _that = this;
 switch (_that) {
 case _Notes():
-return $default(_that.time,_that.page,_that.notes);case _:
+return $default(_that.time,_that.bookId,_that.page,_that.note);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +197,10 @@ return $default(_that.time,_that.page,_that.notes);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( DateTime time,  int page,  String notes)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( DateTime time,  String bookId,  int page,  String note)?  $default,) {final _that = this;
 switch (_that) {
 case _Notes() when $default != null:
-return $default(_that.time,_that.page,_that.notes);case _:
+return $default(_that.time,_that.bookId,_that.page,_that.note);case _:
   return null;
 
 }
@@ -211,12 +212,13 @@ return $default(_that.time,_that.page,_that.notes);case _:
 @JsonSerializable()
 
 class _Notes implements Notes {
-   _Notes({required this.time, required this.page, required this.notes});
+   _Notes({required this.time, required this.bookId, required this.page, required this.note});
   factory _Notes.fromJson(Map<String, dynamic> json) => _$NotesFromJson(json);
 
 @override final  DateTime time;
+@override final  String bookId;
 @override final  int page;
-@override final  String notes;
+@override final  String note;
 
 /// Create a copy of Notes
 /// with the given fields replaced by the non-null parameter values.
@@ -231,16 +233,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Notes&&(identical(other.time, time) || other.time == time)&&(identical(other.page, page) || other.page == page)&&(identical(other.notes, notes) || other.notes == notes));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Notes&&(identical(other.time, time) || other.time == time)&&(identical(other.bookId, bookId) || other.bookId == bookId)&&(identical(other.page, page) || other.page == page)&&(identical(other.note, note) || other.note == note));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,time,page,notes);
+int get hashCode => Object.hash(runtimeType,time,bookId,page,note);
 
 @override
 String toString() {
-  return 'Notes(time: $time, page: $page, notes: $notes)';
+  return 'Notes(time: $time, bookId: $bookId, page: $page, note: $note)';
 }
 
 
@@ -251,7 +253,7 @@ abstract mixin class _$NotesCopyWith<$Res> implements $NotesCopyWith<$Res> {
   factory _$NotesCopyWith(_Notes value, $Res Function(_Notes) _then) = __$NotesCopyWithImpl;
 @override @useResult
 $Res call({
- DateTime time, int page, String notes
+ DateTime time, String bookId, int page, String note
 });
 
 
@@ -268,11 +270,12 @@ class __$NotesCopyWithImpl<$Res>
 
 /// Create a copy of Notes
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? time = null,Object? page = null,Object? notes = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? time = null,Object? bookId = null,Object? page = null,Object? note = null,}) {
   return _then(_Notes(
 time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
-as DateTime,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
-as int,notes: null == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as DateTime,bookId: null == bookId ? _self.bookId : bookId // ignore: cast_nullable_to_non_nullable
+as String,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
+as int,note: null == note ? _self.note : note // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

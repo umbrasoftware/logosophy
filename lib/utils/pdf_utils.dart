@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:logosophy/database/books/book.dart';
-import 'package:logosophy/database/books/book_cache.dart';
-import 'package:logosophy/database/books/book_provider.dart';
-import 'package:logosophy/database/books/rect_converter.dart';
-import 'package:logosophy/database/books/selection_span.dart';
+import 'package:logosophy/database/annotations/annotations_provider.dart';
+import 'package:logosophy/database/annotations/models/page_annotations.dart';
+import 'package:logosophy/database/annotations/models/rect_converter.dart';
+import 'package:logosophy/database/annotations/models/selection_span.dart';
+import 'package:logosophy/database/cache/book_cache.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class PDFUtils {
   static final logger = Logger('PdfUtils');
 
+  /// Apply annotations to a book.
   static void applySelections(
     PdfViewerController pdfViewerController,
-    Map<String, List<SelectionSpan>> selections,
+    List<SelectionSpan> selections,
   ) {
-    for (final selectionSpan in selections.values) {
-      for (final span in selectionSpan) {
-        final annotation = getAnnotationFromSpan(span);
-        pdfViewerController.addAnnotation(annotation);
-      }
+    for (final selectionSpan in selections) {
+      final annotation = getAnnotationFromSpan(selectionSpan);
+      pdfViewerController.addAnnotation(annotation);
     }
   }
 
@@ -28,9 +27,10 @@ class PDFUtils {
   /// selection itself, that is on the variable `annontation.name`.
   ///  Returns true in case of success.
   static Future<bool> removeSelection(
+    String bookId,
     SelectionSpan span,
     PdfViewerController controller,
-    BookNotifier bookProvider,
+    AnnotationsNotifier annoProvider,
   ) async {
     Annotation? annotationObjectToRemove;
     final List<Annotation> allAnnotations = controller.getAnnotations();
@@ -44,9 +44,9 @@ class PDFUtils {
     if (annotationObjectToRemove != null) {
       final page = span.pageNumber.toString();
       controller.removeAnnotation(annotationObjectToRemove);
-      final spansToKeep = bookProvider.removeAnnotationFromBook(span);
+      final spansToKeep = annoProvider.removeAnnotationFromBook(bookId, span);
       if (spansToKeep != null) {
-        await bookProvider.updateSelectionsForPage(page, spansToKeep);
+        await annoProvider.updateSelectionsForPage(bookId, page, spansToKeep);
         logger.info('Successfully removed annotation from PDF and Firebase');
         return true;
       }
@@ -172,20 +172,19 @@ class PDFUtils {
 
   /// Add a squiggly annonation to the PDF and then updates it to Firebase.
   static void onAddSquiggly(
-    GlobalKey<SfPdfViewerState> pdfViewerKey,
+    List<PdfTextLine>? textLines,
     PdfViewerController controller,
-    Book book,
-    BookNotifier bookProvider,
+    String bookId,
+    AnnotationsNotifier annoProvider,
   ) {
-    final textLines = pdfViewerKey.currentState?.getSelectedTextLines();
     if (textLines != null && textLines.isNotEmpty) {
       final squigglyAnno = SquigglyAnnotation(textBoundsCollection: textLines);
       controller.addAnnotation(squigglyAnno);
       final span = makeSelectionSpan(textLines, 'squiggly', squigglyAnno);
 
-      final pageNumber = textLines.first.pageNumber.toString();
-      final existingSpans = book.selections[pageNumber] ?? [];
-      bookProvider.updateSelectionsForPage(pageNumber, [
+      final page = textLines.first.pageNumber.toString();
+      final existingSpans = annoProvider.getSelectionSpans(bookId, page: page);
+      annoProvider.updateSelectionsForPage(bookId, page, [
         ...existingSpans,
         span,
       ]);
@@ -194,12 +193,11 @@ class PDFUtils {
   }
 
   static void onAddStrikethrough(
-    GlobalKey<SfPdfViewerState> pdfViewerKey,
+    List<PdfTextLine>? textLines,
     PdfViewerController controller,
-    Book book,
-    BookNotifier bookProvider,
+    String bookId,
+    AnnotationsNotifier annoProvider,
   ) {
-    final textLines = pdfViewerKey.currentState?.getSelectedTextLines();
     if (textLines != null && textLines.isNotEmpty) {
       final strikeAnno = StrikethroughAnnotation(
         textBoundsCollection: textLines,
@@ -207,9 +205,9 @@ class PDFUtils {
       controller.addAnnotation(strikeAnno);
       final span = makeSelectionSpan(textLines, 'strikethrough', strikeAnno);
 
-      final pageNumber = textLines.first.pageNumber.toString();
-      final existingSpans = book.selections[pageNumber] ?? [];
-      bookProvider.updateSelectionsForPage(pageNumber, [
+      final page = textLines.first.pageNumber.toString();
+      final existingSpans = annoProvider.getSelectionSpans(bookId, page: page);
+      annoProvider.updateSelectionsForPage(bookId, page, [
         ...existingSpans,
         span,
       ]);
@@ -218,12 +216,11 @@ class PDFUtils {
   }
 
   static void onAddUnderline(
-    GlobalKey<SfPdfViewerState> pdfViewerKey,
+    List<PdfTextLine>? textLines,
     PdfViewerController controller,
-    Book book,
-    BookNotifier bookProvider,
+    String bookId,
+    AnnotationsNotifier annoProvider,
   ) {
-    final textLines = pdfViewerKey.currentState?.getSelectedTextLines();
     if (textLines != null && textLines.isNotEmpty) {
       final underLineAnno = UnderlineAnnotation(
         textBoundsCollection: textLines,
@@ -231,9 +228,9 @@ class PDFUtils {
       controller.addAnnotation(underLineAnno);
       final span = makeSelectionSpan(textLines, 'underline', underLineAnno);
 
-      final pageNumber = textLines.first.pageNumber.toString();
-      final existingSpans = book.selections[pageNumber] ?? [];
-      bookProvider.updateSelectionsForPage(pageNumber, [
+      final page = textLines.first.pageNumber.toString();
+      final existingSpans = annoProvider.getSelectionSpans(bookId, page: page);
+      annoProvider.updateSelectionsForPage(bookId, page, [
         ...existingSpans,
         span,
       ]);
@@ -242,12 +239,11 @@ class PDFUtils {
   }
 
   static void onAddHighlight(
-    GlobalKey<SfPdfViewerState> pdfViewerKey,
+    List<PdfTextLine>? textLines,
     PdfViewerController controller,
-    Book book,
-    BookNotifier bookProvider,
+    String bookId,
+    AnnotationsNotifier annoProvider,
   ) {
-    final textLines = pdfViewerKey.currentState?.getSelectedTextLines();
     if (textLines != null && textLines.isNotEmpty) {
       final highlightAnno = HighlightAnnotation(
         textBoundsCollection: textLines,
@@ -255,9 +251,9 @@ class PDFUtils {
       controller.addAnnotation(highlightAnno);
       final span = makeSelectionSpan(textLines, 'highlight', highlightAnno);
 
-      final pageNumber = textLines.first.pageNumber.toString();
-      final existingSpans = book.selections[pageNumber] ?? [];
-      bookProvider.updateSelectionsForPage(pageNumber, [
+      final page = textLines.first.pageNumber.toString();
+      final existingSpans = annoProvider.getSelectionSpans(bookId, page: page);
+      annoProvider.updateSelectionsForPage(bookId, page, [
         ...existingSpans,
         span,
       ]);
@@ -317,3 +313,45 @@ class PDFUtils {
     }
   }
 }
+
+final Map<String, dynamic> bookInitMapFirebase = {
+  'book': {
+    '001': {'page': <String, dynamic>{}},
+    '002': {'page': <String, dynamic>{}},
+    '003': {'page': <String, dynamic>{}},
+    '004': {'page': <String, dynamic>{}},
+    '005': {'page': <String, dynamic>{}},
+    '006': {'page': <String, dynamic>{}},
+    '007': {'page': <String, dynamic>{}},
+    '008': {'page': <String, dynamic>{}},
+    '009': {'page': <String, dynamic>{}},
+    '010': {'page': <String, dynamic>{}},
+    '011': {'page': <String, dynamic>{}},
+    '012': {'page': <String, dynamic>{}},
+    '013': {'page': <String, dynamic>{}},
+    '014': {'page': <String, dynamic>{}},
+    '015': {'page': <String, dynamic>{}},
+    '016': {'page': <String, dynamic>{}},
+    '017': {'page': <String, dynamic>{}},
+  },
+};
+
+final Map<String, PageAnnotations> bookInitMap = {
+  "001": PageAnnotations(page: {}),
+  "002": PageAnnotations(page: {}),
+  "003": PageAnnotations(page: {}),
+  "004": PageAnnotations(page: {}),
+  "005": PageAnnotations(page: {}),
+  "006": PageAnnotations(page: {}),
+  "007": PageAnnotations(page: {}),
+  "008": PageAnnotations(page: {}),
+  "009": PageAnnotations(page: {}),
+  "010": PageAnnotations(page: {}),
+  "011": PageAnnotations(page: {}),
+  "012": PageAnnotations(page: {}),
+  "013": PageAnnotations(page: {}),
+  "014": PageAnnotations(page: {}),
+  "015": PageAnnotations(page: {}),
+  "016": PageAnnotations(page: {}),
+  "017": PageAnnotations(page: {}),
+};

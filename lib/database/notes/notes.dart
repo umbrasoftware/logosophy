@@ -7,8 +7,9 @@ part 'notes.g.dart';
 abstract class Notes with _$Notes {
   factory Notes({
     required DateTime time,
+    required String bookId,
     required int page,
-    required String notes,
+    required String note,
   }) = _Notes;
 
   factory Notes.fromJson(Map<String, dynamic> json) => _$NotesFromJson(json);

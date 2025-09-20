@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logosophy/database/books/book.dart';
-import 'package:logosophy/database/books/book_cache.dart';
-import 'package:logosophy/database/books/book_provider.dart';
+import 'package:logosophy/database/annotations/annotations_provider.dart';
+import 'package:logosophy/database/cache/book_cache.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/utils/pdf_utils.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
-// Imports para os novos arquivos de overlay
 import 'annotations_overlay.dart';
 import 'searchbar_overlay.dart';
 
@@ -35,8 +33,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
   late bool _showToolbar;
   late bool _showScrollHead;
   late String bookId;
-  late Book book;
-  late BookNotifier bookProvider;
+  late AnnotationsNotifier annoProvider;
 
   LocalHistoryEntry? _historyEntry;
 
@@ -45,7 +42,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     bookId = widget.file.path.split('/').last.split('.').first;
     _showToolbar = false;
     _showScrollHead = true;
-    bookProvider = ref.read(bookNotifierProvider.notifier);
+    annoProvider = ref.read(annotationsNotifierProvider.notifier);
     super.initState();
   }
 
@@ -101,9 +98,9 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
                 });
               }
 
-              await ref.read(bookNotifierProvider.notifier).getBook(bookId);
-              book = ref.read(bookNotifierProvider);
-              PDFUtils.applySelections(_pdfViewerController, book.selections);
+              await annoProvider.getAnnotationsDoc();
+              final selections = annoProvider.getSelectionSpans(bookId);
+              PDFUtils.applySelections(_pdfViewerController, selections);
             },
             onPageChanged: (_) =>
                 PDFUtils.savePosition(bookId, _pdfViewerController),
@@ -115,7 +112,9 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
                 _overlayEntry = null;
               } else if (details.selectedText != null &&
                   _overlayEntry == null) {
-                _showContextMenu(context, details);
+                final lines = _pdfViewerKey.currentState
+                    ?.getSelectedTextLines();
+                _showContextMenu(context, details, lines);
               }
             },
           ),
@@ -208,6 +207,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
   void _showContextMenu(
     BuildContext context,
     PdfTextSelectionChangedDetails details,
+    List<PdfTextLine>? textLines,
   ) {
     const double height = 250;
     const double width = 150;
@@ -263,10 +263,10 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
               ),
               TextButton(
                 onPressed: () => PDFUtils.onAddHighlight(
-                  _pdfViewerKey,
+                  textLines,
                   _pdfViewerController,
-                  book,
-                  bookProvider,
+                  bookId,
+                  annoProvider,
                 ),
                 child: Text(
                   t.bookPage.highlight,
@@ -275,10 +275,10 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
               ),
               TextButton(
                 onPressed: () => PDFUtils.onAddUnderline(
-                  _pdfViewerKey,
+                  textLines,
                   _pdfViewerController,
-                  book,
-                  bookProvider,
+                  bookId,
+                  annoProvider,
                 ),
                 child: Text(
                   t.bookPage.underline,
@@ -287,10 +287,10 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
               ),
               TextButton(
                 onPressed: () => PDFUtils.onAddStrikethrough(
-                  _pdfViewerKey,
+                  textLines,
                   _pdfViewerController,
-                  book,
-                  bookProvider,
+                  bookId,
+                  annoProvider,
                 ),
                 child: Text(
                   t.bookPage.strikethrough,
@@ -299,10 +299,10 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
               ),
               TextButton(
                 onPressed: () => PDFUtils.onAddSquiggly(
-                  _pdfViewerKey,
+                  textLines,
                   _pdfViewerController,
-                  book,
-                  bookProvider,
+                  bookId,
+                  annoProvider,
                 ),
                 child: Text(
                   t.bookPage.squiggly,
@@ -317,7 +317,6 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     overlayState.insert(_overlayEntry!);
   }
 
-  // MÉTODO ATUALIZADO PARA USAR O NOVO WIDGET
   void _showNotesOverlay() {
     if (_annotationsOverlay != null) {
       return;
@@ -325,7 +324,6 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
 
     final annotations = _pdfViewerController.getAnnotations();
     if (annotations.isEmpty) {
-      // Opcional: Mostrar uma mensagem de que não há anotações
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Nenhuma anotação encontrada.')),
       );
@@ -335,10 +333,11 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     final overlay = Overlay.of(context);
     _annotationsOverlay = OverlayEntry(
       builder: (context) {
-        // Agora apenas chamamos nosso widget encapsulado, passando o que ele precisa.
         return AnnotationsOverlay(
           controller: _pdfViewerController,
           onClose: _hideAnnotationsOverlay,
+          bookId: bookId,
+          page: _pdfViewerController.pageNumber.toString(),
         );
       },
     );

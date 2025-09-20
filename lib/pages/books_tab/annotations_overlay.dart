@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logosophy/database/books/book.dart';
-import 'package:logosophy/database/books/book_provider.dart';
-import 'package:logosophy/database/books/selection_span.dart';
+import 'package:logosophy/database/annotations/annotations_provider.dart';
+import 'package:logosophy/database/annotations/models/selection_span.dart';
 import 'package:logosophy/utils/pdf_utils.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class AnnotationsOverlay extends ConsumerStatefulWidget {
   final PdfViewerController controller;
   final VoidCallback onClose;
+  final String bookId;
+  final String page;
 
   const AnnotationsOverlay({
     super.key,
     required this.controller,
     required this.onClose,
+    required this.bookId,
+    required this.page,
   });
 
   @override
@@ -21,16 +24,15 @@ class AnnotationsOverlay extends ConsumerStatefulWidget {
 }
 
 class _AnnotationsOverlayState extends ConsumerState<AnnotationsOverlay> {
-  late Book book;
-  late BookNotifier bookProvider;
+  late AnnotationsNotifier annoProvider;
   late List<SelectionSpan> spans;
 
   @override
   void initState() {
     super.initState();
-    book = ref.read(bookNotifierProvider);
-    bookProvider = ref.read(bookNotifierProvider.notifier);
-    spans = PDFUtils.getSpans(book.selections);
+    annoProvider = ref.read(annotationsNotifierProvider.notifier);
+    spans = annoProvider.getSelectionSpans(widget.bookId);
+    print(spans);
   }
 
   @override
@@ -74,9 +76,10 @@ class _AnnotationsOverlayState extends ConsumerState<AnnotationsOverlay> {
             trailing: IconButton(
               onPressed: () async {
                 PDFUtils.removeSelection(
+                  widget.bookId,
                   spans[index],
                   widget.controller,
-                  bookProvider,
+                  annoProvider,
                 );
                 setState(() {
                   spans.removeAt(index);

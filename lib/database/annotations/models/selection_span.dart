@@ -1,13 +1,13 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:logosophy/database/books/rect_converter.dart';
+import 'package:logosophy/database/annotations/models/rect_converter.dart';
 
 part 'selection_span.freezed.dart';
 part 'selection_span.g.dart';
 
+/// This is the type definition for an `Annotation` to be store in the Firebase.
 @freezed
 abstract class SelectionSpan with _$SelectionSpan {
   factory SelectionSpan({
-    // 2. Usamos a nossa classe serializável aqui!
     required List<SerializablePdfTextLine> textLines,
     required String type,
     required int pageNumber,

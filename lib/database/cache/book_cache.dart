@@ -36,7 +36,7 @@ class BookCache {
     }
   }
 
-  void updateBook(String bookId) {
+  void update(String bookId) {
     final data = _prefs.getString('books');
     if (data != null) {
       final dataJson = jsonDecode(data);
@@ -45,7 +45,7 @@ class BookCache {
     }
   }
 
-  bool isBookFresh(String bookId) {
+  bool isFresh(String bookId) {
     final data = _prefs.getString('books');
     if (data != null) {
       final dataJson = jsonDecode(data);
