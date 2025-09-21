@@ -32,7 +32,6 @@ class _AnnotationsOverlayState extends ConsumerState<AnnotationsOverlay> {
     super.initState();
     annoProvider = ref.read(annotationsNotifierProvider.notifier);
     spans = annoProvider.getSelectionSpans(widget.bookId);
-    print(spans);
   }
 
   @override

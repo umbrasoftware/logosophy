@@ -33,7 +33,7 @@ class PDFUtils {
     AnnotationsNotifier annoProvider,
   ) async {
     Annotation? annotationObjectToRemove;
-    final List<Annotation> allAnnotations = controller.getAnnotations();
+    final allAnnotations = controller.getAnnotations();
 
     for (final currentAnnotation in allAnnotations) {
       if (compareSpanAgainstAnnotation(span, currentAnnotation)) {
@@ -64,21 +64,29 @@ class PDFUtils {
     SelectionSpan span,
     Annotation annotation,
   ) {
+    // if (annotation.name == null) {
+    //   return false;
+    // }
+
     String spanText = '';
     for (final span in span.textLines) {
       spanText += span.text;
     }
 
-    if (annotation.name == spanText &&
-        annotation.pageNumber == span.pageNumber) {
+    print('annotation.name: ${annotation.name}');
+    print('spanText: $spanText');
+
+    if (annotation.pageNumber == span.pageNumber &&
+        annotation.name == spanText) {
       return true;
     }
     return false;
   }
 
+  /// Compare two selections spans by their text.
   static bool compareSelectionSpans(SelectionSpan s1, SelectionSpan s2) {
-    if (s1.textLines.length != s2.textLines.length) return false;
     if (s1.pageNumber != s2.pageNumber) return false;
+    if (s1.textLines.length != s2.textLines.length) return false;
 
     String s1Text = '';
     String s2Text = '';
@@ -179,6 +187,7 @@ class PDFUtils {
   ) {
     if (textLines != null && textLines.isNotEmpty) {
       final squigglyAnno = SquigglyAnnotation(textBoundsCollection: textLines);
+      squigglyAnno.name = textLines.map((line) => line.text).join('');
       controller.addAnnotation(squigglyAnno);
       final span = makeSelectionSpan(textLines, 'squiggly', squigglyAnno);
 
@@ -202,6 +211,7 @@ class PDFUtils {
       final strikeAnno = StrikethroughAnnotation(
         textBoundsCollection: textLines,
       );
+      strikeAnno.name = textLines.map((line) => line.text).join('');
       controller.addAnnotation(strikeAnno);
       final span = makeSelectionSpan(textLines, 'strikethrough', strikeAnno);
 
@@ -225,6 +235,7 @@ class PDFUtils {
       final underLineAnno = UnderlineAnnotation(
         textBoundsCollection: textLines,
       );
+      underLineAnno.name = textLines.map((line) => line.text).join('');
       controller.addAnnotation(underLineAnno);
       final span = makeSelectionSpan(textLines, 'underline', underLineAnno);
 
@@ -248,6 +259,7 @@ class PDFUtils {
       final highlightAnno = HighlightAnnotation(
         textBoundsCollection: textLines,
       );
+      highlightAnno.name = textLines.map((line) => line.text).join('');
       controller.addAnnotation(highlightAnno);
       final span = makeSelectionSpan(textLines, 'highlight', highlightAnno);
 

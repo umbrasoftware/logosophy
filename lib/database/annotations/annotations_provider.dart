@@ -54,7 +54,7 @@ class AnnotationsNotifier extends _$AnnotationsNotifier {
         .doc('annotations');
 
     final source = AnnotationsCache().isFresh() ? Source.cache : Source.server;
-    final docSnapshot = await docRef.get(GetOptions(source: Source.server));
+    final docSnapshot = await docRef.get(GetOptions(source: source));
 
     if (docSnapshot.exists) {
       _logger.info('Got annotations document from Firestore.');
