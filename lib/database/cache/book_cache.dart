@@ -68,29 +68,27 @@ class BookCache {
     if (data != null) {
       final dataJson = jsonDecode(data);
       final bookData = dataJson[bookId];
-      if (bookData != null) {
-        return BookPosition(
-          zoom: (bookData['zoom'] as num?)?.toDouble() ?? 1.0,
-          offset: Offset(
-            (bookData['offsetX'] as num?)?.toDouble() ?? 0.0,
-            (bookData['offsetY'] as num?)?.toDouble() ?? 0.0,
-          ),
-        );
-      }
+      return BookPosition(
+        zoom: (bookData['zoom'] as num?)?.toDouble() ?? 1.0,
+        offset: Offset(
+          (bookData['offsetX'] as num?)?.toDouble() ?? 0.0,
+          (bookData['offsetY'] as num?)?.toDouble() ?? 0.0,
+        ),
+      );
     }
+
+    _logger.warning('Book $bookId position is null. Creating default.');
     return BookPosition();
   }
 
-  void savePosition(String bookId, {int? page, double? zoom, Offset? offset}) {
+  void savePosition(String bookId, double zoom, Offset offset) {
     final data = _prefs.getString('books');
     if (data != null) {
       final dataJson = jsonDecode(data);
-      final bookData = dataJson[bookId] ?? {};
-      if (zoom != null) bookData['zoom'] = zoom;
-      if (offset != null) {
-        bookData['offsetX'] = offset.dx;
-        bookData['offsetY'] = offset.dy;
-      }
+      final bookData = dataJson[bookId];
+      bookData['zoom'] = zoom;
+      bookData['offsetX'] = offset.dx;
+      bookData['offsetY'] = offset.dy;
       dataJson[bookId] = bookData;
       _prefs.setString('books', jsonEncode(dataJson));
     }

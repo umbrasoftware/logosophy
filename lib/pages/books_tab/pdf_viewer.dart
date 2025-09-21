@@ -32,6 +32,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
   OverlayEntry? _annotationsOverlay;
   late bool _showToolbar;
   late bool _showScrollHead;
+  bool isDocumentLoaded = false;
   late String bookId;
   late AnnotationsNotifier annoProvider;
 
@@ -86,7 +87,6 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
                 _pdfViewerController.jumpToPage(widget.page!);
               } else {
                 final position = BookCache().getPosition(bookId);
-
                 Future.delayed(const Duration(milliseconds: 200), () {
                   if (mounted) {
                     _pdfViewerController.zoomLevel = position.zoom;
@@ -95,6 +95,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
                       yOffset: position.offset.dy,
                     );
                   }
+                  isDocumentLoaded = true;
                 });
               }
 
@@ -102,10 +103,16 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
               final selections = annoProvider.getSelectionSpans(bookId);
               PDFUtils.applySelections(_pdfViewerController, selections);
             },
-            onPageChanged: (_) =>
-                PDFUtils.savePosition(bookId, _pdfViewerController),
-            onZoomLevelChanged: (_) =>
-                PDFUtils.savePosition(bookId, _pdfViewerController),
+            onPageChanged: (_) {
+              if (isDocumentLoaded) {
+                PDFUtils.savePosition(bookId, _pdfViewerController);
+              }
+            },
+            onZoomLevelChanged: (_) {
+              if (isDocumentLoaded) {
+                PDFUtils.savePosition(bookId, _pdfViewerController);
+              }
+            },
             onTextSelectionChanged: (PdfTextSelectionChangedDetails details) {
               if (details.selectedText == null && _overlayEntry != null) {
                 _overlayEntry!.remove();

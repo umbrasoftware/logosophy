@@ -170,8 +170,8 @@ class PDFUtils {
   static void savePosition(String bookId, PdfViewerController controller) {
     BookCache().savePosition(
       bookId,
-      offset: controller.scrollOffset,
-      zoom: controller.zoomLevel,
+      controller.zoomLevel,
+      controller.scrollOffset,
     );
   }
 
