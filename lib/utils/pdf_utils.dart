@@ -64,17 +64,14 @@ class PDFUtils {
     SelectionSpan span,
     Annotation annotation,
   ) {
-    // if (annotation.name == null) {
-    //   return false;
-    // }
+    if (annotation.name == null) {
+      return false;
+    }
 
     String spanText = '';
     for (final span in span.textLines) {
       spanText += span.text;
     }
-
-    print('annotation.name: ${annotation.name}');
-    print('spanText: $spanText');
 
     if (annotation.pageNumber == span.pageNumber &&
         annotation.name == spanText) {
