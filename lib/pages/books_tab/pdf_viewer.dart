@@ -28,6 +28,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
   final PdfViewerController _pdfViewerController = PdfViewerController();
   final GlobalKey<SearchToolbarState> _textSearchKey = GlobalKey();
   final GlobalKey<SfPdfViewerState> _pdfViewerKey = GlobalKey();
+  final _annotationsOverlayBucket = PageStorageBucket();
   OverlayEntry? _overlayEntry;
   OverlayEntry? _annotationsOverlay;
   late bool _showToolbar;
@@ -340,11 +341,14 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     final overlay = Overlay.of(context);
     _annotationsOverlay = OverlayEntry(
       builder: (context) {
-        return AnnotationsOverlay(
-          controller: _pdfViewerController,
-          onClose: _hideAnnotationsOverlay,
-          bookId: bookId,
-          page: _pdfViewerController.pageNumber.toString(),
+        return PageStorage(
+          bucket: _annotationsOverlayBucket,
+          child: AnnotationsOverlay(
+            controller: _pdfViewerController,
+            onClose: _hideAnnotationsOverlay,
+            bookId: bookId,
+            page: _pdfViewerController.pageNumber.toString(),
+          ),
         );
       },
     );
