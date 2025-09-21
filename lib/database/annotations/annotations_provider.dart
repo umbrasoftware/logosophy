@@ -81,7 +81,11 @@ class AnnotationsNotifier extends _$AnnotationsNotifier {
         .doc('annotations');
 
     final annotationsInPage = state.book[bookId]?.page[page];
-    await docRef.set({"book.$bookId.page.$page": annotationsInPage});
+    try {
+      await docRef.set({"book.$bookId.page.$page": annotationsInPage});
+    } catch (e) {
+      _logger.shout('Error saving document to Firebase: $e');
+    }
 
     _logger.info('Book $bookId, page $page was saved on Firebase.');
   }

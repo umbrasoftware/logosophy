@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AnnotationsState {
 
-@JsonKey(defaultValue: {}) Map<String, PageAnnotations> get book;
+ Map<String, PageAnnotations> get book;
 /// Create a copy of AnnotationsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $AnnotationsStateCopyWith<$Res>  {
   factory $AnnotationsStateCopyWith(AnnotationsState value, $Res Function(AnnotationsState) _then) = _$AnnotationsStateCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(defaultValue: {}) Map<String, PageAnnotations> book
+ Map<String, PageAnnotations> book
 });
 
 
@@ -153,7 +153,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(defaultValue: {})  Map<String, PageAnnotations> book)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Map<String, PageAnnotations> book)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AnnotationsState() when $default != null:
 return $default(_that.book);case _:
@@ -174,7 +174,7 @@ return $default(_that.book);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(defaultValue: {})  Map<String, PageAnnotations> book)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Map<String, PageAnnotations> book)  $default,) {final _that = this;
 switch (_that) {
 case _AnnotationsState():
 return $default(_that.book);case _:
@@ -194,7 +194,7 @@ return $default(_that.book);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(defaultValue: {})  Map<String, PageAnnotations> book)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Map<String, PageAnnotations> book)?  $default,) {final _that = this;
 switch (_that) {
 case _AnnotationsState() when $default != null:
 return $default(_that.book);case _:
@@ -209,11 +209,11 @@ return $default(_that.book);case _:
 @JsonSerializable()
 
 class _AnnotationsState implements AnnotationsState {
-   _AnnotationsState({@JsonKey(defaultValue: {}) required final  Map<String, PageAnnotations> book}): _book = book;
+   _AnnotationsState({required final  Map<String, PageAnnotations> book}): _book = book;
   factory _AnnotationsState.fromJson(Map<String, dynamic> json) => _$AnnotationsStateFromJson(json);
 
  final  Map<String, PageAnnotations> _book;
-@override@JsonKey(defaultValue: {}) Map<String, PageAnnotations> get book {
+@override Map<String, PageAnnotations> get book {
   if (_book is EqualUnmodifiableMapView) return _book;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableMapView(_book);
@@ -253,7 +253,7 @@ abstract mixin class _$AnnotationsStateCopyWith<$Res> implements $AnnotationsSta
   factory _$AnnotationsStateCopyWith(_AnnotationsState value, $Res Function(_AnnotationsState) _then) = __$AnnotationsStateCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(defaultValue: {}) Map<String, PageAnnotations> book
+ Map<String, PageAnnotations> book
 });
 
 

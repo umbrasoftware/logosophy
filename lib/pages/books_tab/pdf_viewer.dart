@@ -5,12 +5,14 @@ import 'package:logging/logging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logosophy/database/annotations/annotations_provider.dart';
 import 'package:logosophy/database/cache/book_cache.dart';
+import 'package:logosophy/database/notes/notes_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
+import 'package:logosophy/pages/books_tab/overlays/notes_overlay.dart';
 import 'package:logosophy/utils/pdf_utils.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
-import 'annotations_overlay.dart';
-import 'searchbar_overlay.dart';
+import 'overlays/annotations_overlay.dart';
+import 'overlays/searchbar_overlay.dart';
 
 class PdfViewer extends ConsumerStatefulWidget {
   const PdfViewer({super.key, required this.file, this.page});
@@ -29,13 +31,16 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
   final GlobalKey<SearchToolbarState> _textSearchKey = GlobalKey();
   final GlobalKey<SfPdfViewerState> _pdfViewerKey = GlobalKey();
   final _annotationsOverlayBucket = PageStorageBucket();
+  final _notesOverlayBucket = PageStorageBucket();
   OverlayEntry? _overlayEntry;
   OverlayEntry? _annotationsOverlay;
+  OverlayEntry? _notesOverlay;
   late bool _showToolbar;
   late bool _showScrollHead;
   bool isDocumentLoaded = false;
   late String bookId;
   late AnnotationsNotifier annoProvider;
+  late NotesNotifier notesProvider;
 
   LocalHistoryEntry? _historyEntry;
 
@@ -45,6 +50,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     _showToolbar = false;
     _showScrollHead = true;
     annoProvider = ref.read(annotationsNotifierProvider.notifier);
+    notesProvider = ref.read(notesNotifierProvider.notifier);
     super.initState();
   }
 
@@ -61,6 +67,11 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
   void _hideAnnotationsOverlay() {
     _annotationsOverlay?.remove();
     _annotationsOverlay = null;
+  }
+
+  void _hideNotesOverlay() {
+    _notesOverlay?.remove();
+    _notesOverlay = null;
   }
 
   void _handleHistoryEntryRemoved() {
@@ -101,6 +112,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
               }
 
               await annoProvider.getAnnotationsDoc();
+              await notesProvider.getDocument();
               final selections = annoProvider.getSelectionSpans(bookId);
               PDFUtils.applySelections(_pdfViewerController, selections);
             },
@@ -161,8 +173,14 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
   AppBar buildAppBar() {
     return AppBar(
       actions: [
-        IconButton(icon: Icon(Icons.note_add_sharp), onPressed: () {}),
-        IconButton(icon: Icon(Icons.bookmark), onPressed: _showNotesOverlay),
+        IconButton(
+          icon: Icon(Icons.note_add_sharp),
+          onPressed: _showNotesOverlay,
+        ),
+        IconButton(
+          icon: Icon(Icons.bookmark),
+          onPressed: _showAnnotationsOverlay,
+        ),
         const Spacer(),
         IconButton(
           icon: Icon(Icons.search),
@@ -325,7 +343,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     overlayState.insert(_overlayEntry!);
   }
 
-  void _showNotesOverlay() {
+  void _showAnnotationsOverlay() {
     if (_annotationsOverlay != null) {
       return;
     }
@@ -354,5 +372,35 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     );
 
     overlay.insert(_annotationsOverlay!);
+  }
+
+  void _showNotesOverlay() {
+    if (_notesOverlay != null) {
+      return;
+    }
+
+    final annotations = _pdfViewerController.getAnnotations();
+    if (annotations.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nenhuma anotação encontrada.')),
+      );
+      return;
+    }
+
+    final overlay = Overlay.of(context);
+    _notesOverlay = OverlayEntry(
+      builder: (context) {
+        return PageStorage(
+          bucket: _notesOverlayBucket,
+          child: NotesOverlay(
+            onClose: _hideNotesOverlay,
+            bookId: bookId,
+            page: _pdfViewerController.pageNumber.toString(),
+          ),
+        );
+      },
+    );
+
+    overlay.insert(_notesOverlay!);
   }
 }
