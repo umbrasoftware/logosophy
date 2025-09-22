@@ -25,13 +25,22 @@ Future<void> main() async {
   runApp(ProviderScope(child: TranslationProvider(child: App())));
 }
 
-class App extends StatelessWidget {
+class App extends ConsumerStatefulWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    initCaches();
+  ConsumerState<App> createState() => _AppState();
+}
 
+class _AppState extends ConsumerState<App> {
+  @override
+  void initState() {
+    initCaches();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,

@@ -44,6 +44,8 @@ class NotesNotifier extends _$NotesNotifier {
       if (source == Source.server) {
         NotesCache().update();
       }
+    } else {
+      _logger.shout('Could not find Notes document from Firestore.');
     }
   }
 

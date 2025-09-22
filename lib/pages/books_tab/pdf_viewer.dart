@@ -5,7 +5,6 @@ import 'package:logging/logging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logosophy/database/annotations/annotations_provider.dart';
 import 'package:logosophy/database/cache/book_cache.dart';
-import 'package:logosophy/database/notes/notes_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/overlays/notes_overlay.dart';
 import 'package:logosophy/utils/pdf_utils.dart';
@@ -40,7 +39,6 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
   bool isDocumentLoaded = false;
   late String bookId;
   late AnnotationsNotifier annoProvider;
-  late NotesNotifier notesProvider;
 
   LocalHistoryEntry? _historyEntry;
 
@@ -50,7 +48,6 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     _showToolbar = false;
     _showScrollHead = true;
     annoProvider = ref.read(annotationsNotifierProvider.notifier);
-    notesProvider = ref.read(notesNotifierProvider.notifier);
     super.initState();
   }
 
@@ -111,8 +108,6 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
                 });
               }
 
-              await annoProvider.getAnnotationsDoc();
-              await notesProvider.getDocument();
               final selections = annoProvider.getSelectionSpans(bookId);
               PDFUtils.applySelections(_pdfViewerController, selections);
             },

@@ -40,7 +40,7 @@ class AnnotationsNotifier extends _$AnnotationsNotifier {
   }
 
   /// Gets the entire Annotation document from Firebase.
-  Future<void> getAnnotationsDoc() async {
+  Future<void> getDocument() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) {
       _logger.shout('User instance is null.');
@@ -63,6 +63,8 @@ class AnnotationsNotifier extends _$AnnotationsNotifier {
       if (source == Source.server) {
         AnnotationsCache().update();
       }
+    } else {
+      _logger.shout('Could not find Annotations document from Firestore.');
     }
   }
 

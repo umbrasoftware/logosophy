@@ -4,25 +4,28 @@ import 'dart:io';
 import 'package:country_flags/country_flags.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
+import 'package:logosophy/database/annotations/annotations_provider.dart';
+import 'package:logosophy/database/notes/notes_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/splash_pages/animated_logo.dart';
 import 'package:logosophy/utils/files_utils.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-class SetupPage extends StatefulWidget {
+class SetupPage extends ConsumerStatefulWidget {
   const SetupPage({super.key});
 
   @override
-  State<SetupPage> createState() => _SetupPageState();
+  ConsumerState<SetupPage> createState() => _SetupPageState();
 }
 
 /// Enum to represent the different states of the setup process.
 enum _SetupStatus { checking, needsDownload, complete }
 
-class _SetupPageState extends State<SetupPage> {
+class _SetupPageState extends ConsumerState<SetupPage> {
   _SetupStatus _status = _SetupStatus.checking;
   final logger = Logger('SetupPage');
   late Map<String, dynamic> mappings;
@@ -64,8 +67,7 @@ class _SetupPageState extends State<SetupPage> {
     // If checks are complete and books exist, update state and navigate.
     if (mounted) setState(() => _status = _SetupStatus.complete);
 
-    // A small delay to prevent screen flicker if checks are very fast.
-    // await Future.delayed(const Duration(milliseconds: 100));
+    await loadDocuments(ref);
     if (mounted) {
       GoRouter.of(context).go('/home');
     }
@@ -262,4 +264,12 @@ class _DownloadProgressDialogState extends State<_DownloadProgressDialog> {
           : null,
     );
   }
+}
+
+Future<void> loadDocuments(WidgetRef ref) async {
+  final annoProvider = ref.read(annotationsNotifierProvider.notifier);
+  final notesProvider = ref.read(notesNotifierProvider.notifier);
+
+  await annoProvider.getDocument();
+  await notesProvider.getDocument();
 }
