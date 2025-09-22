@@ -40,6 +40,7 @@ class TranslationsPtBr implements Translations {
 	@override late final _TranslationsSetupPtBr setup = _TranslationsSetupPtBr._(_root);
 	@override late final _TranslationsNavBarPtBr navBar = _TranslationsNavBarPtBr._(_root);
 	@override late final _TranslationsBookPagePtBr bookPage = _TranslationsBookPagePtBr._(_root);
+	@override late final _TranslationsNotesPagePtBr notesPage = _TranslationsNotesPagePtBr._(_root);
 	@override late final _TranslationsAuthMessagesPtBr authMessages = _TranslationsAuthMessagesPtBr._(_root);
 }
 
@@ -63,6 +64,11 @@ class _TranslationsBtnActionsPtBr implements TranslationsBtnActionsEn {
 	@override String get backToLogin => 'Voltar para a página de login';
 	@override String get changeFont => 'Mudar fonte';
 	@override String get continueAction => 'Continuar';
+	@override String get save => 'Salvar';
+	@override String get clear => 'Limpar';
+	@override String get add => 'Adicionar';
+	@override String get delete => 'Deletar';
+	@override String get confirmDelete => 'Confirmar Exclusão';
 }
 
 // Path: setup
@@ -118,6 +124,26 @@ class _TranslationsBookPagePtBr implements TranslationsBookPageEn {
 	@override String get strikethrough => 'Riscar';
 	@override String get squiggly => 'Ondular';
 	@override String get copy => 'Copiar';
+	@override String page({required Object page}) => 'Página ${page}';
+	@override String get bookAnnotations => 'Anotações do livro';
+}
+
+// Path: notesPage
+class _TranslationsNotesPagePtBr implements TranslationsNotesPageEn {
+	_TranslationsNotesPagePtBr._(this._root);
+
+	final TranslationsPtBr _root; // ignore: unused_field
+
+	// Translations
+	@override String get bookNotes => 'Anotações do livro';
+	@override String get noBookNotes => 'Nenhuma anotação encontrada para este livro.';
+	@override String get editNote => 'Editar anotação';
+	@override String newNote({required Object page}) => 'Nova anotação para a página ${page}';
+	@override String get writeNotes => 'Escreva sua anotação aqui...';
+	@override String get noteUpdated => 'Anotação atualizada!';
+	@override String get noteDeleted => 'Anotação deletada.';
+	@override String get confirmDelete => 'Tem certeza que deseja deletar esta anotação?';
+	@override String get newNoteSaved => 'Nova anotação salva!';
 }
 
 // Path: authMessages
@@ -191,6 +217,11 @@ extension on TranslationsPtBr {
 			case 'btnActions.backToLogin': return 'Voltar para a página de login';
 			case 'btnActions.changeFont': return 'Mudar fonte';
 			case 'btnActions.continueAction': return 'Continuar';
+			case 'btnActions.save': return 'Salvar';
+			case 'btnActions.clear': return 'Limpar';
+			case 'btnActions.add': return 'Adicionar';
+			case 'btnActions.delete': return 'Deletar';
+			case 'btnActions.confirmDelete': return 'Confirmar Exclusão';
 			case 'setup.noBooks': return 'Parece que você não tem nenhum livro ainda. Por favor, selecione uma língua para os livros para começar a usar o aplicativo!';
 			case 'setup.starting': return 'Iniciando download';
 			case 'setup.downloadingBooks': return 'Baixando livros';
@@ -219,6 +250,17 @@ extension on TranslationsPtBr {
 			case 'bookPage.strikethrough': return 'Riscar';
 			case 'bookPage.squiggly': return 'Ondular';
 			case 'bookPage.copy': return 'Copiar';
+			case 'bookPage.page': return ({required Object page}) => 'Página ${page}';
+			case 'bookPage.bookAnnotations': return 'Anotações do livro';
+			case 'notesPage.bookNotes': return 'Anotações do livro';
+			case 'notesPage.noBookNotes': return 'Nenhuma anotação encontrada para este livro.';
+			case 'notesPage.editNote': return 'Editar anotação';
+			case 'notesPage.newNote': return ({required Object page}) => 'Nova anotação para a página ${page}';
+			case 'notesPage.writeNotes': return 'Escreva sua anotação aqui...';
+			case 'notesPage.noteUpdated': return 'Anotação atualizada!';
+			case 'notesPage.noteDeleted': return 'Anotação deletada.';
+			case 'notesPage.confirmDelete': return 'Tem certeza que deseja deletar esta anotação?';
+			case 'notesPage.newNoteSaved': return 'Nova anotação salva!';
 			case 'authMessages.prompt.askPassword': return 'Digite a senha';
 			case 'authMessages.prompt.askEmail': return 'Digite seu email';
 			case 'authMessages.prompt.askAuthenticate': return 'Por favor, se autentique para entrar no aplicativo.';

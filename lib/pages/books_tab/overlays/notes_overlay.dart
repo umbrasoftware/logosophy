@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logosophy/database/notes/models/note.dart';
 import 'package:logosophy/database/notes/notes_provider.dart';
+import 'package:logosophy/gen/strings.g.dart';
 
 class NotesOverlay extends ConsumerStatefulWidget {
   final VoidCallback onClose;
@@ -98,7 +99,7 @@ class _NotesOverlayState extends ConsumerState<NotesOverlay> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'Anotações do Livro',
+          t.bookPage.bookAnnotations,
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         IconButton(icon: const Icon(Icons.close), onPressed: widget.onClose),
@@ -109,9 +110,7 @@ class _NotesOverlayState extends ConsumerState<NotesOverlay> {
   Widget _buildExistingNotesList() {
     return Expanded(
       child: _notes.isEmpty
-          ? const Center(
-              child: Text('Nenhuma anotação encontrada para este livro.'),
-            )
+          ? Center(child: Text(t.notesPage.noBookNotes))
           : ListView.builder(
               itemCount: _notes.length,
               itemBuilder: (context, index) {
@@ -133,16 +132,16 @@ class _NotesOverlayState extends ConsumerState<NotesOverlay> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Página ${note.page ?? 'N/A'}',
+              t.bookPage.page(page: note.page ?? 'N/A'),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             TextField(
               controller: controller,
               maxLines: 3,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Editar anotação',
+                labelText: t.notesPage.editNote,
               ),
             ),
             const SizedBox(height: 8),
@@ -155,7 +154,7 @@ class _NotesOverlayState extends ConsumerState<NotesOverlay> {
                 ),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.save, size: 18),
-                  label: const Text('Salvar'),
+                  label: Text(t.btnActions.save),
                   onPressed: () => _handleSaveNote(note, controller.text),
                 ),
               ],
@@ -173,16 +172,16 @@ class _NotesOverlayState extends ConsumerState<NotesOverlay> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Nova anotação para a página $_currentPage',
+            t.notesPage.newNote(page: _currentPage),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 8),
           TextField(
             controller: _newNoteController,
             maxLines: 3,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: OutlineInputBorder(),
-              labelText: 'Escreva sua anotação aqui...',
+              labelText: t.notesPage.writeNotes,
             ),
           ),
           const SizedBox(height: 8),
@@ -190,13 +189,13 @@ class _NotesOverlayState extends ConsumerState<NotesOverlay> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                child: const Text('Limpar'),
+                child: Text(t.btnActions.clear),
                 onPressed: () => _newNoteController.clear(),
               ),
               const SizedBox(width: 8),
               ElevatedButton.icon(
                 icon: const Icon(Icons.add, size: 18),
-                label: const Text('Adicionar'),
+                label: Text(t.btnActions.add),
                 onPressed: _handleAddNewNote,
               ),
             ],
@@ -213,8 +212,8 @@ class _NotesOverlayState extends ConsumerState<NotesOverlay> {
         .read(notesNotifierProvider.notifier)
         .saveNote(id: note.id, noteText: updatedText);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Anotação atualizada!'),
+      SnackBar(
+        content: Text(t.notesPage.noteUpdated),
         backgroundColor: Colors.green,
       ),
     );
@@ -238,18 +237,16 @@ class _NotesOverlayState extends ConsumerState<NotesOverlay> {
         color: Colors.black.withAlpha(150),
         child: Center(
           child: AlertDialog(
-            title: const Text('Confirmar Exclusão'),
-            content: const Text(
-              'Tem certeza que deseja deletar esta anotação?',
-            ),
+            title: Text(t.btnActions.confirmDelete),
+            content: Text(t.notesPage.confirmDelete),
             actions: [
               TextButton(
                 onPressed: _hideConfirmationDialog,
-                child: const Text('Cancelar'),
+                child: Text(t.btnActions.cancel),
               ),
               TextButton(
-                child: const Text(
-                  'Deletar',
+                child: Text(
+                  t.btnActions.delete,
                   style: TextStyle(color: Colors.red),
                 ),
                 onPressed: () {
@@ -261,8 +258,8 @@ class _NotesOverlayState extends ConsumerState<NotesOverlay> {
                     _notes.removeWhere((n) => n.id == note.id);
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Anotação deletada.'),
+                    SnackBar(
+                      content: Text(t.notesPage.noteDeleted),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -293,8 +290,8 @@ class _NotesOverlayState extends ConsumerState<NotesOverlay> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Nova anotação salva!'),
+      SnackBar(
+        content: Text(t.notesPage.newNoteSaved),
         backgroundColor: Colors.green,
       ),
     );

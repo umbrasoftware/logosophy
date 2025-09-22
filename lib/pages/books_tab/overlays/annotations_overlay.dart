@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logosophy/database/annotations/annotations_provider.dart';
 import 'package:logosophy/database/annotations/models/selection_span.dart';
+import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/utils/pdf_utils.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
@@ -103,7 +104,7 @@ class _AnnotationsOverlayState extends ConsumerState<AnnotationsOverlay> {
               },
               icon: const Icon(Icons.delete_outline, color: Colors.red),
             ),
-            title: Text('Página ${spans[index].pageNumber}'),
+            title: Text(t.bookPage.page(page: spans[index].pageNumber)),
             subtitle: Text(
               PDFUtils.getAllText(spans[index].textLines),
               maxLines: 2,
@@ -126,7 +127,7 @@ class _AnnotationsOverlayState extends ConsumerState<AnnotationsOverlay> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Anotações do livro',
+            t.bookPage.bookAnnotations,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           IconButton(icon: const Icon(Icons.close), onPressed: widget.onClose),

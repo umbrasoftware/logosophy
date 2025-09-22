@@ -12,7 +12,12 @@
         "logIn": "Entrar",
         "backToLogin": "Voltar para a página de login",
         "changeFont": "Mudar fonte",
-        "continueAction": "Continuar"
+        "continueAction": "Continuar",
+        "save": "Salvar",
+        "clear": "Limpar",
+        "add": "Adicionar",
+        "delete": "Deletar",
+        "confirmDelete": "Confirmar Exclusão"
     },
     "setup": {
         "noBooks": "Parece que você não tem nenhum livro ainda. Por favor, selecione uma língua para os livros para começar a usar o aplicativo!",
@@ -46,7 +51,20 @@
         "underline": "Sublinhar",
         "strikethrough": "Riscar",
         "squiggly": "Ondular",
-        "copy": "Copiar"
+        "copy": "Copiar",
+        "page": "Página $page",
+        "bookAnnotations": "Anotações do livro"
+    },
+    "notesPage": {
+        "bookNotes": "Anotações do livro",
+        "noBookNotes": "Nenhuma anotação encontrada para este livro.",
+        "editNote": "Editar anotação",
+        "newNote": "Nova anotação para a página $page",
+        "writeNotes": "Escreva sua anotação aqui...",
+        "noteUpdated": "Anotação atualizada!",
+        "noteDeleted": "Anotação deletada.",
+        "confirmDelete": "Tem certeza que deseja deletar esta anotação?",
+        "newNoteSaved": "Nova anotação salva!"
     },
     "authMessages": {
         "prompt": {

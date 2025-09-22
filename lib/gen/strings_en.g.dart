@@ -43,6 +43,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final TranslationsSetupEn setup = TranslationsSetupEn._(_root);
 	late final TranslationsNavBarEn navBar = TranslationsNavBarEn._(_root);
 	late final TranslationsBookPageEn bookPage = TranslationsBookPageEn._(_root);
+	late final TranslationsNotesPageEn notesPage = TranslationsNotesPageEn._(_root);
 	late final TranslationsAuthMessagesEn authMessages = TranslationsAuthMessagesEn._(_root);
 }
 
@@ -92,6 +93,21 @@ class TranslationsBtnActionsEn {
 
 	/// en: 'Continue'
 	String get continueAction => 'Continue';
+
+	/// en: 'Save'
+	String get save => 'Save';
+
+	/// en: 'Clear'
+	String get clear => 'Clear';
+
+	/// en: 'Add'
+	String get add => 'Add';
+
+	/// en: 'Delete'
+	String get delete => 'Delete';
+
+	/// en: 'Confirm delete'
+	String get confirmDelete => 'Confirm delete';
 }
 
 // Path: setup
@@ -203,6 +219,48 @@ class TranslationsBookPageEn {
 
 	/// en: 'Copy'
 	String get copy => 'Copy';
+
+	/// en: 'Page $page'
+	String page({required Object page}) => 'Page ${page}';
+
+	/// en: 'Book annotations'
+	String get bookAnnotations => 'Book annotations';
+}
+
+// Path: notesPage
+class TranslationsNotesPageEn {
+	TranslationsNotesPageEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Book notes'
+	String get bookNotes => 'Book notes';
+
+	/// en: 'No notes found for this book.'
+	String get noBookNotes => 'No notes found for this book.';
+
+	/// en: 'Edit note'
+	String get editNote => 'Edit note';
+
+	/// en: 'New note for page $page'
+	String newNote({required Object page}) => 'New note for page ${page}';
+
+	/// en: 'Write your notes here...'
+	String get writeNotes => 'Write your notes here...';
+
+	/// en: 'Note updated!'
+	String get noteUpdated => 'Note updated!';
+
+	/// en: 'Note deleted.'
+	String get noteDeleted => 'Note deleted.';
+
+	/// en: 'Are you sure you want to delete this note?'
+	String get confirmDelete => 'Are you sure you want to delete this note?';
+
+	/// en: 'New note saved!'
+	String get newNoteSaved => 'New note saved!';
 }
 
 // Path: authMessages
@@ -324,6 +382,11 @@ extension on Translations {
 			case 'btnActions.backToLogin': return 'Back to login page';
 			case 'btnActions.changeFont': return 'Change font';
 			case 'btnActions.continueAction': return 'Continue';
+			case 'btnActions.save': return 'Save';
+			case 'btnActions.clear': return 'Clear';
+			case 'btnActions.add': return 'Add';
+			case 'btnActions.delete': return 'Delete';
+			case 'btnActions.confirmDelete': return 'Confirm delete';
 			case 'setup.noBooks': return 'It seems you don\'t have any books yet. Please select a language for the books to start using the app!';
 			case 'setup.starting': return 'Starting download';
 			case 'setup.downloadingBooks': return 'Downloading books';
@@ -352,6 +415,17 @@ extension on Translations {
 			case 'bookPage.strikethrough': return 'Strikethrough';
 			case 'bookPage.squiggly': return 'Squiggly';
 			case 'bookPage.copy': return 'Copy';
+			case 'bookPage.page': return ({required Object page}) => 'Page ${page}';
+			case 'bookPage.bookAnnotations': return 'Book annotations';
+			case 'notesPage.bookNotes': return 'Book notes';
+			case 'notesPage.noBookNotes': return 'No notes found for this book.';
+			case 'notesPage.editNote': return 'Edit note';
+			case 'notesPage.newNote': return ({required Object page}) => 'New note for page ${page}';
+			case 'notesPage.writeNotes': return 'Write your notes here...';
+			case 'notesPage.noteUpdated': return 'Note updated!';
+			case 'notesPage.noteDeleted': return 'Note deleted.';
+			case 'notesPage.confirmDelete': return 'Are you sure you want to delete this note?';
+			case 'notesPage.newNoteSaved': return 'New note saved!';
 			case 'authMessages.prompt.askPassword': return 'Enter password';
 			case 'authMessages.prompt.askEmail': return 'Enter email';
 			case 'authMessages.prompt.askAuthenticate': return 'Please authenticate to enter the app.';
