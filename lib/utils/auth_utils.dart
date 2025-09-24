@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
+import 'package:logosophy/database/annotations/annotations_provider.dart';
+import 'package:logosophy/database/notes/notes_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/utils/pdf_utils.dart';
 
@@ -114,5 +117,13 @@ class AuthUtils {
   /// Validates if the given string is a valid email address.
   static bool isEmailValid(String email) {
     return EmailValidator.validate(email);
+  }
+
+  Future<void> loadDocuments(WidgetRef ref) async {
+    final annoProvider = ref.read(annotationsNotifierProvider.notifier);
+    final notesProvider = ref.read(notesNotifierProvider.notifier);
+
+    await annoProvider.getDocument();
+    await notesProvider.getDocument();
   }
 }

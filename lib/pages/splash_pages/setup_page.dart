@@ -7,10 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
-import 'package:logosophy/database/annotations/annotations_provider.dart';
-import 'package:logosophy/database/notes/notes_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/splash_pages/animated_logo.dart';
+import 'package:logosophy/utils/auth_utils.dart';
 import 'package:logosophy/utils/files_utils.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -67,8 +66,9 @@ class _SetupPageState extends ConsumerState<SetupPage> {
     // If checks are complete and books exist, update state and navigate.
     if (mounted) setState(() => _status = _SetupStatus.complete);
 
-    await loadDocuments(ref);
     if (mounted) {
+      await AuthUtils().loadDocuments(ref);
+      // ignore: use_build_context_synchronously
       GoRouter.of(context).go('/home');
     }
   }
@@ -264,12 +264,4 @@ class _DownloadProgressDialogState extends State<_DownloadProgressDialog> {
           : null,
     );
   }
-}
-
-Future<void> loadDocuments(WidgetRef ref) async {
-  final annoProvider = ref.read(annotationsNotifierProvider.notifier);
-  final notesProvider = ref.read(notesNotifierProvider.notifier);
-
-  await annoProvider.getDocument();
-  await notesProvider.getDocument();
 }

@@ -374,14 +374,6 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
       return;
     }
 
-    final annotations = _pdfViewerController.getAnnotations();
-    if (annotations.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nenhuma anotação encontrada.')),
-      );
-      return;
-    }
-
     final overlay = Overlay.of(context);
     _notesOverlay = OverlayEntry(
       builder: (context) {

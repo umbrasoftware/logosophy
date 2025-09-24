@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logosophy/utils/auth_utils.dart';
 import 'package:logosophy/gen/strings.g.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -51,6 +52,7 @@ class _RegisterPageState extends State<RegisterPage> {
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
+      await AuthUtils().loadDocuments(ref);
     } else {
       // Success: Show confirmation message.
       ScaffoldMessenger.of(

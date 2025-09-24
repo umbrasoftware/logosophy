@@ -113,7 +113,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
   /// UI Section for filtering notes
   Widget _buildFilterSection() {
     // Get unique book IDs from the notes to populate the dropdown
-    final allNotes = ref.watch(notesNotifierProvider).notes.values;
+    final allNotes = ref.read(notesNotifierProvider).notes.values;
     final bookIds = allNotes
         .map((e) => e.bookId)
         .whereType<String>()
