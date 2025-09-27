@@ -1,9 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logosophy/database/notes/models/note.dart';
 import 'package:logosophy/database/notes/models/notes_state.dart';
 import 'package:logosophy/database/notes/notes_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 class NotesPage extends ConsumerStatefulWidget {
   const NotesPage({super.key});
@@ -18,9 +23,11 @@ class _NotesPageState extends ConsumerState<NotesPage> {
   DateTime? _afterDate;
   DateTime? _beforeDate;
   final _pageController = TextEditingController();
+  Map<String, dynamic> mappings = {};
+  bool _isLoading = true;
 
   // --- LOCAL UI STATE FOR TEXT EDITING ---
-  Map<String, TextEditingController> _editingControllers = {};
+  final Map<String, TextEditingController> _editingControllers = {};
 
   @override
   void initState() {
@@ -30,14 +37,32 @@ class _NotesPageState extends ConsumerState<NotesPage> {
     _rebuildEditingControllers(
       ref.read(notesNotifierProvider).notes.values.toList(),
     );
+    loadMappings().then((_) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     // Dispose all controllers to prevent memory leaks.
     _pageController.dispose();
-    _editingControllers.values.forEach((controller) => controller.dispose());
+    for (var controller in _editingControllers.values) {
+      controller.dispose();
+    }
     super.dispose();
+  }
+
+  Future<void> loadMappings() async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final booksDir = Directory(p.join(appDir.path, 'books'));
+    final mappingsFile = File(p.join(booksDir.path, 'mappings.json'));
+
+    final content = await mappingsFile.readAsString();
+    mappings = jsonDecode(content);
   }
 
   /// Called by the filter UI to trigger a rebuild with new filter values.
@@ -108,12 +133,8 @@ class _NotesPageState extends ConsumerState<NotesPage> {
     });
 
     // 3. Calculate the list to be displayed here, directly in the build method.
-    final pageAsInt = _pageController.text.isNotEmpty
-        ? int.tryParse(_pageController.text)
-        : null;
     final displayedNotes = notifier.getNotes(
       bookId: _selectedBookId,
-      page: pageAsInt,
       after: _afterDate,
       before: _beforeDate,
     );
@@ -124,6 +145,13 @@ class _NotesPageState extends ConsumerState<NotesPage> {
       if (pageA != pageB) return pageA.compareTo(pageB);
       return (b.createdAt ?? DateTime(0)).compareTo(a.createdAt ?? DateTime(0));
     });
+
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('My Notes')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('My Notes')),
@@ -152,11 +180,12 @@ class _NotesPageState extends ConsumerState<NotesPage> {
   /// UI Section for filtering notes.
   Widget _buildFilterSection(List<Note> allNotes) {
     // Get unique book IDs from the notes to populate the dropdown.
-    final bookIds = allNotes
+    var bookIds = allNotes
         .map((e) => e.bookId)
         .whereType<String>()
         .toSet()
         .toList();
+    bookIds.insert(0, '');
 
     return ExpansionTile(
       title: const Text('Filters'),
@@ -169,25 +198,28 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: _selectedBookId,
+                      initialValue: _selectedBookId ?? '',
                       hint: const Text('Filter by Book'),
                       items: bookIds
                           .map(
-                            (id) =>
-                                DropdownMenuItem(value: id, child: Text(id)),
+                            (id) => DropdownMenuItem(
+                              value: id,
+                              child: Text(
+                                id.isEmpty
+                                    ? 'Todos os livros'
+                                    : mappings['pt-BR']['$id.pdf']?['title'] ??
+                                          'Livro Desconhecido ($id)',
+                              ),
+                            ),
                           )
                           .toList(),
-                      onChanged: (value) =>
-                          setState(() => _selectedBookId = value),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  SizedBox(
-                    width: 100,
-                    child: TextFormField(
-                      controller: _pageController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'Page'),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedBookId = (value == null || value.isEmpty)
+                              ? null
+                              : value;
+                        });
+                      },
                     ),
                   ),
                 ],
@@ -200,7 +232,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                     icon: const Icon(Icons.calendar_today, size: 16),
                     label: Text(
                       _afterDate == null
-                          ? 'Created After...'
+                          ? 'After...'
                           : DateFormat('dd/MM/yy').format(_afterDate!),
                     ),
                     onPressed: () async {
@@ -217,7 +249,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                     icon: const Icon(Icons.calendar_today, size: 16),
                     label: Text(
                       _beforeDate == null
-                          ? 'Created Before...'
+                          ? 'Before...'
                           : DateFormat('dd/MM/yy').format(_beforeDate!),
                     ),
                     onPressed: () async {
@@ -286,7 +318,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
           children: [
             Text(
               note.bookId != null
-                  ? 'Book ${note.bookId}, Page ${note.page}'
+                  ? '${mappings["pt-BR"]["${note.bookId}.pdf"]["title"]}, Page ${note.page}'
                   : 'General Note',
               style: Theme.of(context).textTheme.titleMedium,
             ),

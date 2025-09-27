@@ -117,23 +117,13 @@ class NotesNotifier extends _$NotesNotifier {
   /// [after] - If provided, only notes created after this DateTime will be returned.
   ///
   /// [before] - If provided, only notes created before this DateTime will be returned.
-  List<Note> getNotes({
-    String? bookId,
-    int? page,
-    DateTime? after,
-    DateTime? before,
-  }) {
+  List<Note> getNotes({String? bookId, DateTime? after, DateTime? before}) {
     // Start with an iterable of all notes from the current state.
     Iterable<Note> filteredNotes = state.notes.values;
 
     // Apply bookId filter if it exists.
     if (bookId != null) {
       filteredNotes = filteredNotes.where((note) => note.bookId == bookId);
-    }
-
-    // Apply page filter if it exists.
-    if (page != null) {
-      filteredNotes = filteredNotes.where((note) => note.page == page);
     }
 
     // Apply 'after' date filter if it exists.

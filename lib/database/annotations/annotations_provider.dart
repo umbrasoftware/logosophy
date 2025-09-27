@@ -54,7 +54,14 @@ class AnnotationsNotifier extends _$AnnotationsNotifier {
         .doc('annotations');
 
     final source = AnnotationsCache().isFresh() ? Source.cache : Source.server;
-    final docSnapshot = await docRef.get(GetOptions(source: source));
+    DocumentSnapshot<Map<String, dynamic>> docSnapshot;
+
+    try {
+      docSnapshot = await docRef.get(GetOptions(source: source));
+    } catch (e) {
+      _logger.warning('Error getting document. Using cache.');
+      docSnapshot = await docRef.get(GetOptions(source: Source.cache));
+    }
 
     if (docSnapshot.exists) {
       _logger.info('Got annotations document from Firestore.');
