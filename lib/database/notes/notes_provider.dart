@@ -70,7 +70,7 @@ class NotesNotifier extends _$NotesNotifier {
         note: noteText,
         bookId: bookId, // Assign bookId for new notes
         page: page, // Assign page for new notes
-        createdAt: null,
+        createdAt: DateTime.now(),
         updatedAt: null,
       );
     } else {

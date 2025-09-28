@@ -207,8 +207,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                               child: Text(
                                 id.isEmpty
                                     ? 'Todos os livros'
-                                    : mappings['pt-BR']['$id.pdf']?['title'] ??
-                                          'Livro Desconhecido ($id)',
+                                    : mappings['pt-BR']['$id.pdf']?['title'],
                               ),
                             ),
                           )

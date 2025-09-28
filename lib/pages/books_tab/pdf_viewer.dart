@@ -81,60 +81,67 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _showToolbar ? buildSearchToolbar(context) : buildAppBar(),
-      body: Stack(
-        children: [
-          SfPdfViewer.file(
-            key: _pdfViewerKey,
-            widget.file,
-            controller: _pdfViewerController,
-            canShowTextSelectionMenu: false,
-            canShowScrollHead: _showScrollHead,
-            onDocumentLoaded: (details) async {
-              if (widget.page != null) {
-                _pdfViewerController.jumpToPage(widget.page!);
-              } else {
-                final position = BookCache().getPosition(bookId);
-                Future.delayed(const Duration(milliseconds: 200), () {
-                  if (mounted) {
-                    _pdfViewerController.zoomLevel = position.zoom;
-                    _pdfViewerController.jumpTo(
-                      xOffset: position.offset.dx,
-                      yOffset: position.offset.dy,
-                    );
-                  }
-                  isDocumentLoaded = true;
-                });
-              }
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        _hideAnnotationsOverlay();
+        _hideNotesOverlay();
+      },
+      child: Scaffold(
+        appBar: _showToolbar ? buildSearchToolbar(context) : buildAppBar(),
+        body: Stack(
+          children: [
+            SfPdfViewer.file(
+              key: _pdfViewerKey,
+              widget.file,
+              controller: _pdfViewerController,
+              canShowTextSelectionMenu: false,
+              canShowScrollHead: _showScrollHead,
+              onDocumentLoaded: (details) async {
+                if (widget.page != null) {
+                  _pdfViewerController.jumpToPage(widget.page!);
+                } else {
+                  final position = BookCache().getPosition(bookId);
+                  Future.delayed(const Duration(milliseconds: 200), () {
+                    if (mounted) {
+                      _pdfViewerController.zoomLevel = position.zoom;
+                      _pdfViewerController.jumpTo(
+                        xOffset: position.offset.dx,
+                        yOffset: position.offset.dy,
+                      );
+                    }
+                    isDocumentLoaded = true;
+                  });
+                }
 
-              final selections = annoProvider.getSelectionSpans(bookId);
-              PDFUtils.applySelections(_pdfViewerController, selections);
-            },
-            onPageChanged: (_) {
-              if (isDocumentLoaded) {
-                PDFUtils.savePosition(bookId, _pdfViewerController);
-              }
-            },
-            onZoomLevelChanged: (_) {
-              if (isDocumentLoaded) {
-                PDFUtils.savePosition(bookId, _pdfViewerController);
-              }
-            },
-            onTextSelectionChanged: (PdfTextSelectionChangedDetails details) {
-              if (details.selectedText == null && _overlayEntry != null) {
-                _overlayEntry!.remove();
-                _overlayEntry = null;
-              } else if (details.selectedText != null &&
-                  _overlayEntry == null) {
-                final lines = _pdfViewerKey.currentState
-                    ?.getSelectedTextLines();
-                _showContextMenu(context, details, lines);
-              }
-            },
-          ),
-          buildSearchVisibility(),
-        ],
+                final selections = annoProvider.getSelectionSpans(bookId);
+                PDFUtils.applySelections(_pdfViewerController, selections);
+              },
+              onPageChanged: (_) {
+                if (isDocumentLoaded) {
+                  PDFUtils.savePosition(bookId, _pdfViewerController);
+                }
+              },
+              onZoomLevelChanged: (_) {
+                if (isDocumentLoaded) {
+                  PDFUtils.savePosition(bookId, _pdfViewerController);
+                }
+              },
+              onTextSelectionChanged: (PdfTextSelectionChangedDetails details) {
+                if (details.selectedText == null && _overlayEntry != null) {
+                  _overlayEntry!.remove();
+                  _overlayEntry = null;
+                } else if (details.selectedText != null &&
+                    _overlayEntry == null) {
+                  final lines = _pdfViewerKey.currentState
+                      ?.getSelectedTextLines();
+                  _showContextMenu(context, details, lines);
+                }
+              },
+            ),
+            buildSearchVisibility(),
+          ],
+        ),
       ),
     );
   }
