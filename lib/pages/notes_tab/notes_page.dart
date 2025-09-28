@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logosophy/database/notes/models/note.dart';
-import 'package:logosophy/database/notes/models/notes_state.dart';
 import 'package:logosophy/database/notes/notes_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
@@ -26,17 +25,9 @@ class _NotesPageState extends ConsumerState<NotesPage> {
   Map<String, dynamic> mappings = {};
   bool _isLoading = true;
 
-  // --- LOCAL UI STATE FOR TEXT EDITING ---
-  final Map<String, TextEditingController> _editingControllers = {};
-
   @override
   void initState() {
     super.initState();
-    // When the widget initializes, ensure controllers are built for the initial notes.
-    // ref.read is used here because we only need the initial state to build controllers.
-    _rebuildEditingControllers(
-      ref.read(notesNotifierProvider).notes.values.toList(),
-    );
     loadMappings().then((_) {
       if (mounted) {
         setState(() {
@@ -50,9 +41,6 @@ class _NotesPageState extends ConsumerState<NotesPage> {
   void dispose() {
     // Dispose all controllers to prevent memory leaks.
     _pageController.dispose();
-    for (var controller in _editingControllers.values) {
-      controller.dispose();
-    }
     super.dispose();
   }
 
@@ -80,38 +68,17 @@ class _NotesPageState extends ConsumerState<NotesPage> {
     });
   }
 
-  /// Safely disposes old controllers and creates new ones for the current list of notes.
-  void _rebuildEditingControllers(List<Note> notes) {
-    final noteIds = notes.map((n) => n.id).toSet();
-    // First, remove and dispose controllers that are no longer needed.
-    _editingControllers.removeWhere((id, controller) {
-      if (!noteIds.contains(id)) {
-        controller.dispose();
-        return true;
-      }
-      return false;
-    });
-
-    // Then, create controllers for any new notes.
-    for (var note in notes) {
-      if (!_editingControllers.containsKey(note.id)) {
-        _editingControllers[note.id] = TextEditingController(text: note.note);
-      }
-    }
-  }
-
   /// Opens the modal bottom sheet to add a new general note.
-  void _showAddNewNoteModal() {
+  void _showAddNewNoteModal({Note? note}) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled:
-          true, // Allows the sheet to resize when the keyboard appears.
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) {
         // Use a separate, self-contained widget for the bottom sheet content.
-        return _NewNoteBottomSheet();
+        return BottomSheetNote(note: note);
       },
     );
   }
@@ -123,16 +90,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
     final notesState = ref.watch(notesNotifierProvider);
     final notifier = ref.read(notesNotifierProvider.notifier);
 
-    // 2. Listen for changes to efficiently rebuild controllers only when note count changes.
-    ref.listen<NotesState>(notesNotifierProvider, (previous, next) {
-      if (previous?.notes.length != next.notes.length) {
-        setState(() {
-          _rebuildEditingControllers(next.notes.values.toList());
-        });
-      }
-    });
-
-    // 3. Calculate the list to be displayed here, directly in the build method.
+    // 2. Calculate the list to be displayed here, directly in the build method.
     final displayedNotes = notifier.getNotes(
       bookId: _selectedBookId,
       after: _afterDate,
@@ -302,11 +260,21 @@ class _NotesPageState extends ConsumerState<NotesPage> {
     );
   }
 
+  String getBookNameForCard(Note note) {
+    String bookName;
+    if (note.bookId != null) {
+      bookName = mappings["pt-BR"]["${note.bookId}.pdf"]["title"];
+      if (bookName.contains('–')) {
+        bookName = bookName.split('–').last.trim();
+      }
+    } else {
+      bookName = 'General Note';
+    }
+    return bookName;
+  }
+
   /// A single card for an existing note, allowing editing and deletion.
   Widget _buildNoteCard(Note note) {
-    final controller = _editingControllers[note.id];
-    if (controller == null) return const SizedBox.shrink(); // Safety check.
-
     return Card(
       elevation: 2.0,
       margin: const EdgeInsets.only(bottom: 16),
@@ -315,39 +283,41 @@ class _NotesPageState extends ConsumerState<NotesPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              note.bookId != null
-                  ? '${mappings["pt-BR"]["${note.bookId}.pdf"]["title"]}, Page ${note.page}'
-                  : 'General Note',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            if (note.createdAt != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 4.0),
-                child: Text(
-                  DateFormat('dd/MM/yyyy HH:mm').format(note.createdAt!),
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: controller,
-              maxLines: 3,
-              decoration: const InputDecoration(border: OutlineInputBorder()),
-            ),
-            const SizedBox(height: 8),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      getBookNameForCard(note),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.clip,
+                    ),
+                    if (note.createdAt != null)
+                      Text(
+                        DateFormat('dd/MM/yyyy HH:mm').format(note.createdAt!),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                  ],
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: Icon(Icons.edit_outlined),
+                  onPressed: () => _handleSaveNote(note),
+                ),
                 IconButton(
                   icon: const Icon(Icons.delete_outline, color: Colors.red),
                   onPressed: () => _handleDeleteNote(note),
                 ),
-                ElevatedButton(
-                  onPressed: () => _handleSaveNote(note, controller.text),
-                  child: const Text('Save'),
-                ),
               ],
+            ),
+            Text(
+              note.note,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontSize: 16),
             ),
           ],
         ),
@@ -357,28 +327,39 @@ class _NotesPageState extends ConsumerState<NotesPage> {
 
   // --- HANDLER METHODS ---
 
-  void _handleSaveNote(Note note, String updatedText) {
-    if (updatedText.trim().isEmpty || updatedText.trim() == note.note) return;
-    ref
-        .read(notesNotifierProvider.notifier)
-        .saveNote(id: note.id, noteText: updatedText.trim());
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Note updated!'),
-        backgroundColor: Colors.green,
-      ),
-    );
-    FocusScope.of(context).unfocus();
+  void _handleSaveNote(Note note) {
+    _showAddNewNoteModal(note: note);
   }
 
-  void _handleDeleteNote(Note note) {
-    ref.read(notesNotifierProvider.notifier).deleteNote(id: note.id);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Note deleted.'),
-        backgroundColor: Colors.red,
+  Future<void> _handleDeleteNote(Note note) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Note'),
+        content: const Text('Are you sure you want to delete this note?'),
+        actions: [
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(ctx).pop(false),
+          ),
+          ElevatedButton(
+            child: const Text('Delete'),
+            onPressed: () => Navigator.of(ctx).pop(true),
+          ),
+        ],
       ),
     );
+
+    if (confirmed == true) {
+      ref.read(notesNotifierProvider.notifier).deleteNote(id: note.id);
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Note deleted.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }
 
@@ -386,14 +367,33 @@ class _NotesPageState extends ConsumerState<NotesPage> {
 // WIDGET FOR THE BOTTOM SHEET CONTENT
 // =======================================================================
 
-class _NewNoteBottomSheet extends ConsumerStatefulWidget {
+class BottomSheetNote extends ConsumerStatefulWidget {
+  const BottomSheetNote({super.key, this.note});
+
+  final Note? note;
+
   @override
-  ConsumerState<_NewNoteBottomSheet> createState() =>
-      _NewNoteBottomSheetState();
+  ConsumerState<BottomSheetNote> createState() => BottomSheetNoteState();
 }
 
-class _NewNoteBottomSheetState extends ConsumerState<_NewNoteBottomSheet> {
+class BottomSheetNoteState extends ConsumerState<BottomSheetNote> {
   final _controller = TextEditingController();
+  late Note? note;
+  late String titleText;
+
+  @override
+  void initState() {
+    note = widget.note;
+    if (note != null) {
+      titleText = 'Edit note';
+      _controller.text = note!.note;
+    } else {
+      titleText = 'Create General Note';
+    }
+
+    note != null ? _controller.text = note!.note : null;
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -407,15 +407,11 @@ class _NewNoteBottomSheetState extends ConsumerState<_NewNoteBottomSheet> {
 
     ref
         .read(notesNotifierProvider.notifier)
-        .saveNote(
-          noteText: newText,
-          bookId: null, // General note
-          page: null, // General note
-        );
+        .saveNote(noteText: newText, bookId: note?.bookId, page: note?.page);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('New note saved!'),
+        content: Text('Note saved!'),
         backgroundColor: Colors.green,
       ),
     );
@@ -426,7 +422,6 @@ class _NewNoteBottomSheetState extends ConsumerState<_NewNoteBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    // Padding adjusts automatically when the keyboard appears.
     return Padding(
       padding: EdgeInsets.fromLTRB(
         20,
@@ -435,19 +430,15 @@ class _NewNoteBottomSheetState extends ConsumerState<_NewNoteBottomSheet> {
         MediaQuery.of(context).viewInsets.bottom + 20,
       ),
       child: Column(
-        mainAxisSize:
-            MainAxisSize.min, // Makes the column take minimum necessary height.
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Create General Note',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
+          Text(titleText, style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 16),
           TextField(
             controller: _controller,
-            maxLines: 5,
-            autofocus: true, // Opens the keyboard automatically.
+            maxLines: 8,
+            autofocus: true,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
               labelText: 'Write your note here...',
@@ -465,7 +456,7 @@ class _NewNoteBottomSheetState extends ConsumerState<_NewNoteBottomSheet> {
               const SizedBox(width: 8),
               ElevatedButton(
                 onPressed: _handleAddNewNote,
-                child: const Text('Save Note'),
+                child: const Text('Save'),
               ),
             ],
           ),
