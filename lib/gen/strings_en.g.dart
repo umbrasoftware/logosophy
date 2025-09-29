@@ -44,6 +44,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final TranslationsNavBarEn navBar = TranslationsNavBarEn._(_root);
 	late final TranslationsBookPageEn bookPage = TranslationsBookPageEn._(_root);
 	late final TranslationsNotesPageEn notesPage = TranslationsNotesPageEn._(_root);
+	late final TranslationsSettingsPageEn settingsPage = TranslationsSettingsPageEn._(_root);
 	late final TranslationsAuthMessagesEn authMessages = TranslationsAuthMessagesEn._(_root);
 }
 
@@ -108,6 +109,9 @@ class TranslationsBtnActionsEn {
 
 	/// en: 'Confirm delete'
 	String get confirmDelete => 'Confirm delete';
+
+	/// en: 'Apply'
+	String get apply => 'Apply';
 }
 
 // Path: setup
@@ -261,6 +265,78 @@ class TranslationsNotesPageEn {
 
 	/// en: 'New note saved!'
 	String get newNoteSaved => 'New note saved!';
+
+	/// en: 'My notes'
+	String get myNotes => 'My notes';
+
+	/// en: 'Filters'
+	String get filters => 'Filters';
+
+	/// en: 'Filter by book'
+	String get filterByBook => 'Filter by book';
+
+	/// en: 'All books'
+	String get allBooks => 'All books';
+
+	/// en: 'After...'
+	String get afterDate => 'After...';
+
+	/// en: 'Before...'
+	String get beforeDate => 'Before...';
+
+	/// en: 'Clear filters'
+	String get clearFilters => 'Clear filters';
+
+	/// en: 'No notes found with the applied filters.'
+	String get noNotesFound => 'No notes found with the applied filters.';
+
+	/// en: 'General notes'
+	String get generalNotes => 'General notes';
+
+	/// en: 'Delete note'
+	String get deleteNote => 'Delete note';
+
+	/// en: 'Are you sure you want to delete this note?'
+	String get deleteConfirmation => 'Are you sure you want to delete this note?';
+
+	/// en: 'Note deleted successfully!'
+	String get noteDeletedSuccess => 'Note deleted successfully!';
+
+	/// en: 'Create general note'
+	String get createGeneralNote => 'Create general note';
+
+	/// en: 'Note saved!'
+	String get noteSaved => 'Note saved!';
+
+	/// en: 'Write your note here ...'
+	String get writeHere => 'Write your note here ...';
+}
+
+// Path: settingsPage
+class TranslationsSettingsPageEn {
+	TranslationsSettingsPageEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Settings'
+	String get settings => 'Settings';
+
+	/// en: 'Português (Brasil)'
+	String get portuguese => 'Português (Brasil)';
+
+	/// en: 'English (US)'
+	String get english => 'English (US)';
+
+	/// en: 'Select Language'
+	String get selectLanguage => 'Select Language';
+
+	/// en: 'Language'
+	String get language => 'Language';
+
+	/// en: 'Sign out'
+	String get signOut => 'Sign out';
 }
 
 // Path: authMessages
@@ -387,6 +463,7 @@ extension on Translations {
 			case 'btnActions.add': return 'Add';
 			case 'btnActions.delete': return 'Delete';
 			case 'btnActions.confirmDelete': return 'Confirm delete';
+			case 'btnActions.apply': return 'Apply';
 			case 'setup.noBooks': return 'It seems you don\'t have any books yet. Please select a language for the books to start using the app!';
 			case 'setup.starting': return 'Starting download';
 			case 'setup.downloadingBooks': return 'Downloading books';
@@ -426,6 +503,27 @@ extension on Translations {
 			case 'notesPage.noteDeleted': return 'Note deleted.';
 			case 'notesPage.confirmDelete': return 'Are you sure you want to delete this note?';
 			case 'notesPage.newNoteSaved': return 'New note saved!';
+			case 'notesPage.myNotes': return 'My notes';
+			case 'notesPage.filters': return 'Filters';
+			case 'notesPage.filterByBook': return 'Filter by book';
+			case 'notesPage.allBooks': return 'All books';
+			case 'notesPage.afterDate': return 'After...';
+			case 'notesPage.beforeDate': return 'Before...';
+			case 'notesPage.clearFilters': return 'Clear filters';
+			case 'notesPage.noNotesFound': return 'No notes found with the applied filters.';
+			case 'notesPage.generalNotes': return 'General notes';
+			case 'notesPage.deleteNote': return 'Delete note';
+			case 'notesPage.deleteConfirmation': return 'Are you sure you want to delete this note?';
+			case 'notesPage.noteDeletedSuccess': return 'Note deleted successfully!';
+			case 'notesPage.createGeneralNote': return 'Create general note';
+			case 'notesPage.noteSaved': return 'Note saved!';
+			case 'notesPage.writeHere': return 'Write your note here ...';
+			case 'settingsPage.settings': return 'Settings';
+			case 'settingsPage.portuguese': return 'Português (Brasil)';
+			case 'settingsPage.english': return 'English (US)';
+			case 'settingsPage.selectLanguage': return 'Select Language';
+			case 'settingsPage.language': return 'Language';
+			case 'settingsPage.signOut': return 'Sign out';
 			case 'authMessages.prompt.askPassword': return 'Enter password';
 			case 'authMessages.prompt.askEmail': return 'Enter email';
 			case 'authMessages.prompt.askAuthenticate': return 'Please authenticate to enter the app.';

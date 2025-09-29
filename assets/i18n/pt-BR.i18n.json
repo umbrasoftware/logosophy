@@ -17,7 +17,8 @@
         "clear": "Limpar",
         "add": "Adicionar",
         "delete": "Deletar",
-        "confirmDelete": "Confirmar Exclusão"
+        "confirmDelete": "Confirmar Exclusão",
+        "apply": "Aplicar"
     },
     "setup": {
         "noBooks": "Parece que você não tem nenhum livro ainda. Por favor, selecione uma língua para os livros para começar a usar o aplicativo!",
@@ -64,7 +65,30 @@
         "noteUpdated": "Anotação atualizada!",
         "noteDeleted": "Anotação deletada.",
         "confirmDelete": "Tem certeza que deseja deletar esta anotação?",
-        "newNoteSaved": "Nova anotação salva!"
+        "newNoteSaved": "Nova anotação salva!",
+        "myNotes": "Minhas anotações",
+        "filters": "Filtros",
+        "filterByBook": "Filtrar por livro",
+        "allBooks": "Todos os livros",
+        "afterDate": "Depois...",
+        "beforeDate": "Antes...",
+        "clearFilters": "Limpar filtros",
+        "noNotesFound": "Nenhuma anotação encontrada com os filtros aplicados.",
+        "generalNotes": "Anotações gerais",
+        "deleteNote": "Deletar anotação",
+        "deleteConfirmation": "Tem certeza que deseja deletar esta anotação?",
+        "noteDeletedSuccess": "Anotação deletada com sucesso!",
+        "createGeneralNote": "Criar anotação geral",
+        "noteSaved": "Anotação salva!",
+        "writeHere": "Escreva sua anotação aqui..."
+    },
+    "settingsPage": {
+        "settings": "Configurações",
+        "language": "Idioma",
+        "selectLanguage": "Selecionar idioma",
+        "portuguese": "Português (Brasil)",
+        "english": "English (US)",
+        "signOut": "Sair"
     },
     "authMessages": {
         "prompt": {

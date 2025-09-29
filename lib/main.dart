@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logosophy/database/cache/annotations_cache.dart';
 import 'package:logosophy/database/cache/book_cache.dart';
 import 'package:logosophy/database/cache/notes_cache.dart';
+import 'package:logosophy/database/cache/settings_cache.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/router.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
@@ -34,23 +35,22 @@ class App extends ConsumerStatefulWidget {
 
 class _AppState extends ConsumerState<App> {
   @override
-  void initState() {
-    initCaches();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      theme: FlexThemeData.light(scheme: FlexScheme.amber),
-      darkTheme: FlexThemeData.dark(scheme: FlexScheme.amber),
-      themeMode: ThemeMode.system,
-      locale: TranslationProvider.of(context).flutterLocale,
-      supportedLocales: AppLocaleUtils.supportedLocales,
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      routerConfig: router,
+    return FutureBuilder(
+      future: initApp(),
+      builder: (context, asyncSnapshot) {
+        return MaterialApp.router(
+          title: 'Flutter Demo',
+          debugShowCheckedModeBanner: false,
+          theme: FlexThemeData.light(scheme: FlexScheme.amber),
+          darkTheme: FlexThemeData.dark(scheme: FlexScheme.amber),
+          themeMode: ThemeMode.system,
+          locale: TranslationProvider.of(context).flutterLocale,
+          supportedLocales: AppLocaleUtils.supportedLocales,
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          routerConfig: router,
+        );
+      },
     );
   }
 }
@@ -65,8 +65,19 @@ void setupLogging() {
   });
 }
 
-void initCaches() {
-  AnnotationsCache().init();
-  BookCache().init();
-  NotesCache().init();
+Future<void> initApp() async {
+  await initCaches();
+  await getLocale();
+}
+
+Future<void> initCaches() async {
+  await AnnotationsCache().init();
+  await BookCache().init();
+  await NotesCache().init();
+  await SettingsCache().init();
+}
+
+Future<void> getLocale() async {
+  final locale = SettingsCache().getLocale();
+  await LocaleSettings.setLocaleRaw(locale, listenToDeviceLocale: true);
 }

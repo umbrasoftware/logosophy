@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
+import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
@@ -16,15 +18,16 @@ class _BookData {
   _BookData({required this.coverFile, required this.title});
 }
 
-class BooksPage extends StatefulWidget {
+class BooksPage extends ConsumerStatefulWidget {
   const BooksPage({super.key});
 
   @override
-  State<BooksPage> createState() => _BooksPageState();
+  ConsumerState<BooksPage> createState() => _BooksPageState();
 }
 
-class _BooksPageState extends State<BooksPage> {
+class _BooksPageState extends ConsumerState<BooksPage> {
   final logger = Logger('BooksPage');
+  late String language;
 
   Future<List<_BookData>> _getBooksData() async {
     final appDocumentsDir = await getApplicationDocumentsDirectory();
@@ -41,8 +44,7 @@ class _BooksPageState extends State<BooksPage> {
     final mappings = jsonDecode(mappingsContent) as Map<String, dynamic>;
 
     // For now, we are only handling the 'pt-BR' language.
-    const languageCode = 'pt-BR';
-    final langDir = Directory(p.join(booksDir.path, languageCode));
+    final langDir = Directory(p.join(booksDir.path, 'pt-BR'));
 
     if (await langDir.exists()) {
       final entities = langDir.listSync();
@@ -59,16 +61,14 @@ class _BooksPageState extends State<BooksPage> {
             // Check if the base name is 3 digits.
             if (baseName.length == 3 && int.tryParse(baseName) != null) {
               final pdfFileName = '$baseName.pdf';
-              final bookInfo = mappings[languageCode]?[pdfFileName];
+              final bookInfo = mappings['pt-BR']?[pdfFileName];
 
               if (bookInfo != null && bookInfo['title'] != null) {
                 booksData.add(
                   _BookData(coverFile: entity, title: bookInfo['title']),
                 );
               } else {
-                logger.warning(
-                  'No mapping found for $pdfFileName in $languageCode',
-                );
+                logger.warning('No mapping found for $pdfFileName in pt-BR');
               }
             }
           }
@@ -83,6 +83,7 @@ class _BooksPageState extends State<BooksPage> {
 
   @override
   Widget build(BuildContext context) {
+    language = ref.watch(settingsNotifierProvider).language;
     return Scaffold(
       appBar: AppBar(title: Text(t.navBar.books)),
       body: FutureBuilder<List<_BookData>>(

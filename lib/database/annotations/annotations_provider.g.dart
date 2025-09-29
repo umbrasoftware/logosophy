@@ -7,7 +7,7 @@ part of 'annotations_provider.dart';
 // **************************************************************************
 
 String _$annotationsNotifierHash() =>
-    r'33caf0ac90d08be17ede8d3dce38064662ee1378';
+    r'51330d8a9c6a84c1dcda41087b32116f77101cfc';
 
 /// See also [AnnotationsNotifier].
 @ProviderFor(AnnotationsNotifier)

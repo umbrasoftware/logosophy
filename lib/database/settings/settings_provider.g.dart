@@ -1,26 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'notes_provider.dart';
+part of 'settings_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$notesNotifierHash() => r'2f75889be54b8fc3e3f0e663f1ca5240ed3519d2';
+String _$settingsNotifierHash() => r'a9cb2facda0e9ce9adf8051a791e02e4c25eafd5';
 
-/// See also [NotesNotifier].
-@ProviderFor(NotesNotifier)
-final notesNotifierProvider =
-    NotifierProvider<NotesNotifier, NotesState>.internal(
-      NotesNotifier.new,
-      name: r'notesNotifierProvider',
+/// See also [SettingsNotifier].
+@ProviderFor(SettingsNotifier)
+final settingsNotifierProvider =
+    NotifierProvider<SettingsNotifier, Settings>.internal(
+      SettingsNotifier.new,
+      name: r'settingsNotifierProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
           ? null
-          : _$notesNotifierHash,
+          : _$settingsNotifierHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );
 
-typedef _$NotesNotifier = Notifier<NotesState>;
+typedef _$SettingsNotifier = Notifier<Settings>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

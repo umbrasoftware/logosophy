@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logosophy/database/notes/models/note.dart';
 import 'package:logosophy/database/notes/notes_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:logosophy/database/settings/settings_provider.dart';
+import 'package:logosophy/gen/strings.g.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -17,7 +19,6 @@ class NotesPage extends ConsumerStatefulWidget {
 }
 
 class _NotesPageState extends ConsumerState<NotesPage> {
-  // --- LOCAL UI STATE FOR FILTERS ---
   String? _selectedBookId;
   DateTime? _afterDate;
   DateTime? _beforeDate;
@@ -85,18 +86,14 @@ class _NotesPageState extends ConsumerState<NotesPage> {
 
   @override
   Widget build(BuildContext context) {
-    // --- REACTIVE LOGIC ---
-    // 1. Watch for any changes in the provider. If the state changes, this widget rebuilds.
     final notesState = ref.watch(notesNotifierProvider);
     final notifier = ref.read(notesNotifierProvider.notifier);
 
-    // 2. Calculate the list to be displayed here, directly in the build method.
     final displayedNotes = notifier.getNotes(
       bookId: _selectedBookId,
       after: _afterDate,
       before: _beforeDate,
     );
-    // Sort the list for consistent display.
     displayedNotes.sort((a, b) {
       final pageA = a.page ?? -1;
       final pageB = b.page ?? -1;
@@ -106,13 +103,13 @@ class _NotesPageState extends ConsumerState<NotesPage> {
 
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('My Notes')),
+        appBar: AppBar(title: Text(t.notesPage.myNotes)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Notes')),
+      appBar: AppBar(title: Text(t.notesPage.myNotes)),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddNewNoteModal,
@@ -133,11 +130,10 @@ class _NotesPageState extends ConsumerState<NotesPage> {
     );
   }
 
-  // --- UI BUILDER METHODS ---
-
   /// UI Section for filtering notes.
   Widget _buildFilterSection(List<Note> allNotes) {
-    // Get unique book IDs from the notes to populate the dropdown.
+    final locale = ref.watch(settingsNotifierProvider).language;
+
     var bookIds = allNotes
         .map((e) => e.bookId)
         .whereType<String>()
@@ -146,7 +142,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
     bookIds.insert(0, '');
 
     return ExpansionTile(
-      title: const Text('Filters'),
+      title: Text(t.notesPage.filters),
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -157,14 +153,14 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       initialValue: _selectedBookId ?? '',
-                      hint: const Text('Filter by Book'),
+                      hint: Text(t.notesPage.filterByBook),
                       items: bookIds
                           .map(
                             (id) => DropdownMenuItem(
                               value: id,
                               child: Text(
                                 id.isEmpty
-                                    ? 'Todos os livros'
+                                    ? t.notesPage.allBooks
                                     : mappings['pt-BR']['$id.pdf']?['title'],
                               ),
                             ),
@@ -189,8 +185,11 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                     icon: const Icon(Icons.calendar_today, size: 16),
                     label: Text(
                       _afterDate == null
-                          ? 'After...'
-                          : DateFormat('dd/MM/yy').format(_afterDate!),
+                          ? t.notesPage.afterDate
+                          : DateFormat(
+                              DateFormat.MONTH_DAY,
+                              locale,
+                            ).format(_afterDate!),
                     ),
                     onPressed: () async {
                       final date = await showDatePicker(
@@ -206,8 +205,11 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                     icon: const Icon(Icons.calendar_today, size: 16),
                     label: Text(
                       _beforeDate == null
-                          ? 'Before...'
-                          : DateFormat('dd/MM/yy').format(_beforeDate!),
+                          ? t.notesPage.beforeDate
+                          : DateFormat(
+                              DateFormat.MONTH_DAY,
+                              locale,
+                            ).format(_beforeDate!),
                     ),
                     onPressed: () async {
                       final date = await showDatePicker(
@@ -227,12 +229,12 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                 children: [
                   TextButton(
                     onPressed: _clearFilters,
-                    child: const Text('Clear Filters'),
+                    child: Text(t.notesPage.clearFilters),
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: _applyFilters,
-                    child: const Text('Apply'),
+                    child: Text(t.btnActions.apply),
                   ),
                 ],
               ),
@@ -247,9 +249,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
   Widget _buildNotesList(List<Note> notes) {
     return Expanded(
       child: notes.isEmpty
-          ? const Center(
-              child: Text('No notes found with the selected filters.'),
-            )
+          ? Center(child: Text(t.notesPage.noNotesFound))
           : ListView.builder(
               itemCount: notes.length,
               itemBuilder: (context, index) {
@@ -263,18 +263,19 @@ class _NotesPageState extends ConsumerState<NotesPage> {
   String getBookNameForCard(Note note) {
     String bookName;
     if (note.bookId != null) {
-      bookName = mappings["pt-BR"]["${note.bookId}.pdf"]["title"];
+      bookName = mappings['pt-BR']["${note.bookId}.pdf"]["title"];
       if (bookName.contains('–')) {
         bookName = bookName.split('–').last.trim();
       }
     } else {
-      bookName = 'General Note';
+      bookName = t.notesPage.generalNotes;
     }
     return bookName;
   }
 
   /// A single card for an existing note, allowing editing and deletion.
   Widget _buildNoteCard(Note note) {
+    final locale = ref.watch(settingsNotifierProvider).language;
     return Card(
       elevation: 2.0,
       margin: const EdgeInsets.only(bottom: 16),
@@ -296,9 +297,24 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                       overflow: TextOverflow.clip,
                     ),
                     if (note.createdAt != null)
-                      Text(
-                        DateFormat('dd/MM/yyyy HH:mm').format(note.createdAt!),
-                        style: Theme.of(context).textTheme.bodySmall,
+                      Row(
+                        children: [
+                          Text(
+                            DateFormat(
+                              DateFormat.YEAR_MONTH_DAY,
+                              locale,
+                            ).format(note.createdAt!),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          const SizedBox(width: 8.0),
+                          Text(
+                            DateFormat(
+                              DateFormat.HOUR_MINUTE,
+                              locale,
+                            ).format(note.createdAt!),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
                       ),
                   ],
                 ),
@@ -335,15 +351,15 @@ class _NotesPageState extends ConsumerState<NotesPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete Note'),
-        content: const Text('Are you sure you want to delete this note?'),
+        title: Text(t.notesPage.deleteNote),
+        content: Text(t.notesPage.deleteConfirmation),
         actions: [
           TextButton(
-            child: const Text('Cancel'),
+            child: Text(t.btnActions.cancel),
             onPressed: () => Navigator.of(ctx).pop(false),
           ),
           ElevatedButton(
-            child: const Text('Delete'),
+            child: Text(t.btnActions.delete),
             onPressed: () => Navigator.of(ctx).pop(true),
           ),
         ],
@@ -354,8 +370,8 @@ class _NotesPageState extends ConsumerState<NotesPage> {
       ref.read(notesNotifierProvider.notifier).deleteNote(id: note.id);
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Note deleted.'),
+        SnackBar(
+          content: Text(t.notesPage.noteDeletedSuccess),
           backgroundColor: Colors.red,
         ),
       );
@@ -385,10 +401,10 @@ class BottomSheetNoteState extends ConsumerState<BottomSheetNote> {
   void initState() {
     note = widget.note;
     if (note != null) {
-      titleText = 'Edit note';
+      titleText = t.notesPage.editNote;
       _controller.text = note!.note;
     } else {
-      titleText = 'Create General Note';
+      titleText = t.notesPage.generalNotes;
     }
 
     note != null ? _controller.text = note!.note : null;
@@ -410,8 +426,8 @@ class BottomSheetNoteState extends ConsumerState<BottomSheetNote> {
         .saveNote(noteText: newText, bookId: note?.bookId, page: note?.page);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Note saved!'),
+      SnackBar(
+        content: Text(t.notesPage.noteSaved),
         backgroundColor: Colors.green,
       ),
     );
@@ -439,9 +455,9 @@ class BottomSheetNoteState extends ConsumerState<BottomSheetNote> {
             controller: _controller,
             maxLines: 8,
             autofocus: true,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Write your note here...',
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              labelText: t.notesPage.writeHere,
             ),
           ),
           const SizedBox(height: 16),
@@ -449,14 +465,14 @@ class BottomSheetNoteState extends ConsumerState<BottomSheetNote> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                child: const Text('Cancel'),
+                child: Text(t.btnActions.cancel),
                 onPressed: () =>
                     Navigator.of(context).pop(), // Just close the sheet.
               ),
               const SizedBox(width: 8),
               ElevatedButton(
                 onPressed: _handleAddNewNote,
-                child: const Text('Save'),
+                child: Text(t.btnActions.save),
               ),
             ],
           ),

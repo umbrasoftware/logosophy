@@ -41,6 +41,7 @@ class TranslationsPtBr implements Translations {
 	@override late final _TranslationsNavBarPtBr navBar = _TranslationsNavBarPtBr._(_root);
 	@override late final _TranslationsBookPagePtBr bookPage = _TranslationsBookPagePtBr._(_root);
 	@override late final _TranslationsNotesPagePtBr notesPage = _TranslationsNotesPagePtBr._(_root);
+	@override late final _TranslationsSettingsPagePtBr settingsPage = _TranslationsSettingsPagePtBr._(_root);
 	@override late final _TranslationsAuthMessagesPtBr authMessages = _TranslationsAuthMessagesPtBr._(_root);
 }
 
@@ -69,6 +70,7 @@ class _TranslationsBtnActionsPtBr implements TranslationsBtnActionsEn {
 	@override String get add => 'Adicionar';
 	@override String get delete => 'Deletar';
 	@override String get confirmDelete => 'Confirmar Exclusão';
+	@override String get apply => 'Aplicar';
 }
 
 // Path: setup
@@ -144,6 +146,36 @@ class _TranslationsNotesPagePtBr implements TranslationsNotesPageEn {
 	@override String get noteDeleted => 'Anotação deletada.';
 	@override String get confirmDelete => 'Tem certeza que deseja deletar esta anotação?';
 	@override String get newNoteSaved => 'Nova anotação salva!';
+	@override String get myNotes => 'Minhas anotações';
+	@override String get filters => 'Filtros';
+	@override String get filterByBook => 'Filtrar por livro';
+	@override String get allBooks => 'Todos os livros';
+	@override String get afterDate => 'Depois...';
+	@override String get beforeDate => 'Antes...';
+	@override String get clearFilters => 'Limpar filtros';
+	@override String get noNotesFound => 'Nenhuma anotação encontrada com os filtros aplicados.';
+	@override String get generalNotes => 'Anotações gerais';
+	@override String get deleteNote => 'Deletar anotação';
+	@override String get deleteConfirmation => 'Tem certeza que deseja deletar esta anotação?';
+	@override String get noteDeletedSuccess => 'Anotação deletada com sucesso!';
+	@override String get createGeneralNote => 'Criar anotação geral';
+	@override String get noteSaved => 'Anotação salva!';
+	@override String get writeHere => 'Escreva sua anotação aqui...';
+}
+
+// Path: settingsPage
+class _TranslationsSettingsPagePtBr implements TranslationsSettingsPageEn {
+	_TranslationsSettingsPagePtBr._(this._root);
+
+	final TranslationsPtBr _root; // ignore: unused_field
+
+	// Translations
+	@override String get settings => 'Configurações';
+	@override String get language => 'Idioma';
+	@override String get selectLanguage => 'Selecionar idioma';
+	@override String get portuguese => 'Português (Brasil)';
+	@override String get english => 'English (US)';
+	@override String get signOut => 'Sair';
 }
 
 // Path: authMessages
@@ -222,6 +254,7 @@ extension on TranslationsPtBr {
 			case 'btnActions.add': return 'Adicionar';
 			case 'btnActions.delete': return 'Deletar';
 			case 'btnActions.confirmDelete': return 'Confirmar Exclusão';
+			case 'btnActions.apply': return 'Aplicar';
 			case 'setup.noBooks': return 'Parece que você não tem nenhum livro ainda. Por favor, selecione uma língua para os livros para começar a usar o aplicativo!';
 			case 'setup.starting': return 'Iniciando download';
 			case 'setup.downloadingBooks': return 'Baixando livros';
@@ -261,6 +294,27 @@ extension on TranslationsPtBr {
 			case 'notesPage.noteDeleted': return 'Anotação deletada.';
 			case 'notesPage.confirmDelete': return 'Tem certeza que deseja deletar esta anotação?';
 			case 'notesPage.newNoteSaved': return 'Nova anotação salva!';
+			case 'notesPage.myNotes': return 'Minhas anotações';
+			case 'notesPage.filters': return 'Filtros';
+			case 'notesPage.filterByBook': return 'Filtrar por livro';
+			case 'notesPage.allBooks': return 'Todos os livros';
+			case 'notesPage.afterDate': return 'Depois...';
+			case 'notesPage.beforeDate': return 'Antes...';
+			case 'notesPage.clearFilters': return 'Limpar filtros';
+			case 'notesPage.noNotesFound': return 'Nenhuma anotação encontrada com os filtros aplicados.';
+			case 'notesPage.generalNotes': return 'Anotações gerais';
+			case 'notesPage.deleteNote': return 'Deletar anotação';
+			case 'notesPage.deleteConfirmation': return 'Tem certeza que deseja deletar esta anotação?';
+			case 'notesPage.noteDeletedSuccess': return 'Anotação deletada com sucesso!';
+			case 'notesPage.createGeneralNote': return 'Criar anotação geral';
+			case 'notesPage.noteSaved': return 'Anotação salva!';
+			case 'notesPage.writeHere': return 'Escreva sua anotação aqui...';
+			case 'settingsPage.settings': return 'Configurações';
+			case 'settingsPage.language': return 'Idioma';
+			case 'settingsPage.selectLanguage': return 'Selecionar idioma';
+			case 'settingsPage.portuguese': return 'Português (Brasil)';
+			case 'settingsPage.english': return 'English (US)';
+			case 'settingsPage.signOut': return 'Sair';
 			case 'authMessages.prompt.askPassword': return 'Digite a senha';
 			case 'authMessages.prompt.askEmail': return 'Digite seu email';
 			case 'authMessages.prompt.askAuthenticate': return 'Por favor, se autentique para entrar no aplicativo.';

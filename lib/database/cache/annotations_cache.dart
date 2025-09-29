@@ -11,7 +11,7 @@ class AnnotationsCache {
   final _logger = Logger('AnnotationsCache');
   late SharedPreferencesWithCache _prefs;
 
-  void init() async {
+  Future<void> init() async {
     _prefs = await SharedPreferencesWithCache.create(
       cacheOptions: const SharedPreferencesWithCacheOptions(),
     );

@@ -17,7 +17,8 @@
         "clear": "Clear",
         "add": "Add",
         "delete": "Delete",
-        "confirmDelete": "Confirm delete"
+        "confirmDelete": "Confirm delete",
+        "apply": "Apply"
     },
     "setup": {
         "noBooks": "It seems you don't have any books yet. Please select a language for the books to start using the app!",
@@ -64,7 +65,30 @@
         "noteUpdated": "Note updated!",
         "noteDeleted": "Note deleted.",
         "confirmDelete": "Are you sure you want to delete this note?",
-        "newNoteSaved": "New note saved!"
+        "newNoteSaved": "New note saved!",
+        "myNotes": "My notes",
+        "filters": "Filters",
+        "filterByBook": "Filter by book",
+        "allBooks": "All books",
+        "afterDate": "After...",
+        "beforeDate": "Before...",
+        "clearFilters": "Clear filters",
+        "noNotesFound": "No notes found with the applied filters.",
+        "generalNotes": "General notes",
+        "deleteNote": "Delete note",
+        "deleteConfirmation": "Are you sure you want to delete this note?",
+        "noteDeletedSuccess": "Note deleted successfully!",
+        "createGeneralNote": "Create general note",
+        "noteSaved": "Note saved!",
+        "writeHere": "Write your note here ..."
+    },
+    "settingsPage": {
+        "settings": "Settings",
+        "portuguese": "Português (Brasil)",
+        "english": "English (US)",
+        "selectLanguage": "Select Language",
+        "language": "Language",
+        "signOut": "Sign out"
     },
     "authMessages": {
         "prompt": {
