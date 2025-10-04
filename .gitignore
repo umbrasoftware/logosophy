@@ -68,6 +68,7 @@ unlinked_spec.ds
 **/*.jks
 **/release/
 **/profile/
+/android/key.properties
 
 # iOS/XCode related
 **/ios/**/*.mode1v3

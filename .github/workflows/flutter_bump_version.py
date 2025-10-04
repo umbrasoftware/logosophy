@@ -110,16 +110,13 @@ class Version:
                 build += 1
             case VersionType.PATCH:
                 patch += 1
-                build = 1
             case VersionType.MINOR:
                 minor += 1
                 patch = 0
-                build = 1
             case VersionType.MAJOR:
                 major += 1
                 minor = 0
                 patch = 0
-                build = 1
 
         self.next_version = f"{major}.{minor}.{patch}+{build}"
         return self.next_version

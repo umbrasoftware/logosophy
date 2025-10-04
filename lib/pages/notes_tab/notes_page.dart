@@ -178,7 +178,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<String>(
-                        value: _selectedBookId ?? '',
+                        initialValue: _selectedBookId ?? '',
                         hint: Text(t.notesPage.filterByBook),
                         items: bookIdsList
                             .map(
@@ -392,6 +392,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
 
     if (confirmed == true) {
       ref.read(notesNotifierProvider.notifier).deleteNote(id: note.id);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(t.notesPage.noteDeletedSuccess),

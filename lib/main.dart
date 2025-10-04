@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -17,10 +20,17 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setupLogging();
-  // await dotenv.load();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+
   await FirebaseAppCheck.instance.activate(
-    androidProvider: AndroidProvider.debug,
+    androidProvider: AndroidProvider.playIntegrity,
     appleProvider: AppleProvider.appAttest,
   );
   runApp(ProviderScope(child: TranslationProvider(child: App())));

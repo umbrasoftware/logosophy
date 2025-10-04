@@ -37,11 +37,7 @@ def extract(commit_message: str) -> str:
     if ' ' in bump_type:
         return 'error'
     
-    if bump_type == 'build':
-        # Build type must be done mannualy.
-        return 'error'
-    
-    if bump_type in ['major', 'minor', 'patch']:
+    if bump_type in ['build', 'major', 'minor', 'patch']:
         return bump_type
     else:
         return 'error'
