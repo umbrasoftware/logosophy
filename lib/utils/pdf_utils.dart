@@ -321,6 +321,19 @@ class PDFUtils {
         return TextStyle();
     }
   }
+
+  static String getBookNameById(
+    Map<String, dynamic> mappings,
+    String bookId,
+    String locale, {
+    bool returnShort = false,
+  }) {
+    String bookName = mappings[locale]["$bookId.pdf"]["title"];
+    if (returnShort && bookName.contains('–')) {
+      bookName = bookName.split('–').last.trim();
+    }
+    return bookName;
+  }
 }
 
 final Map<String, dynamic> bookInitMapFirebase = {

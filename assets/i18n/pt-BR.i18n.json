@@ -80,7 +80,8 @@
         "noteDeletedSuccess": "Anotação deletada com sucesso!",
         "createGeneralNote": "Criar anotação geral",
         "noteSaved": "Anotação salva!",
-        "writeHere": "Escreva sua anotação aqui..."
+        "writeHere": "Escreva sua anotação aqui...",
+        "bookNoteAdd": "Adicionar anotação ao $bookName"
     },
     "settingsPage": {
         "settings": "Configurações",

@@ -310,6 +310,9 @@ class TranslationsNotesPageEn {
 
 	/// en: 'Write your note here ...'
 	String get writeHere => 'Write your note here ...';
+
+	/// en: 'Add note to $bookName'
+	String bookNoteAdd({required Object bookName}) => 'Add note to ${bookName}';
 }
 
 // Path: settingsPage
@@ -518,6 +521,7 @@ extension on Translations {
 			case 'notesPage.createGeneralNote': return 'Create general note';
 			case 'notesPage.noteSaved': return 'Note saved!';
 			case 'notesPage.writeHere': return 'Write your note here ...';
+			case 'notesPage.bookNoteAdd': return ({required Object bookName}) => 'Add note to ${bookName}';
 			case 'settingsPage.settings': return 'Settings';
 			case 'settingsPage.portuguese': return 'Português (Brasil)';
 			case 'settingsPage.english': return 'English (US)';

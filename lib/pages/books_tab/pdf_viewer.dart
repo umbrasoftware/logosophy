@@ -1,12 +1,14 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:logging/logging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:logging/logging.dart';
 import 'package:logosophy/database/annotations/annotations_provider.dart';
 import 'package:logosophy/database/cache/book_cache.dart';
+import 'package:logosophy/database/notes/models/note.dart';
 import 'package:logosophy/gen/strings.g.dart';
-import 'package:logosophy/pages/books_tab/overlays/notes_overlay.dart';
 import 'package:logosophy/utils/pdf_utils.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
@@ -30,10 +32,8 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
   final GlobalKey<SearchToolbarState> _textSearchKey = GlobalKey();
   final GlobalKey<SfPdfViewerState> _pdfViewerKey = GlobalKey();
   final _annotationsOverlayBucket = PageStorageBucket();
-  final _notesOverlayBucket = PageStorageBucket();
   OverlayEntry? _overlayEntry;
   OverlayEntry? _annotationsOverlay;
-  OverlayEntry? _notesOverlay;
   late bool _showToolbar;
   late bool _showScrollHead;
   bool isDocumentLoaded = false;
@@ -66,11 +66,6 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     _annotationsOverlay = null;
   }
 
-  void _hideNotesOverlay() {
-    _notesOverlay?.remove();
-    _notesOverlay = null;
-  }
-
   void _handleHistoryEntryRemoved() {
     _textSearchKey.currentState?.clearSearch();
     setState(() {
@@ -85,7 +80,6 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
       canPop: true,
       onPopInvokedWithResult: (didPop, result) {
         _hideAnnotationsOverlay();
-        _hideNotesOverlay();
       },
       child: Scaffold(
         appBar: _showToolbar ? buildSearchToolbar(context) : buildAppBar(),
@@ -175,10 +169,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
   AppBar buildAppBar() {
     return AppBar(
       actions: [
-        IconButton(
-          icon: Icon(Icons.note_add_sharp),
-          onPressed: _showNotesOverlay,
-        ),
+        IconButton(icon: Icon(Icons.note_add_sharp), onPressed: callNotesPage),
         IconButton(
           icon: Icon(Icons.bookmark),
           onPressed: _showAnnotationsOverlay,
@@ -376,25 +367,16 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     overlay.insert(_annotationsOverlay!);
   }
 
-  void _showNotesOverlay() {
-    if (_notesOverlay != null) {
-      return;
-    }
-
-    final overlay = Overlay.of(context);
-    _notesOverlay = OverlayEntry(
-      builder: (context) {
-        return PageStorage(
-          bucket: _notesOverlayBucket,
-          child: NotesOverlay(
-            onClose: _hideNotesOverlay,
-            bookId: bookId,
-            page: _pdfViewerController.pageNumber.toString(),
-          ),
-        );
-      },
+  void callNotesPage() {
+    context.push(
+      '/note-editor',
+      extra: Note(
+        id: '',
+        bookId: bookId,
+        updatedAt: null,
+        note: '',
+        page: _pdfViewerController.pageNumber,
+      ),
     );
-
-    overlay.insert(_notesOverlay!);
   }
 }

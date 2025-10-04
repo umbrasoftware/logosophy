@@ -161,6 +161,7 @@ class _TranslationsNotesPagePtBr implements TranslationsNotesPageEn {
 	@override String get createGeneralNote => 'Criar anotação geral';
 	@override String get noteSaved => 'Anotação salva!';
 	@override String get writeHere => 'Escreva sua anotação aqui...';
+	@override String bookNoteAdd({required Object bookName}) => 'Adicionar anotação ao ${bookName}';
 }
 
 // Path: settingsPage
@@ -309,6 +310,7 @@ extension on TranslationsPtBr {
 			case 'notesPage.createGeneralNote': return 'Criar anotação geral';
 			case 'notesPage.noteSaved': return 'Anotação salva!';
 			case 'notesPage.writeHere': return 'Escreva sua anotação aqui...';
+			case 'notesPage.bookNoteAdd': return ({required Object bookName}) => 'Adicionar anotação ao ${bookName}';
 			case 'settingsPage.settings': return 'Configurações';
 			case 'settingsPage.language': return 'Idioma';
 			case 'settingsPage.selectLanguage': return 'Selecionar idioma';

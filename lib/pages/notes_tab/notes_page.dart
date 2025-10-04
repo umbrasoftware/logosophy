@@ -3,16 +3,19 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:logosophy/database/notes/models/note.dart';
 import 'package:logosophy/database/notes/notes_provider.dart';
-import 'package:intl/intl.dart';
 import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
+import 'package:logosophy/utils/pdf_utils.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 class NotesPage extends ConsumerStatefulWidget {
-  const NotesPage({super.key});
+  const NotesPage({super.key, this.note});
+
+  final Note? note;
 
   @override
   ConsumerState<NotesPage> createState() => _NotesPageState();
@@ -26,21 +29,33 @@ class _NotesPageState extends ConsumerState<NotesPage> {
   Map<String, dynamic> mappings = {};
   bool _isLoading = true;
 
+  /// Returns true if the page is for a specific book (from /note-editor).
+  bool get isBookSpecificContext => widget.note != null;
+
   @override
   void initState() {
     super.initState();
+    _selectedBookId = widget.note?.bookId;
+
     loadMappings().then((_) {
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
+
+        if (isBookSpecificContext && widget.note!.id.isEmpty) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              _showAddNewNoteModal(note: widget.note);
+            }
+          });
+        }
       }
     });
   }
 
   @override
   void dispose() {
-    // Dispose all controllers to prevent memory leaks.
     _pageController.dispose();
     super.dispose();
   }
@@ -54,22 +69,21 @@ class _NotesPageState extends ConsumerState<NotesPage> {
     mappings = jsonDecode(content);
   }
 
-  /// Called by the filter UI to trigger a rebuild with new filter values.
   void _applyFilters() {
     setState(() {});
   }
 
-  /// Clears all filter values and triggers a rebuild.
   void _clearFilters() {
     setState(() {
-      _selectedBookId = null;
+      if (!isBookSpecificContext) {
+        _selectedBookId = null;
+      }
       _afterDate = null;
       _beforeDate = null;
       _pageController.clear();
     });
   }
 
-  /// Opens the modal bottom sheet to add a new general note.
   void _showAddNewNoteModal({Note? note}) {
     showModalBottomSheet(
       context: context,
@@ -78,8 +92,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) {
-        // Use a separate, self-contained widget for the bottom sheet content.
-        return BottomSheetNote(note: note);
+        return BottomSheetNote(note: note, mappings: mappings);
       },
     );
   }
@@ -108,11 +121,26 @@ class _NotesPageState extends ConsumerState<NotesPage> {
       );
     }
 
+    final appBarTitle = isBookSpecificContext
+        ? Text(_getBookTitle(_selectedBookId!) ?? t.notesPage.myNotes)
+        : Text(t.notesPage.myNotes);
+
     return Scaffold(
-      appBar: AppBar(title: Text(t.notesPage.myNotes)),
+      appBar: AppBar(title: appBarTitle),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
-        onPressed: _showAddNewNoteModal,
+        onPressed: () {
+          final noteForModal = isBookSpecificContext
+              ? Note(
+                  id: '',
+                  bookId: _selectedBookId,
+                  updatedAt: null,
+                  note: '',
+                  page: null, // Page is not known here
+                )
+              : null;
+          _showAddNewNoteModal(note: noteForModal);
+        },
         shape: const CircleBorder(),
         child: const Icon(Icons.add),
       ),
@@ -122,7 +150,6 @@ class _NotesPageState extends ConsumerState<NotesPage> {
           children: [
             _buildFilterSection(notesState.notes.values.toList()),
             const Divider(height: 24),
-            // The list of notes now takes up the remaining space.
             _buildNotesList(displayedNotes),
           ],
         ),
@@ -130,54 +157,52 @@ class _NotesPageState extends ConsumerState<NotesPage> {
     );
   }
 
-  /// UI Section for filtering notes.
   Widget _buildFilterSection(List<Note> allNotes) {
     final locale = ref.watch(settingsNotifierProvider).language;
 
-    var bookIds = allNotes
-        .map((e) => e.bookId)
-        .whereType<String>()
-        .toSet()
-        .toList();
-    bookIds.insert(0, '');
+    var bookIds = allNotes.map((e) => e.bookId).whereType<String>().toSet();
+    var bookIdsList = bookIds.toList();
+    bookIdsList.remove('');
+    bookIdsList.insert(0, '');
 
     return ExpansionTile(
+      initiallyExpanded: isBookSpecificContext,
       title: Text(t.notesPage.filters),
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      initialValue: _selectedBookId ?? '',
-                      hint: Text(t.notesPage.filterByBook),
-                      items: bookIds
-                          .map(
-                            (id) => DropdownMenuItem(
-                              value: id,
-                              child: Text(
-                                id.isEmpty
-                                    ? t.notesPage.allBooks
-                                    : mappings['pt-BR']['$id.pdf']?['title'],
+              if (!isBookSpecificContext) ...[
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedBookId ?? '',
+                        hint: Text(t.notesPage.filterByBook),
+                        items: bookIdsList
+                            .map(
+                              (id) => DropdownMenuItem(
+                                value: id,
+                                child: Text(
+                                  _getBookTitle(id) ?? t.notesPage.allBooks,
+                                ),
                               ),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedBookId = (value == null || value.isEmpty)
-                              ? null
-                              : value;
-                        });
-                      },
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedBookId = (value == null || value.isEmpty)
+                                ? null
+                                : value;
+                          });
+                        },
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
+                  ],
+                ),
+                const SizedBox(height: 16),
+              ],
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -245,7 +270,6 @@ class _NotesPageState extends ConsumerState<NotesPage> {
     );
   }
 
-  /// UI Section for displaying the list of filtered notes.
   Widget _buildNotesList(List<Note> notes) {
     return Expanded(
       child: notes.isEmpty
@@ -260,20 +284,19 @@ class _NotesPageState extends ConsumerState<NotesPage> {
     );
   }
 
-  String getBookNameForCard(Note note) {
-    String bookName;
-    if (note.bookId != null) {
-      bookName = mappings['pt-BR']["${note.bookId}.pdf"]["title"];
-      if (bookName.contains('–')) {
-        bookName = bookName.split('–').last.trim();
-      }
-    } else {
-      bookName = t.notesPage.generalNotes;
+  String? _getBookTitle(String bookId) {
+    if (bookId.isEmpty) return t.notesPage.allBooks;
+
+    final locale = ref.read(settingsNotifierProvider).language;
+    String? bookName = mappings[locale.toString()]?['$bookId.pdf']?['title'];
+    if (bookName == null) return 'Unknown Book';
+
+    if (bookName.contains('–')) {
+      return bookName.split('–').last.trim();
     }
     return bookName;
   }
 
-  /// A single card for an existing note, allowing editing and deletion.
   Widget _buildNoteCard(Note note) {
     final locale = ref.watch(settingsNotifierProvider).language;
     return Card(
@@ -290,7 +313,10 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      getBookNameForCard(note),
+                      note.bookId != null
+                          ? _getBookTitle(note.bookId!) ??
+                                t.notesPage.generalNotes
+                          : t.notesPage.generalNotes,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -320,7 +346,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
                 ),
                 const Spacer(),
                 IconButton(
-                  icon: Icon(Icons.edit_outlined),
+                  icon: const Icon(Icons.edit_outlined),
                   onPressed: () => _handleSaveNote(note),
                 ),
                 IconButton(
@@ -340,8 +366,6 @@ class _NotesPageState extends ConsumerState<NotesPage> {
       ),
     );
   }
-
-  // --- HANDLER METHODS ---
 
   void _handleSaveNote(Note note) {
     _showAddNewNoteModal(note: note);
@@ -368,7 +392,6 @@ class _NotesPageState extends ConsumerState<NotesPage> {
 
     if (confirmed == true) {
       ref.read(notesNotifierProvider.notifier).deleteNote(id: note.id);
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(t.notesPage.noteDeletedSuccess),
@@ -384,9 +407,10 @@ class _NotesPageState extends ConsumerState<NotesPage> {
 // =======================================================================
 
 class BottomSheetNote extends ConsumerStatefulWidget {
-  const BottomSheetNote({super.key, this.note});
+  const BottomSheetNote({super.key, this.note, this.mappings});
 
   final Note? note;
+  final Map<String, dynamic>? mappings;
 
   @override
   ConsumerState<BottomSheetNote> createState() => BottomSheetNoteState();
@@ -394,21 +418,27 @@ class BottomSheetNote extends ConsumerStatefulWidget {
 
 class BottomSheetNoteState extends ConsumerState<BottomSheetNote> {
   final _controller = TextEditingController();
-  late Note? note;
   late String titleText;
 
   @override
   void initState() {
-    note = widget.note;
-    if (note != null) {
+    super.initState();
+    final note = widget.note;
+    final locale = ref.read(settingsNotifierProvider).language;
+    _controller.text = note?.note ?? '';
+
+    if (note != null && note.id.isNotEmpty) {
       titleText = t.notesPage.editNote;
-      _controller.text = note!.note;
+    } else if (note != null && note.bookId != null && note.bookId!.isNotEmpty) {
+      final bookName = PDFUtils.getBookNameById(
+        widget.mappings!,
+        note.bookId!,
+        locale.toString(),
+      );
+      titleText = t.notesPage.bookNoteAdd(bookName: bookName);
     } else {
       titleText = t.notesPage.generalNotes;
     }
-
-    note != null ? _controller.text = note!.note : null;
-    super.initState();
   }
 
   @override
@@ -423,7 +453,12 @@ class BottomSheetNoteState extends ConsumerState<BottomSheetNote> {
 
     ref
         .read(notesNotifierProvider.notifier)
-        .saveNote(noteText: newText, bookId: note?.bookId, page: note?.page);
+        .saveNote(
+          id: widget.note?.id,
+          noteText: newText,
+          bookId: widget.note?.bookId,
+          page: widget.note?.page,
+        );
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -432,7 +467,6 @@ class BottomSheetNoteState extends ConsumerState<BottomSheetNote> {
       ),
     );
 
-    // Close the bottom sheet after saving.
     Navigator.of(context).pop();
   }
 
@@ -466,8 +500,7 @@ class BottomSheetNoteState extends ConsumerState<BottomSheetNote> {
             children: [
               TextButton(
                 child: Text(t.btnActions.cancel),
-                onPressed: () =>
-                    Navigator.of(context).pop(), // Just close the sheet.
+                onPressed: () => Navigator.of(context).pop(),
               ),
               const SizedBox(width: 8),
               ElevatedButton(

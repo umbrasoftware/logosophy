@@ -1,13 +1,15 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:logosophy/database/notes/models/note.dart';
+import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/pdf_viewer.dart';
-import 'package:logosophy/pages/splash_pages/setup_page.dart';
 import 'package:logosophy/pages/splash_pages/login_page.dart';
 import 'package:logosophy/pages/splash_pages/registration_page.dart';
+import 'package:logosophy/pages/splash_pages/setup_page.dart';
 import 'package:logosophy/pages/splash_pages/splash_page.dart';
 
 import 'pages/books_tab/books_page.dart';
@@ -15,7 +17,6 @@ import 'pages/home_tab/home_page.dart';
 import 'pages/notes_tab/notes_page.dart';
 import 'pages/search_tab/search_page.dart';
 import 'pages/settings_tab/settings_page.dart';
-import 'package:logosophy/gen/strings.g.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -109,7 +110,8 @@ final GoRouter router = GoRouter(
           routes: [
             GoRoute(
               path: '/notes',
-              builder: (context, state) => const NotesPage(),
+              builder: (context, state) =>
+                  NotesPage(note: state.extra as Note?),
             ),
           ],
         ),
@@ -126,6 +128,10 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/pdfviewer',
       builder: (context, state) => PdfViewer(file: state.extra as File),
+    ),
+    GoRoute(
+      path: '/note-editor',
+      builder: (context, state) => NotesPage(note: state.extra as Note?),
     ),
   ],
 );
