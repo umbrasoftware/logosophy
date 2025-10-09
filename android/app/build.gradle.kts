@@ -80,4 +80,6 @@ dependencies {
     // --> DEPENDÊNCIA CORRIGIDA E ADICIONADA
     implementation("com.google.firebase:firebase-crashlytics") 
     implementation("com.google.firebase:firebase-crashlytics-ndk")
+
+    implementation("com.google.android.play:integrity:1.5.0")
 }
