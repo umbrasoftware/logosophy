@@ -4,6 +4,7 @@ import 'package:logging/logging.dart';
 import 'package:logosophy/database/cache/notes_cache.dart';
 import 'package:logosophy/database/notes/models/note.dart';
 import 'package:logosophy/database/notes/models/notes_state.dart';
+import 'package:logosophy/utils/encryption_utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'notes_provider.g.dart';
@@ -50,42 +51,31 @@ class NotesNotifier extends _$NotesNotifier {
   }
 
   /// Saves a new note or updates an existing one.
-  Future<void> saveNote({
-    String? id,
-    required String noteText,
-    String? bookId, // Add this parameter
-    int? page, // Add this parameter
-  }) async {
+  Future<void> saveNote(Note note) async {
     final docRef = _getDocRef();
     if (docRef == null) return;
 
-    final isCreating = id == null;
-    final noteId = id ?? docRef.collection('_').doc().id;
-
-    Note noteToSave;
-
-    if (isCreating) {
-      noteToSave = Note(
-        id: noteId,
-        note: noteText,
-        bookId: bookId, // Assign bookId for new notes
-        page: page, // Assign page for new notes
-        createdAt: DateTime.now(),
-        updatedAt: null,
-      );
-    } else {
-      final existingNote = state.notes[id]!;
-      noteToSave = existingNote.copyWith(note: noteText, updatedAt: null);
+    final encryptedText = EncryptionUtils().encrypt(note.note);
+    if (encryptedText == null) {
+      _logger.shout('Error encrypting notes. Aborting...');
+      return;
     }
 
-    // ... (o resto da função permanece o mesmo) ...
+    Note noteToSave = note.copyWith(
+      id: note.id ?? docRef.collection('_').doc().id,
+      note: encryptedText,
+      createdAt: note.createdAt ?? DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
     final newNotesMap = Map<String, Note>.from(state.notes);
-    newNotesMap[noteId] = noteToSave;
+    final id = noteToSave.id!;
+    newNotesMap[id] = noteToSave;
     state = state.copyWith(notes: newNotesMap);
 
     try {
-      await docRef.update({'notes.$noteId': noteToSave.toJson()});
-      _logger.info('Successfully saved note with id: $noteId');
+      await docRef.update({'notes.$id': noteToSave.toJson()});
+      _logger.info('Successfully saved note with id: $id');
     } catch (e) {
       _logger.severe('Failed to save note: $e');
     }

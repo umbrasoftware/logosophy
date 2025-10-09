@@ -4,10 +4,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
 import 'package:logosophy/database/notes/models/note.dart';
 import 'package:logosophy/database/notes/notes_provider.dart';
 import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
+import 'package:logosophy/utils/encryption_utils.dart';
 import 'package:logosophy/utils/pdf_utils.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -22,6 +24,7 @@ class NotesPage extends ConsumerStatefulWidget {
 }
 
 class _NotesPageState extends ConsumerState<NotesPage> {
+  final _logger = Logger('NotesPage');
   String? _selectedBookId;
   DateTime? _afterDate;
   DateTime? _beforeDate;
@@ -30,26 +33,19 @@ class _NotesPageState extends ConsumerState<NotesPage> {
   bool _isLoading = true;
 
   /// Returns true if the page is for a specific book (from /note-editor).
-  bool get isBookSpecificContext => widget.note != null;
+  late bool isNoteForBook;
 
   @override
   void initState() {
     super.initState();
     _selectedBookId = widget.note?.bookId;
+    isNoteForBook = widget.note != null;
 
     loadMappings().then((_) {
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
-
-        if (isBookSpecificContext && widget.note!.id.isEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              _showAddNewNoteModal(note: widget.note);
-            }
-          });
-        }
       }
     });
   }
@@ -75,7 +71,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
 
   void _clearFilters() {
     setState(() {
-      if (!isBookSpecificContext) {
+      if (!isNoteForBook) {
         _selectedBookId = null;
       }
       _afterDate = null;
@@ -84,7 +80,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
     });
   }
 
-  void _showAddNewNoteModal({Note? note}) {
+  void _showAddNewNoteModal(Note? note) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -99,8 +95,8 @@ class _NotesPageState extends ConsumerState<NotesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final notesState = ref.watch(notesNotifierProvider);
-    final notifier = ref.read(notesNotifierProvider.notifier);
+    final notesState = ref.watch(notesProvider);
+    final notifier = ref.read(notesProvider.notifier);
 
     final displayedNotes = notifier.getNotes(
       bookId: _selectedBookId,
@@ -121,7 +117,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
       );
     }
 
-    final appBarTitle = isBookSpecificContext
+    final appBarTitle = isNoteForBook
         ? Text(_getBookTitle(_selectedBookId!) ?? t.notesPage.myNotes)
         : Text(t.notesPage.myNotes);
 
@@ -130,16 +126,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          final noteForModal = isBookSpecificContext
-              ? Note(
-                  id: '',
-                  bookId: _selectedBookId,
-                  updatedAt: null,
-                  note: '',
-                  page: null, // Page is not known here
-                )
-              : null;
-          _showAddNewNoteModal(note: noteForModal);
+          _showAddNewNoteModal(widget.note);
         },
         shape: const CircleBorder(),
         child: const Icon(Icons.add),
@@ -149,7 +136,10 @@ class _NotesPageState extends ConsumerState<NotesPage> {
         child: Column(
           children: [
             _buildFilterSection(notesState.notes.values.toList()),
-            const Divider(height: 24),
+            // When in book-specific context the ExpansionTile is initially
+            // expanded and may render its own separation. Use a plain
+            // SizedBox to preserve spacing and avoid a double divider line.
+            const SizedBox(height: 24),
             _buildNotesList(displayedNotes),
           ],
         ),
@@ -158,7 +148,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
   }
 
   Widget _buildFilterSection(List<Note> allNotes) {
-    final locale = ref.watch(settingsNotifierProvider).language;
+    final locale = ref.watch(settingsProvider).language;
 
     var bookIds = allNotes.map((e) => e.bookId).whereType<String>().toSet();
     var bookIdsList = bookIds.toList();
@@ -166,14 +156,14 @@ class _NotesPageState extends ConsumerState<NotesPage> {
     bookIdsList.insert(0, '');
 
     return ExpansionTile(
-      initiallyExpanded: isBookSpecificContext,
+      initiallyExpanded: isNoteForBook,
       title: Text(t.notesPage.filters),
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              if (!isBookSpecificContext) ...[
+              if (!isNoteForBook) ...[
                 Row(
                   children: [
                     Expanded(
@@ -287,7 +277,8 @@ class _NotesPageState extends ConsumerState<NotesPage> {
   String? _getBookTitle(String bookId) {
     if (bookId.isEmpty) return t.notesPage.allBooks;
 
-    final locale = ref.read(settingsNotifierProvider).language;
+    String locale = ref.read(settingsProvider).language;
+    locale = 'pt-BR'; // TODO: Replace when more book languages come.
     String? bookName = mappings[locale.toString()]?['$bookId.pdf']?['title'];
     if (bookName == null) return 'Unknown Book';
 
@@ -298,7 +289,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
   }
 
   Widget _buildNoteCard(Note note) {
-    final locale = ref.watch(settingsNotifierProvider).language;
+    final locale = ref.watch(settingsProvider).language;
     return Card(
       elevation: 2.0,
       margin: const EdgeInsets.only(bottom: 16),
@@ -356,7 +347,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
               ],
             ),
             Text(
-              note.note,
+              EncryptionUtils().decrypt(note.note) ?? 'error decrypting',
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(fontSize: 16),
@@ -368,10 +359,15 @@ class _NotesPageState extends ConsumerState<NotesPage> {
   }
 
   void _handleSaveNote(Note note) {
-    _showAddNewNoteModal(note: note);
+    _showAddNewNoteModal(note);
   }
 
   Future<void> _handleDeleteNote(Note note) async {
+    if (note.id == null) {
+      _logger.severe('Note does not gave id. Impossible to delete.');
+      return;
+    }
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -391,14 +387,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
     );
 
     if (confirmed == true) {
-      ref.read(notesNotifierProvider.notifier).deleteNote(id: note.id);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(t.notesPage.noteDeletedSuccess),
-          backgroundColor: Colors.red,
-        ),
-      );
+      ref.read(notesProvider.notifier).deleteNote(id: note.id!);
     }
   }
 }
@@ -425,12 +414,12 @@ class BottomSheetNoteState extends ConsumerState<BottomSheetNote> {
   void initState() {
     super.initState();
     final note = widget.note;
-    final locale = ref.read(settingsNotifierProvider).language;
-    _controller.text = note?.note ?? '';
+    final locale = ref.read(settingsProvider).language;
+    _controller.text = EncryptionUtils().decrypt(note?.note) ?? '';
 
-    if (note != null && note.id.isNotEmpty) {
+    if (note != null) {
       titleText = t.notesPage.editNote;
-    } else if (note != null && note.bookId != null && note.bookId!.isNotEmpty) {
+    } else if (note != null && note.bookId != null) {
       final bookName = PDFUtils.getBookNameById(
         widget.mappings!,
         note.bookId!,
@@ -448,26 +437,13 @@ class BottomSheetNoteState extends ConsumerState<BottomSheetNote> {
     super.dispose();
   }
 
-  void _handleAddNewNote() {
+  void _createOrEditNote() {
     final newText = _controller.text.trim();
     if (newText.isEmpty) return;
+    Note note = widget.note ?? Note(note: newText);
+    note = note.copyWith(note: newText);
 
-    ref
-        .read(notesNotifierProvider.notifier)
-        .saveNote(
-          id: widget.note?.id,
-          noteText: newText,
-          bookId: widget.note?.bookId,
-          page: widget.note?.page,
-        );
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(t.notesPage.noteSaved),
-        backgroundColor: Colors.green,
-      ),
-    );
-
+    ref.read(notesProvider.notifier).saveNote(note);
     Navigator.of(context).pop();
   }
 
@@ -505,7 +481,7 @@ class BottomSheetNoteState extends ConsumerState<BottomSheetNote> {
               ),
               const SizedBox(width: 8),
               ElevatedButton(
-                onPressed: _handleAddNewNote,
+                onPressed: _createOrEditNote,
                 child: Text(t.btnActions.save),
               ),
             ],

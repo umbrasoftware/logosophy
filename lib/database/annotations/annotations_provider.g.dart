@@ -6,22 +6,59 @@ part of 'annotations_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(AnnotationsNotifier)
+const annotationsProvider = AnnotationsNotifierProvider._();
+
+final class AnnotationsNotifierProvider
+    extends $NotifierProvider<AnnotationsNotifier, AnnotationsState> {
+  const AnnotationsNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'annotationsProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$annotationsNotifierHash();
+
+  @$internal
+  @override
+  AnnotationsNotifier create() => AnnotationsNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AnnotationsState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AnnotationsState>(value),
+    );
+  }
+}
+
 String _$annotationsNotifierHash() =>
     r'51330d8a9c6a84c1dcda41087b32116f77101cfc';
 
-/// See also [AnnotationsNotifier].
-@ProviderFor(AnnotationsNotifier)
-final annotationsNotifierProvider =
-    NotifierProvider<AnnotationsNotifier, AnnotationsState>.internal(
-      AnnotationsNotifier.new,
-      name: r'annotationsNotifierProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$annotationsNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-typedef _$AnnotationsNotifier = Notifier<AnnotationsState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$AnnotationsNotifier extends $Notifier<AnnotationsState> {
+  AnnotationsState build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AnnotationsState, AnnotationsState>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AnnotationsState, AnnotationsState>,
+              AnnotationsState,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}

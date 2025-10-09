@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logosophy/utils/auth_utils.dart';
 import 'package:logosophy/gen/strings.g.dart';
+import 'package:logosophy/utils/encryption_utils.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
@@ -53,6 +54,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         ),
       );
       await AuthUtils().loadDocuments(ref);
+      await EncryptionUtils().loadEncryptionKey();
     } else {
       // Success: Show confirmation message.
       ScaffoldMessenger.of(

@@ -10,6 +10,7 @@ import 'package:logging/logging.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/splash_pages/animated_logo.dart';
 import 'package:logosophy/utils/auth_utils.dart';
+import 'package:logosophy/utils/encryption_utils.dart';
 import 'package:logosophy/utils/files_utils.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -68,6 +69,7 @@ class _SetupPageState extends ConsumerState<SetupPage> {
 
     if (mounted) {
       await AuthUtils().loadDocuments(ref);
+      await EncryptionUtils().loadEncryptionKey();
       // ignore: use_build_context_synchronously
       GoRouter.of(context).go('/home');
     }
@@ -131,7 +133,7 @@ class _SetupPageState extends ConsumerState<SetupPage> {
                 children: [
                   const Text('Português'),
                   const SizedBox(width: 8),
-                  CountryFlag.fromLanguageCode('pt-BR', shape: Circle()),
+                  ClipOval(child: CountryFlag.fromLanguageCode('pt-BR')),
                 ],
               ),
             ),

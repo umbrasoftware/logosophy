@@ -1,24 +1,25 @@
-import 'dart:ui';
-
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
 import 'package:logosophy/database/cache/annotations_cache.dart';
 import 'package:logosophy/database/cache/book_cache.dart';
 import 'package:logosophy/database/cache/notes_cache.dart';
 import 'package:logosophy/database/cache/settings_cache.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/router.dart';
-import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:logging/logging.dart';
 
 import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
   setupLogging();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
@@ -30,9 +31,11 @@ Future<void> main() async {
   };
 
   await FirebaseAppCheck.instance.activate(
-    androidProvider: AndroidProvider.playIntegrity,
-    appleProvider: AppleProvider.appAttest,
+    androidProvider: kDebugMode
+        ? AndroidProvider.debug
+        : AndroidProvider.playIntegrity,
   );
+
   runApp(ProviderScope(child: TranslationProvider(child: App())));
 }
 

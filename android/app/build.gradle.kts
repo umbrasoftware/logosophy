@@ -70,10 +70,14 @@ dependencies {
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:34.3.0"))
 
+    // Add the dependencies for the App Check libraries
+    implementation("com.google.firebase:firebase-appcheck-debug")
+    implementation("com.google.firebase:firebase-appcheck-playintegrity")
+
     // Dependências do Firebase
     implementation("com.google.firebase:firebase-analytics")
     
     // --> DEPENDÊNCIA CORRIGIDA E ADICIONADA
     implementation("com.google.firebase:firebase-crashlytics") 
-    implementation("com.google.firebase:firebase-crashlytics-ndk") // Pode manter esta para erros nativos
+    implementation("com.google.firebase:firebase-crashlytics-ndk")
 }

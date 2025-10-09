@@ -18,7 +18,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    _currentLocale = ref.read(settingsNotifierProvider).language;
+    _currentLocale = ref.read(settingsProvider).language;
   }
 
   // Helper method to get the display name for a locale
@@ -78,7 +78,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   Future<void> _changeLocale(BuildContext context, String locale) async {
     setState(() {
       _currentLocale = locale;
-      ref.read(settingsNotifierProvider.notifier).changeLanguage(locale);
+      ref.read(settingsProvider.notifier).changeLanguage(locale);
     });
     SettingsCache().saveLanguage(locale);
     await LocaleSettings.setLocaleRaw(locale);

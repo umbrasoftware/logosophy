@@ -37,7 +37,7 @@ class _AnnotationsOverlayState extends ConsumerState<AnnotationsOverlay> {
   void initState() {
     super.initState();
     page = int.parse(widget.page);
-    annoProvider = ref.read(annotationsNotifierProvider.notifier);
+    annoProvider = ref.read(annotationsProvider.notifier);
     spans = annoProvider.getSelectionSpans(widget.bookId)
       ..sort((a, b) => a.pageNumber.compareTo(b.pageNumber));
 

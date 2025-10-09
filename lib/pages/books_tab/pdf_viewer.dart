@@ -47,7 +47,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     bookId = widget.file.path.split('/').last.split('.').first;
     _showToolbar = false;
     _showScrollHead = true;
-    annoProvider = ref.read(annotationsNotifierProvider.notifier);
+    annoProvider = ref.read(annotationsProvider.notifier);
     super.initState();
   }
 
@@ -371,9 +371,7 @@ class _PdfViewerState extends ConsumerState<PdfViewer> {
     context.push(
       '/note-editor',
       extra: Note(
-        id: '',
         bookId: bookId,
-        updatedAt: null,
         note: '',
         page: _pdfViewerController.pageNumber,
       ),

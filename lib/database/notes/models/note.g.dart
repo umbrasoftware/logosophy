@@ -7,7 +7,7 @@ part of 'note.dart';
 // **************************************************************************
 
 _Note _$NoteFromJson(Map<String, dynamic> json) => _Note(
-  id: json['id'] as String,
+  id: json['id'] as String?,
   bookId: json['bookId'] as String?,
   page: (json['page'] as num?)?.toInt(),
   note: json['note'] as String,

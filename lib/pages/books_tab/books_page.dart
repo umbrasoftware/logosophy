@@ -7,8 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 /// A simple data class to hold book information for sorting and display.
 class _BookData {
@@ -83,7 +83,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
 
   @override
   Widget build(BuildContext context) {
-    language = ref.watch(settingsNotifierProvider).language;
+    language = ref.watch(settingsProvider).language;
     return Scaffold(
       appBar: AppBar(title: Text(t.navBar.books)),
       body: FutureBuilder<List<_BookData>>(

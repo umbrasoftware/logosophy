@@ -7,12 +7,12 @@ part 'note.g.dart';
 @freezed
 abstract class Note with _$Note {
   factory Note({
-    required String id,
+    String? id,
     String? bookId,
     int? page,
     required String note,
     @TimestampConverter() DateTime? createdAt,
-    @TimestampConverter() required DateTime? updatedAt,
+    @TimestampConverter() DateTime? updatedAt,
   }) = _Note;
 
   factory Note.fromJson(Map<String, dynamic> json) => _$NoteFromJson(json);

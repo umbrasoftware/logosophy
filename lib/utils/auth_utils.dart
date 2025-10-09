@@ -120,10 +120,10 @@ class AuthUtils {
   }
 
   Future<void> loadDocuments(WidgetRef ref) async {
-    final annoProvider = ref.read(annotationsNotifierProvider.notifier);
-    final notesProvider = ref.read(notesNotifierProvider.notifier);
+    final annoProvider = ref.read(annotationsProvider.notifier);
+    final notesNotifier = ref.read(notesProvider.notifier);
 
     await annoProvider.getDocument();
-    await notesProvider.getDocument();
+    await notesNotifier.getDocument();
   }
 }

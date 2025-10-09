@@ -328,7 +328,25 @@ class PDFUtils {
     String locale, {
     bool returnShort = false,
   }) {
-    String bookName = mappings[locale]["$bookId.pdf"]["title"];
+    // Defensive lookup: mappings may not contain the requested locale
+    // (for example 'pt-BR' vs 'pt'). Try exact locale first, then the
+    // language subtag, then fall back to an empty map so indexing won't
+    // throw a NoSuchMethodError on null.
+    locale = 'pt-BR';
+    final Map<String, dynamic> localeMap =
+        (mappings[locale] as Map<String, dynamic>?) ??
+        (locale.contains('-')
+            ? (mappings[locale.split('-').first] as Map<String, dynamic>?)
+            : null) ??
+        <String, dynamic>{};
+
+    final bookEntry = localeMap['$bookId.pdf'] as Map<String, dynamic>?;
+    String? bookName = bookEntry != null ? bookEntry['title'] as String? : null;
+
+    if (bookName == null) {
+      return 'Unknown Book';
+    }
+
     if (returnShort && bookName.contains('–')) {
       bookName = bookName.split('–').last.trim();
     }
