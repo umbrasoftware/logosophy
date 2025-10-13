@@ -109,7 +109,7 @@ class AuthUtils {
       }
       return t.authMessages.error.unknown;
     } catch (e) {
-      logger.severe('Error occurred during sign-in: $e');
+      logger.shout('Error occurred during sign-in: $e');
       return t.authMessages.error.unknown;
     }
   }

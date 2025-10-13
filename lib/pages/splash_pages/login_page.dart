@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logging/logging.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/utils/auth_utils.dart';
 import 'package:logosophy/utils/encryption_utils.dart';
@@ -15,6 +16,7 @@ class LoginPage extends ConsumerStatefulWidget {
 }
 
 class _LoginPageState extends ConsumerState<LoginPage> {
+  final _logger = Logger('LoginPage');
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -47,15 +49,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     setState(() => _isLoading = false);
 
     if (errorMessage != null) {
-      await AuthUtils().loadDocuments(ref);
-      await EncryptionUtils().loadEncryptionKey();
+      _logger.info('Error logging in: $errorMessage');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(errorMessage),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
+      return;
     }
+
+    await AuthUtils().loadDocuments(ref);
+    await EncryptionUtils().loadEncryptionKey();
   }
 
   @override

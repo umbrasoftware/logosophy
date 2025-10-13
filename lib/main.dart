@@ -14,6 +14,7 @@ import 'package:logosophy/database/cache/notes_cache.dart';
 import 'package:logosophy/database/cache/settings_cache.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'firebase_options.dart';
 
@@ -34,6 +35,11 @@ Future<void> main() async {
     androidProvider: kDebugMode
         ? AndroidProvider.debug
         : AndroidProvider.playIntegrity,
+  );
+
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
   runApp(ProviderScope(child: TranslationProvider(child: App())));
@@ -75,6 +81,12 @@ void setupLogging() {
   Logger.root.onRecord.listen((record) {
     // ignore: avoid_print
     print('${record.level.name}: ${record.loggerName}: ${record.message}');
+
+    if (record.level == Level.SHOUT) {
+      FirebaseCrashlytics.instance.log(
+        '${record.loggerName}: ${record.message}',
+      );
+    }
   });
 }
 

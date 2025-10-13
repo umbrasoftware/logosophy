@@ -4,7 +4,7 @@ description: "A new Flutter project."
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev.
 
-version: 0.2.18+9
+version: 0.2.18+10
 
 environment:
   sdk: ^3.8.1
@@ -47,6 +47,7 @@ dependencies:
   flutter_secure_storage: ^10.0.0-beta.4
   pointycastle: ^4.0.0
   cloud_functions: ^6.0.2
+  supabase_flutter: ^2.10.3
 
 dev_dependencies:
   flutter_test:

@@ -53,10 +53,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
+    } else {
       await AuthUtils().loadDocuments(ref);
       await EncryptionUtils().loadEncryptionKey();
-    } else {
-      // Success: Show confirmation message.
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(t.btnActions.registrationSuccess)));
