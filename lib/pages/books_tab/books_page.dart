@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
+import 'package:logosophy/pages/books_tab/pdf_viewer_args.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -118,15 +119,14 @@ class _BooksPageState extends ConsumerState<BooksPage> {
               final bookData = books[index];
               return InkWell(
                 onTap: () {
-                  // Derive the PDF file path from the cover file path by replacing
-                  // '_cover.png' with '.pdf'.
                   const coverSuffix = '_cover.png';
                   final coverPath = bookData.coverFile.path;
                   final pdfPath =
                       '${coverPath.substring(0, coverPath.length - coverSuffix.length)}.pdf';
-                  // Use push to navigate, which adds the page to the stack
-                  // and allows the user to go back.
-                  GoRouter.of(context).push('/pdfviewer', extra: File(pdfPath));
+
+                  final pdfFile = File(pdfPath);
+                  final args = PdfViewerArgs(file: pdfFile);
+                  GoRouter.of(context).push('/pdfviewer', extra: args);
                 },
                 child: Card(
                   elevation: 2.0,

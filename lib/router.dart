@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:logosophy/database/notes/models/note.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/pdf_viewer.dart';
+import 'package:logosophy/pages/books_tab/pdf_viewer_args.dart';
 import 'package:logosophy/pages/splash_pages/login_page.dart';
 import 'package:logosophy/pages/splash_pages/registration_page.dart';
 import 'package:logosophy/pages/splash_pages/setup_page.dart';
@@ -127,7 +127,12 @@ final GoRouter router = GoRouter(
     ),
     GoRoute(
       path: '/pdfviewer',
-      builder: (context, state) => PdfViewer(file: state.extra as File),
+      builder: (context, state) {
+        final args = state.extra as PdfViewerArgs;
+
+        // Passa os argumentos para o widget PdfViewer
+        return PdfViewer(file: args.file, page: args.page);
+      },
     ),
     GoRoute(
       path: '/note-editor',
