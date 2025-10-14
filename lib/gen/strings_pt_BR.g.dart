@@ -42,6 +42,7 @@ class TranslationsPtBr implements Translations {
 	@override late final _TranslationsBookPagePtBr bookPage = _TranslationsBookPagePtBr._(_root);
 	@override late final _TranslationsNotesPagePtBr notesPage = _TranslationsNotesPagePtBr._(_root);
 	@override late final _TranslationsSettingsPagePtBr settingsPage = _TranslationsSettingsPagePtBr._(_root);
+	@override late final _TranslationsSearchPagePtBr searchPage = _TranslationsSearchPagePtBr._(_root);
 	@override late final _TranslationsAuthMessagesPtBr authMessages = _TranslationsAuthMessagesPtBr._(_root);
 }
 
@@ -177,6 +178,19 @@ class _TranslationsSettingsPagePtBr implements TranslationsSettingsPageEn {
 	@override String get portuguese => 'Português (Brasil)';
 	@override String get english => 'English (US)';
 	@override String get signOut => 'Sair';
+}
+
+// Path: searchPage
+class _TranslationsSearchPagePtBr implements TranslationsSearchPageEn {
+	_TranslationsSearchPagePtBr._(this._root);
+
+	final TranslationsPtBr _root; // ignore: unused_field
+
+	// Translations
+	@override String get unkownBook => 'Livro desconhecido';
+	@override String get typeYourSearch => 'Digite sua busca';
+	@override String get startSearch => 'Digite algo para iniciar a busca';
+	@override String get noResultFound => 'Nenhum resultado encontrado';
 }
 
 // Path: authMessages
@@ -317,6 +331,10 @@ extension on TranslationsPtBr {
 			case 'settingsPage.portuguese': return 'Português (Brasil)';
 			case 'settingsPage.english': return 'English (US)';
 			case 'settingsPage.signOut': return 'Sair';
+			case 'searchPage.unkownBook': return 'Livro desconhecido';
+			case 'searchPage.typeYourSearch': return 'Digite sua busca';
+			case 'searchPage.startSearch': return 'Digite algo para iniciar a busca';
+			case 'searchPage.noResultFound': return 'Nenhum resultado encontrado';
 			case 'authMessages.prompt.askPassword': return 'Digite a senha';
 			case 'authMessages.prompt.askEmail': return 'Digite seu email';
 			case 'authMessages.prompt.askAuthenticate': return 'Por favor, se autentique para entrar no aplicativo.';

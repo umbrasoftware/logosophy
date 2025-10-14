@@ -45,6 +45,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final TranslationsBookPageEn bookPage = TranslationsBookPageEn._(_root);
 	late final TranslationsNotesPageEn notesPage = TranslationsNotesPageEn._(_root);
 	late final TranslationsSettingsPageEn settingsPage = TranslationsSettingsPageEn._(_root);
+	late final TranslationsSearchPageEn searchPage = TranslationsSearchPageEn._(_root);
 	late final TranslationsAuthMessagesEn authMessages = TranslationsAuthMessagesEn._(_root);
 }
 
@@ -342,6 +343,27 @@ class TranslationsSettingsPageEn {
 	String get signOut => 'Sign out';
 }
 
+// Path: searchPage
+class TranslationsSearchPageEn {
+	TranslationsSearchPageEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Unkown book'
+	String get unkownBook => 'Unkown book';
+
+	/// en: 'Type your search'
+	String get typeYourSearch => 'Type your search';
+
+	/// en: 'Type something to start your search'
+	String get startSearch => 'Type something to start your search';
+
+	/// en: 'No results found'
+	String get noResultFound => 'No results found';
+}
+
 // Path: authMessages
 class TranslationsAuthMessagesEn {
 	TranslationsAuthMessagesEn._(this._root);
@@ -528,6 +550,10 @@ extension on Translations {
 			case 'settingsPage.selectLanguage': return 'Select Language';
 			case 'settingsPage.language': return 'Language';
 			case 'settingsPage.signOut': return 'Sign out';
+			case 'searchPage.unkownBook': return 'Unkown book';
+			case 'searchPage.typeYourSearch': return 'Type your search';
+			case 'searchPage.startSearch': return 'Type something to start your search';
+			case 'searchPage.noResultFound': return 'No results found';
 			case 'authMessages.prompt.askPassword': return 'Enter password';
 			case 'authMessages.prompt.askEmail': return 'Enter email';
 			case 'authMessages.prompt.askAuthenticate': return 'Please authenticate to enter the app.';

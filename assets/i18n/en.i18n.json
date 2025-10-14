@@ -91,6 +91,12 @@
         "language": "Language",
         "signOut": "Sign out"
     },
+    "searchPage": {
+        "unkownBook": "Unkown book",
+        "typeYourSearch": "Type your search",
+        "startSearch": "Type something to start your search",
+        "noResultFound": "No results found"
+    },
     "authMessages": {
         "prompt": {
             "askPassword": "Enter password",

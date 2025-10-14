@@ -41,7 +41,7 @@ final class NotesNotifierProvider
   }
 }
 
-String _$notesNotifierHash() => r'bb9820d52063d5e5b1c2b8bbc384d4484a9f0a20';
+String _$notesNotifierHash() => r'76d0666003a09826f9d0760c9227f16b5615613d';
 
 abstract class _$NotesNotifier extends $Notifier<NotesState> {
   NotesState build();

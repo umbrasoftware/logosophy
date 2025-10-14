@@ -91,6 +91,12 @@
         "english": "English (US)",
         "signOut": "Sair"
     },
+    "searchPage": {
+        "unkownBook": "Livro desconhecido",
+        "typeYourSearch": "Digite sua busca",
+        "startSearch": "Digite algo para iniciar a busca",
+        "noResultFound": "Nenhum resultado encontrado"
+    },
     "authMessages": {
         "prompt": {
             "askPassword": "Digite a senha",

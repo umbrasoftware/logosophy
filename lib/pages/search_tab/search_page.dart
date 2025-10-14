@@ -3,21 +3,23 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/pdf_viewer_args.dart';
 import 'package:logosophy/pages/search_tab/search_result.dart';
 import 'package:logosophy/utils/search_utils.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-class SearchPage extends StatefulWidget {
+class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
 
   @override
-  State<SearchPage> createState() => _SearchPageState();
+  ConsumerState<SearchPage> createState() => _SearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _SearchPageState extends ConsumerState<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   List<SearchResult> _searchResults = [];
   bool _isLoading = false;
@@ -29,10 +31,10 @@ class _SearchPageState extends State<SearchPage> {
     try {
       // O caminho no JSON é 'pt-BR' -> 'ID.pdf' -> 'title'
       final pdfFileName = '$bookId.pdf';
-      return mappings['pt-BR'][pdfFileName]['title'] ?? 'Título desconhecido';
+      return mappings['pt-BR'][pdfFileName]['title'] ?? t.searchPage.unkownBook;
     } catch (e) {
       // Retorna um valor padrão caso a chave não seja encontrada
-      return 'Título desconhecido';
+      return t.searchPage.unkownBook;
     }
   }
 
@@ -87,7 +89,7 @@ class _SearchPageState extends State<SearchPage> {
       future: getMappings(),
       builder: (context, asyncSnapshot) {
         return Scaffold(
-          appBar: AppBar(title: const Text('Pesquisa de Documentos')),
+          appBar: AppBar(title: Text(t.navBar.search)),
           body: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -95,7 +97,7 @@ class _SearchPageState extends State<SearchPage> {
                 TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    labelText: 'Digite sua busca',
+                    labelText: t.searchPage.typeYourSearch,
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.search),
                       onPressed: () => _performSearch(_searchController.text),
@@ -129,13 +131,13 @@ class _SearchPageState extends State<SearchPage> {
     }
 
     if (_searchResults.isEmpty && _searchController.text.isNotEmpty) {
-      return const Center(child: Text('Nenhum resultado encontrado.'));
+      return Center(child: Text(t.searchPage.noResultFound));
     }
 
     if (_searchResults.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'Digite algo para iniciar a busca.',
+          t.searchPage.startSearch,
           style: TextStyle(color: Colors.grey),
         ),
       );
@@ -156,12 +158,11 @@ class _SearchPageState extends State<SearchPage> {
               bookTitle,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            subtitle: Text('Página: ${result.page}\n"${result.content}"'),
-            isThreeLine: true,
-            trailing: Chip(
-              label: Text(result.score.toStringAsFixed(3)),
-              backgroundColor: Colors.teal.withOpacity(0.1),
+            subtitle: Text(
+              '${t.bookPage.page(page: result.page)}\n"${result.content}"',
             ),
+            isThreeLine: true,
+            trailing: Chip(label: Text(result.score.toStringAsFixed(3))),
             onTap: () async {
               final appDir = await getApplicationDocumentsDirectory();
               final pdfPath = p.join(
@@ -173,7 +174,7 @@ class _SearchPageState extends State<SearchPage> {
 
               final pdfFile = File(pdfPath);
 
-              if (mounted) {
+              if (context.mounted) {
                 final args = PdfViewerArgs(file: pdfFile, page: result.page);
                 context.push('/pdfviewer', extra: args);
               }
