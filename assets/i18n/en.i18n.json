@@ -81,7 +81,8 @@
         "createGeneralNote": "Create general note",
         "noteSaved": "Note saved!",
         "writeHere": "Write your note here ...",
-        "bookNoteAdd": "Add note to $bookName"
+        "bookNoteAdd": "Add note to $bookName",
+        "bookNoteEdit": "Edit note in $bookName"
     },
     "settingsPage": {
         "settings": "Settings",

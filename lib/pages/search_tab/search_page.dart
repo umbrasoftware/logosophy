@@ -52,7 +52,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       _errorMessage = null;
     });
 
-    // Simulação de uma resposta bem-sucedida
     try {
       final embeddings = await SearchUtils.createEmbedding(query);
       final queryResults = await SearchUtils.similaritySearch(embeddings!, 10);
@@ -71,7 +70,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         _isLoading = false;
       });
     }
-    // ** FIM DA SEÇÃO DE SUBSTITUIÇÃO **
   }
 
   Future<void> getMappings() async {
@@ -102,7 +100,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       icon: const Icon(Icons.search),
                       onPressed: () => _performSearch(_searchController.text),
                     ),
-                    border: const OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
                   ),
                   onSubmitted: (value) => _performSearch(value),
                 ),
@@ -118,7 +118,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
-  /// Constrói a visualização de resultados com base no estado atual
   Widget _buildResultsView() {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -143,7 +142,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       );
     }
 
-    // Lista de cards com os resultados
     return ListView.builder(
       itemCount: _searchResults.length,
       itemBuilder: (context, index) {
@@ -153,7 +151,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         return Card(
           margin: const EdgeInsets.only(bottom: 12.0),
           child: ListTile(
-            leading: const Icon(Icons.article_outlined, color: Colors.blueGrey),
             title: Text(
               bookTitle,
               style: const TextStyle(fontWeight: FontWeight.bold),
@@ -161,8 +158,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             subtitle: Text(
               '${t.bookPage.page(page: result.page)}\n"${result.content}"',
             ),
-            isThreeLine: true,
-            trailing: Chip(label: Text(result.score.toStringAsFixed(3))),
             onTap: () async {
               final appDir = await getApplicationDocumentsDirectory();
               final pdfPath = p.join(

@@ -81,7 +81,8 @@
         "createGeneralNote": "Criar anotação geral",
         "noteSaved": "Anotação salva!",
         "writeHere": "Escreva sua anotação aqui...",
-        "bookNoteAdd": "Adicionar anotação ao $bookName"
+        "bookNoteAdd": "Adicionar anotação ao $bookName",
+        "bookNoteEdit": "Editar anotação em $bookName"
     },
     "settingsPage": {
         "settings": "Configurações",

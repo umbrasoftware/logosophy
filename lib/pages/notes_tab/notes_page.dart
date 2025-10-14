@@ -417,15 +417,29 @@ class BottomSheetNoteState extends ConsumerState<BottomSheetNote> {
     final locale = ref.read(settingsProvider).language;
     _controller.text = EncryptionUtils().decrypt(note?.note) ?? '';
 
-    if (note != null) {
-      titleText = t.notesPage.editNote;
-    } else if (note != null && note.bookId != null) {
-      final bookName = PDFUtils.getBookNameById(
+    print('note: $note');
+
+    String? bookName;
+    if (note != null && note.bookId != null) {
+      bookName = PDFUtils.getBookNameById(
         widget.mappings!,
         note.bookId!,
         locale.toString(),
       );
-      titleText = t.notesPage.bookNoteAdd(bookName: bookName);
+    }
+
+    if (note != null) {
+      if (note.id != null) {
+        titleText = note.bookId != null
+            ? t.notesPage.bookNoteEdit(bookName: bookName!)
+            : t.notesPage.editNote;
+        return;
+      }
+
+      // note.id is null!
+      titleText = note.bookId != null
+          ? t.notesPage.bookNoteAdd(bookName: bookName!)
+          : t.notesPage.generalNotes;
     } else {
       titleText = t.notesPage.generalNotes;
     }
