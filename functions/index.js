@@ -8,7 +8,7 @@ admin.initializeApp();
 const client = new SecretManagerServiceClient();
 
 // v2 Callable Cloud Function to securely return the secret value.
-exports.getAndroidKey = onCall({ enforceAppCheck: true }, async (request) => {
+exports.getAndroidKey = onCall({ enforceAppCheck: false }, async (request) => {
     // App Check is enforced by the 'enforceAppCheck: true' option.
 
     // Authentication verification. If a user is not signed in, request.auth is undefined.
