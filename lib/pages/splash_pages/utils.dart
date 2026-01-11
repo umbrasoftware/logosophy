@@ -45,8 +45,7 @@ class FilesUtils {
     final appDir = await getApplicationDocumentsDirectory();
     final langDir = Directory(join(appDir.path, 'books', languageCode));
     await langDir.create(recursive: true);
-    final url = await storage.from('books').createSignedUrl('$languageCode/books.zip', 180);
-    _logger.info('Download URL: $url');
+    final url = await storage.from('books').createSignedUrl('$languageCode/books.zip', 600);
 
     final dio = Dio();
     final zipPath = join(langDir.path, 'books.zip');

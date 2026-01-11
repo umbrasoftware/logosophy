@@ -35,18 +35,19 @@ class _PdfViewerState extends ConsumerState<PDFReader> {
         initialPageNumber: widget.page ?? 1,
         controller: _pdfController,
         params: PdfViewerParams(
-          onViewerReady: (document, controller) {
+          onViewerReady: (document, controller) async {
             if (widget.page != null) return;
 
-            final position = BookData().getPosition(bookId);
+            final position = BookReadStatus().getPosition(bookId);
             _pdfController.setZoom(position.offset, position.zoom);
+            await BookReadStatus().saveTimestamp(bookId);
           },
           onInteractionEnd: (details) async {
             if (widget.page != null) return;
 
             final zoom = _pdfController.currentZoom;
             final offset = _pdfController.centerPosition;
-            await BookData().savePosition(bookId, zoom, offset);
+            await BookReadStatus().savePosition(bookId, zoom, offset);
             logger.info("Book position saved: zoom: $zoom, offset:  $offset");
           },
         ),

@@ -19,10 +19,10 @@ class BookPosition {
 
 /// This class is responsible for saving the read state for every books.
 /// This mean the page, scroll position and zoom state.
-class BookData {
-  BookData._internal();
-  static final BookData _instance = BookData._internal();
-  factory BookData() => _instance;
+class BookReadStatus {
+  BookReadStatus._internal();
+  static final BookReadStatus _instance = BookReadStatus._internal();
+  factory BookReadStatus() => _instance;
 
   final _logger = Logger('BookCache');
   late SharedPreferencesWithCache _prefs;
@@ -32,7 +32,17 @@ class BookData {
     _prefs = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
 
     if (_prefs.getString('books') == null) {
-      await _prefs.setString('books', json.encode(bookMap));
+      DateTime time = DateTime.now().subtract(const Duration(days: 180));
+      int count = 0;
+      final finalBookMap = json.decode(json.encode(bookMap));
+
+      for (final entries in bookMap.entries) {
+        finalBookMap[entries.key]!["lastOpened"] = time.toIso8601String();
+        count++;
+        time = time.subtract(Duration(days: count));
+      }
+
+      await _prefs.setString('books', json.encode(finalBookMap));
     }
   }
 
@@ -68,24 +78,46 @@ class BookData {
       await _prefs.setString('books', jsonEncode(dataJson));
     }
   }
+
+  /// Saves a book's Timestamp.
+  Future<void> saveTimestamp(String bookId) async {
+    final data = _prefs.getString('books');
+    if (data == null) {
+      _logger.severe("SharedPrefs is null while trying to save $bookId timestamp.");
+      return;
+    }
+    final dataJson = jsonDecode(data);
+    dataJson[bookId]['lastOpened'] = DateTime.now().toIso8601String();
+    await _prefs.setString('books', jsonEncode(dataJson));
+  }
+
+  Map<String, dynamic> getReadStatus() {
+    final data = _prefs.getString('books');
+    if (data == null) {
+      _logger.severe("SharedPrefs is null while trying to get all books status.");
+      return {};
+    }
+
+    return jsonDecode(data);
+  }
 }
 
 const bookMap = {
-  "001": {"offsetX": 0, "offsetY": 0, "zoom": 1},
-  "002": {"offsetX": 0, "offsetY": 0, "zoom": 1},
-  "003": {"offsetX": 0, "offsetY": 0, "zoom": 1},
-  "004": {"offsetX": 0, "offsetY": 0, "zoom": 1},
-  "005": {"offsetX": 0, "offsetY": 0, "zoom": 1},
-  "006": {"offsetX": 0, "offsetY": 0, "zoom": 1},
-  "007": {"offsetX": 0, "offsetY": 0, "zoom": 1},
-  "008": {"offsetX": 0, "offsetY": 0, "zoom": 1},
-  "009": {"offsetX": 0, "offsetY": 0, "zoom": 1},
-  "010": {"offsetX": 0, "offsetY": 0, "zoom": 1},
-  "011": {"offsetX": 0, "offsetY": 0, "zoom": 1},
-  "012": {"offsetX": 0, "offsetY": 0, "zoom": 1},
-  "013": {"offsetX": 0, "offsetY": 0, "zoom": 1},
-  "014": {"offsetX": 0, "offsetY": 0, "zoom": 1},
-  "015": {"offsetX": 0, "offsetY": 0, "zoom": 1},
-  "016": {"offsetX": 0, "offsetY": 0, "zoom": 1},
-  "017": {"offsetX": 0, "offsetY": 0, "zoom": 1},
+  "001": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
+  "002": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
+  "003": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
+  "004": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
+  "005": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
+  "006": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
+  "007": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
+  "008": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
+  "009": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
+  "010": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
+  "011": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
+  "012": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
+  "013": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
+  "014": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
+  "015": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
+  "016": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
+  "017": {"lastOpened": "", "offsetX": 0, "offsetY": 0, "zoom": 1},
 };

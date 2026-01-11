@@ -81,7 +81,7 @@ Future<void> initApp(WidgetRef ref) async {
 }
 
 Future<void> initProviders(WidgetRef ref) async {
-  await BookData().init();
+  await BookReadStatus().init();
   await ref.read(settingsProvider.notifier).init();
 }
 
