@@ -15,11 +15,8 @@ class SearchUtils {
 
     final response = await http.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $apiKey',
-      },
-      body: jsonEncode({'model': 'text-embedding-ada-002', 'input': text}),
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $apiKey'},
+      body: jsonEncode({'model': 'text-embedding-3-small', 'input': text}),
     );
 
     if (response.statusCode == 200) {
@@ -27,17 +24,12 @@ class SearchUtils {
       final embedding = data['data'][0]['embedding'];
       return List<double>.from(embedding);
     } else {
-      _logger.warning(
-        'Error creating embeddings: ${response.statusCode}: ${response.body}',
-      );
+      _logger.warning('Error creating embeddings: ${response.statusCode}: ${response.body}');
       return null;
     }
   }
 
-  static Future<List<Map<String, dynamic>>?> similaritySearch(
-    List<double> queryEmbedding,
-    int k,
-  ) async {
+  static Future<List<Map<String, dynamic>>?> similaritySearch(List<double> queryEmbedding, int k) async {
     final supabaseUrl = dotenv.env['SUPABASE_URL']!;
     final supabaseAnonKey = dotenv.env['SUPABASE_SERVICE_KEY']!;
 
@@ -49,26 +41,15 @@ class SearchUtils {
       'Content-Type': 'application/json',
     };
 
-    final body = jsonEncode({
-      'query_embedding': queryEmbedding,
-      'match_count': k,
-      'filter': {},
-    });
-
+    final body = jsonEncode({'query_embedding': queryEmbedding, 'match_count': k, 'filter': {}});
     final response = await http.post(url, headers: headers, body: body);
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
-
-      // Converter List<dynamic> para List<Map<String, dynamic>>
-      final results = List<Map<String, dynamic>>.from(
-        jsonData.map((item) => Map<String, dynamic>.from(item)),
-      );
+      final results = List<Map<String, dynamic>>.from(jsonData.map((item) => Map<String, dynamic>.from(item)));
       return results;
     } else {
-      _logger.warning(
-        'Error calling search: ${response.statusCode}: ${response.body}',
-      );
+      _logger.warning('Error calling search: ${response.statusCode}: ${response.body}');
       return null;
     }
   }

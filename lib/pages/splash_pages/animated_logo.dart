@@ -8,18 +8,14 @@ class BreathingLogo extends StatefulWidget {
   State<BreathingLogo> createState() => _BreathingLogoState();
 }
 
-class _BreathingLogoState extends State<BreathingLogo>
-    with SingleTickerProviderStateMixin {
+class _BreathingLogoState extends State<BreathingLogo> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
+    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat(reverse: true);
     _animation = Tween<double>(
       begin: 0.85,
       end: 1.15,
@@ -39,10 +35,7 @@ class _BreathingLogoState extends State<BreathingLogo>
       builder: (context, child) {
         return Transform.scale(
           scale: _animation.value,
-          child: CustomPaint(
-            size: const Size(150, 150),
-            painter: _LogoPainter(),
-          ),
+          child: CustomPaint(size: const Size(150, 150), painter: _LogoPainter()),
         );
       },
     );
@@ -58,10 +51,7 @@ class _LogoPainter extends CustomPainter {
       colors: [Colors.deepOrange, Colors.orange, Colors.yellow],
       stops: const [0.5, 0.8, 1.0],
     );
-    final paint = Paint()
-      ..shader = gradient.createShader(
-        Rect.fromCircle(center: center, radius: radius),
-      );
+    final paint = Paint()..shader = gradient.createShader(Rect.fromCircle(center: center, radius: radius));
     canvas.drawCircle(center, radius, paint);
   }
 

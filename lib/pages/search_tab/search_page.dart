@@ -54,7 +54,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
     try {
       final embeddings = await SearchUtils.createEmbedding(query);
-      final queryResults = await SearchUtils.similaritySearch(embeddings!, 10);
+      final queryResults = await SearchUtils.similaritySearch(embeddings!, 20);
       final data = List<Map<String, dynamic>>.from(queryResults!);
       final results = data.map((item) => SearchResult.fromMap(item)).toList();
 
@@ -83,6 +83,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return FutureBuilder(
       future: getMappings(),
       builder: (context, asyncSnapshot) {
@@ -96,18 +98,26 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   controller: _searchController,
                   decoration: InputDecoration(
                     labelText: t.searchPage.typeYourSearch,
+                    labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                     suffixIcon: IconButton(
-                      icon: const Icon(Icons.search),
+                      icon: Icon(Icons.search, color: colorScheme.onSurface),
                       onPressed: () => _performSearch(_searchController.text),
                     ),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide(color: colorScheme.outline),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                    ),
                   ),
+                  style: TextStyle(color: colorScheme.onSurface),
                   onSubmitted: (value) => _performSearch(value),
                 ),
                 const SizedBox(height: 20),
-
-                // Área de resultados
-                Expanded(child: _buildResultsView()),
+                Expanded(child: _buildResultsView(colorScheme)),
               ],
             ),
           ),
@@ -116,24 +126,26 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
-  Widget _buildResultsView() {
+  Widget _buildResultsView(ColorScheme colorScheme) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(child: CircularProgressIndicator(color: colorScheme.primary));
     }
 
     if (_errorMessage != null) {
       return Center(
-        child: Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+        child: Text(_errorMessage!, style: TextStyle(color: colorScheme.error)),
       );
     }
 
     if (_searchResults.isEmpty && _searchController.text.isNotEmpty) {
-      return Center(child: Text(t.searchPage.noResultFound));
+      return Center(
+        child: Text(t.searchPage.noResultFound, style: TextStyle(color: colorScheme.onSurface)),
+      );
     }
 
     if (_searchResults.isEmpty) {
       return Center(
-        child: Text(t.searchPage.startSearch, style: TextStyle(color: Colors.grey)),
+        child: Text(t.searchPage.startSearch, style: TextStyle(color: colorScheme.onSurfaceVariant)),
       );
     }
 
@@ -143,19 +155,48 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         final result = _searchResults[index];
         final bookTitle = _getBookTitle(result.bookId);
 
-        return Card(
-          margin: const EdgeInsets.only(bottom: 12.0),
-          child: ListTile(
-            title: Text(bookTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text('${t.bookPage.page(page: result.page)}\n"${result.content}"'),
-            onTap: () async {
-              final appDir = await getApplicationDocumentsDirectory();
-              final pdfPath = p.join(appDir.path, 'books', 'pt-BR', '${result.bookId}.pdf');
+        return GestureDetector(
+          onTap: () async {
+            final appDir = await getApplicationDocumentsDirectory();
+            final pdfPath = p.join(appDir.path, 'books', 'pt-BR', '${result.bookId}.pdf');
 
-              if (context.mounted) {
-                context.push('/pdfviewer', extra: ReaderArgs(pdfPath, page: result.page));
-              }
-            },
+            if (context.mounted) {
+              context.push('/pdfviewer', extra: ReaderArgs(pdfPath, page: result.page));
+            }
+          },
+          child: Card(
+            color: colorScheme.surfaceContainer,
+            margin: const EdgeInsets.only(bottom: 12.0),
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    bookTitle,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.onSurface),
+                  ),
+                  Text(
+                    t.bookPage.page(page: result.page),
+                    style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(10.0),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceDim,
+                      borderRadius: BorderRadius.circular(6.0),
+                      border: Border.all(color: colorScheme.outlineVariant),
+                    ),
+                    child: Text(
+                      result.content,
+                      style: TextStyle(fontSize: 13, color: colorScheme.onSurface, fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         );
       },

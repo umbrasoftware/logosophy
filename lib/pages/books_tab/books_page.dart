@@ -30,6 +30,12 @@ class _BooksPageState extends ConsumerState<BooksPage> {
   final logger = Logger('BooksPage');
   late String language;
 
+  @override
+  void initState() {
+    language = ref.read(settingsProvider).language;
+    super.initState();
+  }
+
   Future<List<_BookData>> _getBooksData() async {
     final appDocumentsDir = await getApplicationDocumentsDirectory();
     final booksDir = Directory(p.join(appDocumentsDir.path, 'books'));
@@ -44,7 +50,6 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     final mappingsContent = await mappingsFile.readAsString();
     final mappings = jsonDecode(mappingsContent) as Map<String, dynamic>;
 
-    // For now, we are only handling the 'pt-BR' language.
     final langDir = Directory(p.join(booksDir.path, 'pt-BR'));
 
     if (await langDir.exists()) {
@@ -52,20 +57,16 @@ class _BooksPageState extends ConsumerState<BooksPage> {
       for (var entity in entities) {
         if (entity is File) {
           final fileName = p.basename(entity.path);
-          // Check if the filename matches the 'XXX_cover.png' pattern without regex.
           const coverSuffix = '_cover.png';
           if (fileName.endsWith(coverSuffix)) {
             final baseName = fileName.substring(0, fileName.length - coverSuffix.length);
-            // Check if the base name is 3 digits.
-            if (baseName.length == 3 && int.tryParse(baseName) != null) {
-              final pdfFileName = '$baseName.pdf';
-              final bookInfo = mappings['pt-BR']?[pdfFileName];
+            final pdfFileName = '$baseName.pdf';
+            final bookInfo = mappings['pt-BR']?[pdfFileName];
 
-              if (bookInfo != null && bookInfo['title'] != null) {
-                booksData.add(_BookData(coverFile: entity, title: bookInfo['title']));
-              } else {
-                logger.warning('No mapping found for $pdfFileName in pt-BR');
-              }
+            if (bookInfo != null && bookInfo['title'] != null) {
+              booksData.add(_BookData(coverFile: entity, title: bookInfo['title']));
+            } else {
+              logger.warning('No mapping found for $pdfFileName in pt-BR');
             }
           }
         }
@@ -79,7 +80,6 @@ class _BooksPageState extends ConsumerState<BooksPage> {
 
   @override
   Widget build(BuildContext context) {
-    language = ref.watch(settingsProvider).language;
     return Scaffold(
       appBar: AppBar(title: Text(t.navBar.books)),
       body: FutureBuilder<List<_BookData>>(
