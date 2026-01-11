@@ -1,9 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logosophy/database/cache/settings_cache.dart';
 import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
+import 'package:logosophy/pages/settings_tab/utils.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -13,27 +12,46 @@ class SettingsPage extends ConsumerStatefulWidget {
 }
 
 class _SettingsPageState extends ConsumerState<SettingsPage> {
-  late String _currentLocale;
-
   @override
-  void initState() {
-    super.initState();
-    _currentLocale = ref.read(settingsProvider).language;
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Scaffold(
+      appBar: AppBar(title: Text(t.settingsPage.settings)),
+      body: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: [
+          Card(
+            color: colorScheme.surfaceContainer,
+            child: ListTile(
+              textColor: colorScheme.onSurface,
+              iconColor: colorScheme.onSurface,
+              leading: const Icon(Icons.language),
+              title: Text(t.settingsPage.language),
+              subtitle: Text(SettingsUtils.getLocaleName(ref), style: TextStyle(color: colorScheme.onSurfaceVariant)),
+              trailing: Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
+              onTap: _showLanguageDialog,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            color: colorScheme.surfaceContainer,
+            child: ListTile(
+              textColor: colorScheme.onSurface,
+              iconColor: colorScheme.onSurface,
+              leading: const Icon(Icons.brightness_4),
+              title: Text(t.settingsPage.theme),
+              subtitle: Text(SettingsUtils.getThemeName(ref), style: TextStyle(color: colorScheme.onSurfaceVariant)),
+              trailing: Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
+              onTap: _showThemeDialog,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
-  // Helper method to get the display name for a locale
-  String _getLocaleName(String locale) {
-    switch (locale) {
-      case 'pt-BR':
-        return t.settingsPage.portuguese;
-      case 'en':
-        return t.settingsPage.english;
-      default:
-        return '';
-    }
-  }
-
-  // Method to show the language selection dialog
+  /// Shows the Language Dialog.
   void _showLanguageDialog() {
     showDialog(
       context: context,
@@ -41,7 +59,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         return AlertDialog(
           title: Text(t.settingsPage.selectLanguage),
           content: RadioGroup<String>(
-            groupValue: _currentLocale,
+            groupValue: ref.watch(settingsProvider).language,
             onChanged: (String? value) async {
               if (value != null) {
                 await _changeLocale(context, value);
@@ -50,14 +68,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                RadioListTile<String>(
-                  title: Text(t.settingsPage.portuguese),
-                  value: 'pt-BR',
-                ),
-                RadioListTile<String>(
-                  title: Text(t.settingsPage.english),
-                  value: 'en',
-                ),
+                RadioListTile<String>(title: Text(t.settingsPage.portuguese), value: 'pt-BR'),
+                RadioListTile<String>(title: Text(t.settingsPage.english), value: 'en'),
               ],
             ),
           ),
@@ -74,44 +86,39 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
   }
 
+  /// Shows the Theme Dialog.
+  void _showThemeDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(t.settingsPage.selectTheme),
+        content: RadioGroup<String>(
+          groupValue: ref.watch(settingsProvider).theme,
+          onChanged: (String? value) async {
+            if (value != null) {
+              await ref.read(settingsProvider.notifier).changeTheme(value);
+
+              if (context.mounted) Navigator.pop(context);
+            }
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<String>(title: Text(t.settingsPage.light), value: 'light'),
+              RadioListTile<String>(title: Text(t.settingsPage.dark), value: 'dark'),
+              RadioListTile<String>(title: Text(t.settingsPage.system), value: 'system'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   // Method to change the locale and update the UI
   Future<void> _changeLocale(BuildContext context, String locale) async {
-    setState(() {
-      _currentLocale = locale;
-      ref.read(settingsProvider.notifier).changeLanguage(locale);
-    });
-    SettingsCache().saveLanguage(locale);
-    await LocaleSettings.setLocaleRaw(locale);
+    await ref.read(settingsProvider.notifier).changeLanguage(locale);
     if (context.mounted) {
       Navigator.of(context).pop();
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(t.settingsPage.settings)),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.language),
-              title: Text(t.settingsPage.language),
-              subtitle: Text(_getLocaleName(_currentLocale)),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: _showLanguageDialog,
-            ),
-          ),
-          const SizedBox(height: 32),
-          ElevatedButton(
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-            },
-            child: Text(t.settingsPage.signOut),
-          ),
-        ],
-      ),
-    );
   }
 }

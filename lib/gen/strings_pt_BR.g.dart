@@ -3,6 +3,7 @@
 ///
 // coverage:ignore-file
 // ignore_for_file: type=lint, unused_import
+// dart format off
 
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
@@ -10,7 +11,7 @@ import 'package:slang/generated.dart';
 import 'strings.g.dart';
 
 // Path: <root>
-class TranslationsPtBr implements Translations {
+class TranslationsPtBr with BaseTranslations<AppLocale, Translations> implements Translations {
 	/// You can call this constructor and build your own translation instance of this locale.
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	TranslationsPtBr({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver, TranslationMetadata<AppLocale, Translations>? meta})
@@ -40,7 +41,6 @@ class TranslationsPtBr implements Translations {
 	@override late final _TranslationsSetupPtBr setup = _TranslationsSetupPtBr._(_root);
 	@override late final _TranslationsNavBarPtBr navBar = _TranslationsNavBarPtBr._(_root);
 	@override late final _TranslationsBookPagePtBr bookPage = _TranslationsBookPagePtBr._(_root);
-	@override late final _TranslationsNotesPagePtBr notesPage = _TranslationsNotesPagePtBr._(_root);
 	@override late final _TranslationsSettingsPagePtBr settingsPage = _TranslationsSettingsPagePtBr._(_root);
 	@override late final _TranslationsSearchPagePtBr searchPage = _TranslationsSearchPagePtBr._(_root);
 	@override late final _TranslationsAuthMessagesPtBr authMessages = _TranslationsAuthMessagesPtBr._(_root);
@@ -95,7 +95,6 @@ class _TranslationsNavBarPtBr implements TranslationsNavBarEn {
 	final TranslationsPtBr _root; // ignore: unused_field
 
 	// Translations
-	@override String get home => 'Início';
 	@override String get books => 'Livros';
 	@override String get search => 'Pesquisar';
 	@override String get notes => 'Notas';
@@ -131,41 +130,6 @@ class _TranslationsBookPagePtBr implements TranslationsBookPageEn {
 	@override String get bookAnnotations => 'Anotações do livro';
 }
 
-// Path: notesPage
-class _TranslationsNotesPagePtBr implements TranslationsNotesPageEn {
-	_TranslationsNotesPagePtBr._(this._root);
-
-	final TranslationsPtBr _root; // ignore: unused_field
-
-	// Translations
-	@override String get bookNotes => 'Anotações do livro';
-	@override String get noBookNotes => 'Nenhuma anotação encontrada para este livro.';
-	@override String get editNote => 'Editar anotação';
-	@override String newNote({required Object page}) => 'Nova anotação para a página ${page}';
-	@override String get writeNotes => 'Escreva sua anotação aqui...';
-	@override String get noteUpdated => 'Anotação atualizada!';
-	@override String get noteDeleted => 'Anotação deletada.';
-	@override String get confirmDelete => 'Tem certeza que deseja deletar esta anotação?';
-	@override String get newNoteSaved => 'Nova anotação salva!';
-	@override String get myNotes => 'Minhas anotações';
-	@override String get filters => 'Filtros';
-	@override String get filterByBook => 'Filtrar por livro';
-	@override String get allBooks => 'Todos os livros';
-	@override String get afterDate => 'Depois...';
-	@override String get beforeDate => 'Antes...';
-	@override String get clearFilters => 'Limpar filtros';
-	@override String get noNotesFound => 'Nenhuma anotação encontrada com os filtros aplicados.';
-	@override String get generalNotes => 'Anotações gerais';
-	@override String get deleteNote => 'Deletar anotação';
-	@override String get deleteConfirmation => 'Tem certeza que deseja deletar esta anotação?';
-	@override String get noteDeletedSuccess => 'Anotação deletada com sucesso!';
-	@override String get createGeneralNote => 'Criar anotação geral';
-	@override String get noteSaved => 'Anotação salva!';
-	@override String get writeHere => 'Escreva sua anotação aqui...';
-	@override String bookNoteAdd({required Object bookName}) => 'Adicionar anotação ao ${bookName}';
-	@override String bookNoteEdit({required Object bookName}) => 'Editar anotação em ${bookName}';
-}
-
 // Path: settingsPage
 class _TranslationsSettingsPagePtBr implements TranslationsSettingsPageEn {
 	_TranslationsSettingsPagePtBr._(this._root);
@@ -178,7 +142,11 @@ class _TranslationsSettingsPagePtBr implements TranslationsSettingsPageEn {
 	@override String get selectLanguage => 'Selecionar idioma';
 	@override String get portuguese => 'Português (Brasil)';
 	@override String get english => 'English (US)';
-	@override String get signOut => 'Sair';
+	@override String get theme => 'Tema';
+	@override String get light => 'Claro';
+	@override String get dark => 'Escuro';
+	@override String get system => 'Sistema';
+	@override String get selectTheme => 'Selecionar tema';
 }
 
 // Path: searchPage
@@ -247,122 +215,101 @@ class _TranslationsAuthMessagesErrorPtBr implements TranslationsAuthMessagesErro
 	@override String get tryLoginAgain => 'Um erro ocorreu. Por favor, tente fazer login novamente.';
 }
 
-/// Flat map(s) containing all translations.
+/// The flat map containing all translations for locale <pt-BR>.
 /// Only for edge cases! For simple maps, use the map function of this library.
+///
+/// The Dart AOT compiler has issues with very large switch statements,
+/// so the map is split into smaller functions (512 entries each).
 extension on TranslationsPtBr {
 	dynamic _flatMapFunction(String path) {
-		switch (path) {
-			case 'btnActions.confirm': return 'Confirmar';
-			case 'btnActions.cancel': return 'Cancelar';
-			case 'btnActions.authenticate': return 'Autenticar';
-			case 'btnActions.register': return 'Registrar';
-			case 'btnActions.registrationSuccess': return 'Registro bem-sucedido! Você pode fazer login agora.';
-			case 'btnActions.registerWithGoogle': return 'Registrar com Google';
-			case 'btnActions.registerWithApple': return 'Registrar com Apple';
-			case 'btnActions.password': return 'Senha';
-			case 'btnActions.email': return 'Email';
-			case 'btnActions.logIn': return 'Entrar';
-			case 'btnActions.backToLogin': return 'Voltar para a página de login';
-			case 'btnActions.changeFont': return 'Mudar fonte';
-			case 'btnActions.continueAction': return 'Continuar';
-			case 'btnActions.save': return 'Salvar';
-			case 'btnActions.clear': return 'Limpar';
-			case 'btnActions.add': return 'Adicionar';
-			case 'btnActions.delete': return 'Deletar';
-			case 'btnActions.confirmDelete': return 'Confirmar Exclusão';
-			case 'btnActions.apply': return 'Aplicar';
-			case 'setup.noBooks': return 'Parece que você não tem nenhum livro ainda. Por favor, selecione uma língua para os livros para começar a usar o aplicativo!';
-			case 'setup.starting': return 'Iniciando download';
-			case 'setup.downloadingBooks': return 'Baixando livros';
-			case 'setup.downloadProgress': return ({required Object filename, required Object current, required Object total}) => 'Baixando ${filename}\n(${current} de ${total})';
-			case 'setup.downloadComplete': return 'Download concluído!';
-			case 'navBar.home': return 'Início';
-			case 'navBar.books': return 'Livros';
-			case 'navBar.search': return 'Pesquisar';
-			case 'navBar.notes': return 'Notas';
-			case 'navBar.settings': return 'Configurações';
-			case 'bookPage.find': return 'Procurar...';
-			case 'bookPage.clearText': return 'Limpar texto';
-			case 'bookPage.searchResult': return 'Resultado da pesquisa';
-			case 'bookPage.noResult': return 'Nenhum resultado';
-			case 'bookPage.cancelSearch': return 'Cancelar pesquisa';
-			case 'bookPage.noMoreResults': return 'Nenhuma outra ocorrência encontrada. Gostaria de continuar a pesquisa desde o início?';
-			case 'bookPage.YES': return 'SIM';
-			case 'bookPage.NO': return 'NÃO';
-			case 'bookPage.previous': return 'Anterior';
-			case 'bookPage.next': return 'Próximo';
-			case 'bookPage.previousInstance': return 'Instância anterior';
-			case 'bookPage.nextInstance': return 'Próxima instância';
-			case 'bookPage.of': return 'de';
-			case 'bookPage.highlight': return 'Destacar';
-			case 'bookPage.underline': return 'Sublinhar';
-			case 'bookPage.strikethrough': return 'Riscar';
-			case 'bookPage.squiggly': return 'Ondular';
-			case 'bookPage.copy': return 'Copiar';
-			case 'bookPage.page': return ({required Object page}) => 'Página ${page}';
-			case 'bookPage.bookAnnotations': return 'Anotações do livro';
-			case 'notesPage.bookNotes': return 'Anotações do livro';
-			case 'notesPage.noBookNotes': return 'Nenhuma anotação encontrada para este livro.';
-			case 'notesPage.editNote': return 'Editar anotação';
-			case 'notesPage.newNote': return ({required Object page}) => 'Nova anotação para a página ${page}';
-			case 'notesPage.writeNotes': return 'Escreva sua anotação aqui...';
-			case 'notesPage.noteUpdated': return 'Anotação atualizada!';
-			case 'notesPage.noteDeleted': return 'Anotação deletada.';
-			case 'notesPage.confirmDelete': return 'Tem certeza que deseja deletar esta anotação?';
-			case 'notesPage.newNoteSaved': return 'Nova anotação salva!';
-			case 'notesPage.myNotes': return 'Minhas anotações';
-			case 'notesPage.filters': return 'Filtros';
-			case 'notesPage.filterByBook': return 'Filtrar por livro';
-			case 'notesPage.allBooks': return 'Todos os livros';
-			case 'notesPage.afterDate': return 'Depois...';
-			case 'notesPage.beforeDate': return 'Antes...';
-			case 'notesPage.clearFilters': return 'Limpar filtros';
-			case 'notesPage.noNotesFound': return 'Nenhuma anotação encontrada com os filtros aplicados.';
-			case 'notesPage.generalNotes': return 'Anotações gerais';
-			case 'notesPage.deleteNote': return 'Deletar anotação';
-			case 'notesPage.deleteConfirmation': return 'Tem certeza que deseja deletar esta anotação?';
-			case 'notesPage.noteDeletedSuccess': return 'Anotação deletada com sucesso!';
-			case 'notesPage.createGeneralNote': return 'Criar anotação geral';
-			case 'notesPage.noteSaved': return 'Anotação salva!';
-			case 'notesPage.writeHere': return 'Escreva sua anotação aqui...';
-			case 'notesPage.bookNoteAdd': return ({required Object bookName}) => 'Adicionar anotação ao ${bookName}';
-			case 'notesPage.bookNoteEdit': return ({required Object bookName}) => 'Editar anotação em ${bookName}';
-			case 'settingsPage.settings': return 'Configurações';
-			case 'settingsPage.language': return 'Idioma';
-			case 'settingsPage.selectLanguage': return 'Selecionar idioma';
-			case 'settingsPage.portuguese': return 'Português (Brasil)';
-			case 'settingsPage.english': return 'English (US)';
-			case 'settingsPage.signOut': return 'Sair';
-			case 'searchPage.unkownBook': return 'Livro desconhecido';
-			case 'searchPage.typeYourSearch': return 'Digite sua busca';
-			case 'searchPage.startSearch': return 'Digite algo para iniciar a busca';
-			case 'searchPage.noResultFound': return 'Nenhum resultado encontrado';
-			case 'authMessages.prompt.askPassword': return 'Digite a senha';
-			case 'authMessages.prompt.askEmail': return 'Digite seu email';
-			case 'authMessages.prompt.askAuthenticate': return 'Por favor, se autentique para entrar no aplicativo.';
-			case 'authMessages.prompt.retypePassword': return 'Digite a senha novamente';
-			case 'authMessages.prompt.forgotPassword': return 'Esqueceu sua senha?';
-			case 'authMessages.prompt.alreadyHaveAccount': return 'Já tem uma conta? Faça login.';
-			case 'authMessages.prompt.dontHaveAccount': return 'Não tem uma conta? Cadastre-se.';
-			case 'authMessages.error.unknown': return 'Um erro desconhecido ocorreu. Por favor, entre em contato com a equipe de suporte.';
-			case 'authMessages.error.emailAddressInvalid': return 'Email inválido. Tente novamente, por favor.';
-			case 'authMessages.error.emailExists': return 'Este email já está em uso.';
-			case 'authMessages.error.emailNotConfirmed': return 'Confirme sua conta clicando no link enviado para seu email.';
-			case 'authMessages.error.invalidCredentials': return 'Seu email ou senha está incorreto.';
-			case 'authMessages.error.passwordMismatch': return 'As senhas não são iguais.';
-			case 'authMessages.error.passwordTooShort': return 'Sua senha precisa ter pelo menos 8 caracteres.';
-			case 'authMessages.error.samePassword': return 'Você não pode usar a mesma senha de antes.';
-			case 'authMessages.error.weakPassword': return 'Sua senha precisa ter pelo menos 1 caractere maiúsculo, 1 minúsculo, 1 número e 1 caractere especial.';
-			case 'authMessages.error.overRequestRateLimit': return 'Você está fazendo muitas solicitações. Por favor, tente novamente mais tarde.';
-			case 'authMessages.error.wrongPassword': return 'Senha errada';
-			case 'authMessages.error.nameTooLong': return 'Seu nome não pode ter mais de 100 caracteres.';
-			case 'authMessages.error.noConnection': return 'Sem conexão com a internet.';
-			case 'authMessages.error.unprocessableEntity': return 'O servidor não pôde satisfazer sua solicitação. Por favor, tente novamente mais tarde.';
-			case 'authMessages.error.tooManyRequests': return 'Os servidores estão sobrecarregados agora. Por favor, tente novamente mais tarde.';
-			case 'authMessages.error.internalServerError': return 'Houve um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.';
-			case 'authMessages.error.tryLoginAgain': return 'Um erro ocorreu. Por favor, tente fazer login novamente.';
-			default: return null;
-		}
+		return switch (path) {
+			'btnActions.confirm' => 'Confirmar',
+			'btnActions.cancel' => 'Cancelar',
+			'btnActions.authenticate' => 'Autenticar',
+			'btnActions.register' => 'Registrar',
+			'btnActions.registrationSuccess' => 'Registro bem-sucedido! Você pode fazer login agora.',
+			'btnActions.registerWithGoogle' => 'Registrar com Google',
+			'btnActions.registerWithApple' => 'Registrar com Apple',
+			'btnActions.password' => 'Senha',
+			'btnActions.email' => 'Email',
+			'btnActions.logIn' => 'Entrar',
+			'btnActions.backToLogin' => 'Voltar para a página de login',
+			'btnActions.changeFont' => 'Mudar fonte',
+			'btnActions.continueAction' => 'Continuar',
+			'btnActions.save' => 'Salvar',
+			'btnActions.clear' => 'Limpar',
+			'btnActions.add' => 'Adicionar',
+			'btnActions.delete' => 'Deletar',
+			'btnActions.confirmDelete' => 'Confirmar Exclusão',
+			'btnActions.apply' => 'Aplicar',
+			'setup.noBooks' => 'Parece que você não tem nenhum livro ainda. Por favor, selecione uma língua para os livros para começar a usar o aplicativo!',
+			'setup.starting' => 'Iniciando download',
+			'setup.downloadingBooks' => 'Baixando livros',
+			'setup.downloadProgress' => ({required Object filename, required Object current, required Object total}) => 'Baixando ${filename}\n(${current} de ${total})',
+			'setup.downloadComplete' => 'Download concluído!',
+			'navBar.books' => 'Livros',
+			'navBar.search' => 'Pesquisar',
+			'navBar.notes' => 'Notas',
+			'navBar.settings' => 'Configurações',
+			'bookPage.find' => 'Procurar...',
+			'bookPage.clearText' => 'Limpar texto',
+			'bookPage.searchResult' => 'Resultado da pesquisa',
+			'bookPage.noResult' => 'Nenhum resultado',
+			'bookPage.cancelSearch' => 'Cancelar pesquisa',
+			'bookPage.noMoreResults' => 'Nenhuma outra ocorrência encontrada. Gostaria de continuar a pesquisa desde o início?',
+			'bookPage.YES' => 'SIM',
+			'bookPage.NO' => 'NÃO',
+			'bookPage.previous' => 'Anterior',
+			'bookPage.next' => 'Próximo',
+			'bookPage.previousInstance' => 'Instância anterior',
+			'bookPage.nextInstance' => 'Próxima instância',
+			'bookPage.of' => 'de',
+			'bookPage.highlight' => 'Destacar',
+			'bookPage.underline' => 'Sublinhar',
+			'bookPage.strikethrough' => 'Riscar',
+			'bookPage.squiggly' => 'Ondular',
+			'bookPage.copy' => 'Copiar',
+			'bookPage.page' => ({required Object page}) => 'Página ${page}',
+			'bookPage.bookAnnotations' => 'Anotações do livro',
+			'settingsPage.settings' => 'Configurações',
+			'settingsPage.language' => 'Idioma',
+			'settingsPage.selectLanguage' => 'Selecionar idioma',
+			'settingsPage.portuguese' => 'Português (Brasil)',
+			'settingsPage.english' => 'English (US)',
+			'settingsPage.theme' => 'Tema',
+			'settingsPage.light' => 'Claro',
+			'settingsPage.dark' => 'Escuro',
+			'settingsPage.system' => 'Sistema',
+			'settingsPage.selectTheme' => 'Selecionar tema',
+			'searchPage.unkownBook' => 'Livro desconhecido',
+			'searchPage.typeYourSearch' => 'Digite sua busca',
+			'searchPage.startSearch' => 'Digite algo para iniciar a busca',
+			'searchPage.noResultFound' => 'Nenhum resultado encontrado',
+			'authMessages.prompt.askPassword' => 'Digite a senha',
+			'authMessages.prompt.askEmail' => 'Digite seu email',
+			'authMessages.prompt.askAuthenticate' => 'Por favor, se autentique para entrar no aplicativo.',
+			'authMessages.prompt.retypePassword' => 'Digite a senha novamente',
+			'authMessages.prompt.forgotPassword' => 'Esqueceu sua senha?',
+			'authMessages.prompt.alreadyHaveAccount' => 'Já tem uma conta? Faça login.',
+			'authMessages.prompt.dontHaveAccount' => 'Não tem uma conta? Cadastre-se.',
+			'authMessages.error.unknown' => 'Um erro desconhecido ocorreu. Por favor, entre em contato com a equipe de suporte.',
+			'authMessages.error.emailAddressInvalid' => 'Email inválido. Tente novamente, por favor.',
+			'authMessages.error.emailExists' => 'Este email já está em uso.',
+			'authMessages.error.emailNotConfirmed' => 'Confirme sua conta clicando no link enviado para seu email.',
+			'authMessages.error.invalidCredentials' => 'Seu email ou senha está incorreto.',
+			'authMessages.error.passwordMismatch' => 'As senhas não são iguais.',
+			'authMessages.error.passwordTooShort' => 'Sua senha precisa ter pelo menos 8 caracteres.',
+			'authMessages.error.samePassword' => 'Você não pode usar a mesma senha de antes.',
+			'authMessages.error.weakPassword' => 'Sua senha precisa ter pelo menos 1 caractere maiúsculo, 1 minúsculo, 1 número e 1 caractere especial.',
+			'authMessages.error.overRequestRateLimit' => 'Você está fazendo muitas solicitações. Por favor, tente novamente mais tarde.',
+			'authMessages.error.wrongPassword' => 'Senha errada',
+			'authMessages.error.nameTooLong' => 'Seu nome não pode ter mais de 100 caracteres.',
+			'authMessages.error.noConnection' => 'Sem conexão com a internet.',
+			'authMessages.error.unprocessableEntity' => 'O servidor não pôde satisfazer sua solicitação. Por favor, tente novamente mais tarde.',
+			'authMessages.error.tooManyRequests' => 'Os servidores estão sobrecarregados agora. Por favor, tente novamente mais tarde.',
+			'authMessages.error.internalServerError' => 'Houve um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.',
+			'authMessages.error.tryLoginAgain' => 'Um erro ocorreu. Por favor, tente fazer login novamente.',
+			_ => null,
+		};
 	}
 }
-

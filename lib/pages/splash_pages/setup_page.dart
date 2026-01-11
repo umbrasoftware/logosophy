@@ -2,16 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:country_flags/country_flags.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:logosophy/gen/strings.g.dart';
+import 'package:logosophy/main.dart';
 import 'package:logosophy/pages/splash_pages/animated_logo.dart';
-import 'package:logosophy/utils/auth_utils.dart';
-import 'package:logosophy/utils/encryption_utils.dart';
-import 'package:logosophy/utils/files_utils.dart';
+import 'package:logosophy/pages/splash_pages/utils.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -23,12 +21,14 @@ class SetupPage extends ConsumerStatefulWidget {
 }
 
 /// Enum to represent the different states of the setup process.
-enum _SetupStatus { checking, needsDownload, complete }
+enum _SetupStatus { checking, needsDownload }
 
 class _SetupPageState extends ConsumerState<SetupPage> {
   _SetupStatus _status = _SetupStatus.checking;
   final logger = Logger('SetupPage');
   late Map<String, dynamic> mappings;
+  bool aDownloadWasFinished = false;
+  double _downloadProgress = 0.0;
 
   @override
   void initState() {
@@ -36,21 +36,23 @@ class _SetupPageState extends ConsumerState<SetupPage> {
     _performChecksAndNavigate();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   Future<void> _performChecksAndNavigate() async {
     // await FilesUtils.deleteDownloadedBooks(); // For testing purposes
-
-    // Create a storage reference from our app
-    final storageRef = FirebaseStorage.instance.ref();
+    final storage = supabase.client.storage;
 
     final appDir = await getApplicationDocumentsDirectory();
     final booksDir = Directory(p.join(appDir.path, 'books'));
     final mappingsFile = File(p.join(booksDir.path, 'mappings.json'));
     if (!await mappingsFile.exists()) {
       logger.info("mappings.json does not exists. Downloading...");
-      // Ensure the parent directory exists before trying to write the file.
-      // `writeToFile` will create the file itself.
       await booksDir.create(recursive: true);
-      await storageRef.child('books/mapping.json').writeToFile(mappingsFile);
+      final mappingsBytes = await storage.from('books').download('mapping.json');
+      await mappingsFile.writeAsBytes(mappingsBytes);
     }
 
     // Loads the mapping.json to a actual dart Map file
@@ -64,15 +66,7 @@ class _SetupPageState extends ConsumerState<SetupPage> {
       return;
     }
 
-    // If checks are complete and books exist, update state and navigate.
-    if (mounted) setState(() => _status = _SetupStatus.complete);
-
-    if (mounted) {
-      await AuthUtils().loadDocuments(ref);
-      await EncryptionUtils().loadEncryptionKey();
-      // ignore: use_build_context_synchronously
-      GoRouter.of(context).go('/home');
-    }
+    if (mounted) GoRouter.of(context).go('/books');
   }
 
   @override
@@ -84,7 +78,6 @@ class _SetupPageState extends ConsumerState<SetupPage> {
   Widget _buildBody() {
     switch (_status) {
       case _SetupStatus.checking:
-      case _SetupStatus.complete:
         return const Center(child: BreathingLogo());
       case _SetupStatus.needsDownload:
         return _buildLanguageSelectionBody(mappings);
@@ -99,171 +92,60 @@ class _SetupPageState extends ConsumerState<SetupPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              t.setup.noBooks,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 32),
+            Text(t.setup.noBooks, textAlign: TextAlign.center, style: const TextStyle(fontSize: 18)),
+            const SizedBox(height: 64),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(18),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
+              onPressed: _downloadProgress > 0 ? null : () => _downloadLanguageBooks('pt-BR'),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    CountryFlag.fromLanguageCode('pt-BR'),
+                    const Text('Português'),
+                    if (_downloadProgress > 0 && _downloadProgress < 1)
+                      SizedBox(width: 24, height: 24, child: CircularProgressIndicator(value: _downloadProgress))
+                    else if (_downloadProgress == 0)
+                      const Icon(Icons.download)
+                    else
+                      const Icon(Icons.check_circle, color: Colors.green),
+                  ],
                 ),
               ),
-              onPressed: () async {
-                // Show the progress dialog and wait for it to be popped.
-                await showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (dialogContext) => _DownloadProgressDialog(
-                    languageCode: 'pt-BR',
-                    mappings: mappings,
-                  ),
-                );
-
-                // After the dialog is closed (download complete), navigate.
-                if (mounted) {
-                  GoRouter.of(context).go('/home');
-                }
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('Português'),
-                  const SizedBox(width: 8),
-                  ClipOval(child: CountryFlag.fromLanguageCode('pt-BR')),
-                ],
-              ),
+            ),
+            const SizedBox(height: 64),
+            ElevatedButton(
+              onPressed: aDownloadWasFinished ? () => GoRouter.of(context).go('/books') : null,
+              child: Text(t.btnActions.continueAction),
             ),
           ],
         ),
       ),
     );
   }
-}
 
-/// A dialog that shows the progress of book downloads.
-class _DownloadProgressDialog extends StatefulWidget {
-  final String languageCode;
-  final Map<String, dynamic> mappings;
+  Future<void> _downloadLanguageBooks(String languageCode) async {
+    setState(() {
+      _downloadProgress = 0.0001;
+    });
 
-  const _DownloadProgressDialog({
-    required this.languageCode,
-    required this.mappings,
-  });
-
-  @override
-  State<_DownloadProgressDialog> createState() =>
-      _DownloadProgressDialogState();
-}
-
-class _DownloadProgressDialogState extends State<_DownloadProgressDialog> {
-  String _progressMessage = t.setup.starting;
-  double _fileProgress = 0.0;
-  bool _isDownloadComplete = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _startDownload();
-  }
-
-  Future<void> _startDownload() async {
-    await FilesUtils.downloadBooksForLanguage(
-      widget.languageCode,
-      onBookProgress: (current, total, filename) {
-        if (mounted) {
-          setState(() {
-            // Use the internationalized string for the progress message.
-            _progressMessage = t.setup.downloadProgress(
-              filename: widget.mappings[widget.languageCode][filename]['title'],
-              current: current,
-              total: total,
-            );
-            _fileProgress = 0.0; // Reset for new file
-          });
-        }
-      },
-      onFileProgress: (percentage) {
-        if (mounted) {
-          // Clamp the value between 0.0 and 1.0 to prevent any potential
-          // floating point inaccuracies or negative values like the '-0' you saw.
-          setState(() => _fileProgress = percentage.clamp(0.0, 1.0));
-        }
-      },
-    );
-
-    // When download is complete, update the state to show the continue button.
-    if (mounted) {
-      setState(() {
-        _isDownloadComplete = true;
-        _progressMessage = t.setup.downloadComplete;
+    try {
+      await FilesUtils.downloadBooksForLanguage(languageCode, (progress) {
+        setState(() => _downloadProgress = progress);
       });
+
+      if (mounted) {
+        setState(() {
+          _downloadProgress = 1.0;
+          aDownloadWasFinished = true;
+        });
+      }
+    } catch (e) {
+      logger.severe('Error downloading books: $e');
+      if (mounted) {
+        setState(() => _downloadProgress = 0.0);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // To prevent the dialog from resizing horizontally, we give its content
-    // a fixed width based on the screen size.
-    final dialogWidth = MediaQuery.of(context).size.width * 0.75;
-
-    return AlertDialog(
-      title: Text(t.setup.downloadingBooks),
-      content: SizedBox(
-        width: dialogWidth,
-        child: _isDownloadComplete
-            ? Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.check_circle_outline,
-                    color: Colors.green,
-                    size: 48,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    _progressMessage,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ],
-              )
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // To prevent the dialog from resizing vertically when the
-                  // filename changes, we use a SizedBox with a fixed height.
-                  SizedBox(
-                    height: 60,
-                    child: Center(
-                      child: Text(
-                        _progressMessage,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  LinearProgressIndicator(
-                    value: _fileProgress,
-                    minHeight: 10,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  const SizedBox(height: 8),
-                  Text('${(_fileProgress * 100).toStringAsFixed(0)}%'),
-                ],
-              ),
-      ),
-      actions: _isDownloadComplete
-          ? [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(t.btnActions.continueAction),
-              ),
-            ]
-          : null,
-    );
   }
 }

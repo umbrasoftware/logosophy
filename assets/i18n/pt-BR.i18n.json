@@ -28,7 +28,6 @@
         "downloadComplete": "Download concluído!"
     },
     "navBar": {
-        "home": "Início",
         "books": "Livros",
         "search": "Pesquisar",
         "notes": "Notas",
@@ -56,41 +55,17 @@
         "page": "Página $page",
         "bookAnnotations": "Anotações do livro"
     },
-    "notesPage": {
-        "bookNotes": "Anotações do livro",
-        "noBookNotes": "Nenhuma anotação encontrada para este livro.",
-        "editNote": "Editar anotação",
-        "newNote": "Nova anotação para a página $page",
-        "writeNotes": "Escreva sua anotação aqui...",
-        "noteUpdated": "Anotação atualizada!",
-        "noteDeleted": "Anotação deletada.",
-        "confirmDelete": "Tem certeza que deseja deletar esta anotação?",
-        "newNoteSaved": "Nova anotação salva!",
-        "myNotes": "Minhas anotações",
-        "filters": "Filtros",
-        "filterByBook": "Filtrar por livro",
-        "allBooks": "Todos os livros",
-        "afterDate": "Depois...",
-        "beforeDate": "Antes...",
-        "clearFilters": "Limpar filtros",
-        "noNotesFound": "Nenhuma anotação encontrada com os filtros aplicados.",
-        "generalNotes": "Anotações gerais",
-        "deleteNote": "Deletar anotação",
-        "deleteConfirmation": "Tem certeza que deseja deletar esta anotação?",
-        "noteDeletedSuccess": "Anotação deletada com sucesso!",
-        "createGeneralNote": "Criar anotação geral",
-        "noteSaved": "Anotação salva!",
-        "writeHere": "Escreva sua anotação aqui...",
-        "bookNoteAdd": "Adicionar anotação ao $bookName",
-        "bookNoteEdit": "Editar anotação em $bookName"
-    },
     "settingsPage": {
         "settings": "Configurações",
         "language": "Idioma",
         "selectLanguage": "Selecionar idioma",
         "portuguese": "Português (Brasil)",
         "english": "English (US)",
-        "signOut": "Sair"
+        "theme": "Tema",
+        "light": "Claro",
+        "dark": "Escuro",
+        "system": "Sistema",
+        "selectTheme": "Selecionar tema"
     },
     "searchPage": {
         "unkownBook": "Livro desconhecido",

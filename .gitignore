@@ -133,5 +133,4 @@ app.*.symbols
 !/dev/ci/**/Gemfile.lock
 
 # Visual Code
-.vscode/
 .idea/

@@ -4,14 +4,8 @@ class SearchResult {
   final int page;
   final String bookId;
 
-  SearchResult({
-    required this.score,
-    required this.content,
-    required this.page,
-    required this.bookId,
-  });
+  SearchResult({required this.score, required this.content, required this.page, required this.bookId});
 
-  // Um factory constructor para facilitar a criação a partir de um Map (como o JSON da sua API)
   factory SearchResult.fromMap(Map<String, dynamic> map) {
     // Acessando os metadados aninhados
     final metadata = map['metadata'] as Map<String, dynamic>;

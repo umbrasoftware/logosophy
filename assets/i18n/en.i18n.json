@@ -28,7 +28,6 @@
         "downloadComplete": "Download complete!"
     },
     "navBar": {
-        "home": "Home",
         "books": "Books",
         "search": "Search",
         "notes": "Notes",
@@ -56,41 +55,17 @@
         "page": "Page $page",
         "bookAnnotations": "Book annotations"
     },
-    "notesPage": {
-        "bookNotes": "Book notes",
-        "noBookNotes": "No notes found for this book.",
-        "editNote": "Edit note",
-        "newNote": "New note for page $page",
-        "writeNotes": "Write your notes here...",
-        "noteUpdated": "Note updated!",
-        "noteDeleted": "Note deleted.",
-        "confirmDelete": "Are you sure you want to delete this note?",
-        "newNoteSaved": "New note saved!",
-        "myNotes": "My notes",
-        "filters": "Filters",
-        "filterByBook": "Filter by book",
-        "allBooks": "All books",
-        "afterDate": "After...",
-        "beforeDate": "Before...",
-        "clearFilters": "Clear filters",
-        "noNotesFound": "No notes found with the applied filters.",
-        "generalNotes": "General notes",
-        "deleteNote": "Delete note",
-        "deleteConfirmation": "Are you sure you want to delete this note?",
-        "noteDeletedSuccess": "Note deleted successfully!",
-        "createGeneralNote": "Create general note",
-        "noteSaved": "Note saved!",
-        "writeHere": "Write your note here ...",
-        "bookNoteAdd": "Add note to $bookName",
-        "bookNoteEdit": "Edit note in $bookName"
-    },
     "settingsPage": {
         "settings": "Settings",
         "portuguese": "Português (Brasil)",
         "english": "English (US)",
         "selectLanguage": "Select Language",
         "language": "Language",
-        "signOut": "Sign out"
+        "theme": "Theme",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System",
+        "selectTheme": "Select theme"
     },
     "searchPage": {
         "unkownBook": "Unkown book",

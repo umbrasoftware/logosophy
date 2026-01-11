@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logosophy/gen/strings.g.dart';
-import 'package:logosophy/pages/books_tab/pdf_viewer_args.dart';
+import 'package:logosophy/pages/books_tab/pdf_reader.dart';
 import 'package:logosophy/pages/search_tab/search_result.dart';
-import 'package:logosophy/utils/search_utils.dart';
+import 'package:logosophy/pages/search_tab/utils.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -100,9 +100,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       icon: const Icon(Icons.search),
                       onPressed: () => _performSearch(_searchController.text),
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
                   ),
                   onSubmitted: (value) => _performSearch(value),
                 ),
@@ -135,10 +133,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
     if (_searchResults.isEmpty) {
       return Center(
-        child: Text(
-          t.searchPage.startSearch,
-          style: TextStyle(color: Colors.grey),
-        ),
+        child: Text(t.searchPage.startSearch, style: TextStyle(color: Colors.grey)),
       );
     }
 
@@ -151,27 +146,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         return Card(
           margin: const EdgeInsets.only(bottom: 12.0),
           child: ListTile(
-            title: Text(
-              bookTitle,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(
-              '${t.bookPage.page(page: result.page)}\n"${result.content}"',
-            ),
+            title: Text(bookTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text('${t.bookPage.page(page: result.page)}\n"${result.content}"'),
             onTap: () async {
               final appDir = await getApplicationDocumentsDirectory();
-              final pdfPath = p.join(
-                appDir.path,
-                'books',
-                'pt-BR',
-                '${result.bookId}.pdf',
-              );
-
-              final pdfFile = File(pdfPath);
+              final pdfPath = p.join(appDir.path, 'books', 'pt-BR', '${result.bookId}.pdf');
 
               if (context.mounted) {
-                final args = PdfViewerArgs(file: pdfFile, page: result.page);
-                context.push('/pdfviewer', extra: args);
+                context.push('/pdfviewer', extra: ReaderArgs(pdfPath, page: result.page));
               }
             },
           ),
