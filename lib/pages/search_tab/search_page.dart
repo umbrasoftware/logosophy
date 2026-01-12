@@ -5,9 +5,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logosophy/database/search_history/history_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/pdf_reader.dart';
-import 'package:logosophy/pages/search_tab/search_result.dart';
+import 'package:logosophy/pages/search_tab/search_result_class.dart';
 import 'package:logosophy/pages/search_tab/utils.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -29,7 +30,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   /// Retorna o título do livro com base no book_id, usando o mapa fornecido.
   String _getBookTitle(String bookId) {
     try {
-      // O caminho no JSON é 'pt-BR' -> 'ID.pdf' -> 'title'
       final pdfFileName = '$bookId.pdf';
       return mappings['pt-BR'][pdfFileName]['title'] ?? t.searchPage.unkownBook;
     } catch (e) {
@@ -56,7 +56,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       final embeddings = await SearchUtils.createEmbedding(query);
       final queryResults = await SearchUtils.similaritySearch(embeddings!, 20);
       final data = List<Map<String, dynamic>>.from(queryResults!);
-      final results = data.map((item) => SearchResult.fromMap(item)).toList();
+      final results = data.map((item) => SearchResult.fromJson(item)).toList();
 
       setState(() {
         _searchResults = results;
@@ -90,6 +90,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       builder: (context, asyncSnapshot) {
         return Scaffold(
           appBar: AppBar(title: Text(t.navBar.search)),
+          // drawer: _buildDrawer(),
           body: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -200,6 +201,64 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           ),
         );
       },
+    );
+  }
+
+  Drawer _buildDrawer() {
+    final colorScheme = Theme.of(context).colorScheme;
+    final results = ref.watch(historyProvider);
+    return Drawer(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(color: colorScheme.surfaceContainer),
+              child: Center(
+                child: Text(
+                  "Pesquisas salvas",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                  selectionColor: colorScheme.onSurface,
+                ),
+              ),
+            ),
+            ListView.separated(
+              itemCount: results.length,
+              separatorBuilder: (context, index) {
+                return SizedBox(height: 12);
+              },
+              itemBuilder: (context, index) {
+                return InkWell(
+                  onTap: () {
+                    print('oi');
+                  },
+                  child: Card(
+                    color: colorScheme.surfaceContainer,
+                    margin: const EdgeInsets.all(6.0),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(results[index].madeAt!, style: TextStyle(fontSize: 11, color: colorScheme.onSurface)),
+                          Text(
+                            results[index].content,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: colorScheme.onSurfaceVariant,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+                //return ListTile(title: Text("11/01/2026 21:09"), subtitle: Text());
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
