@@ -109,7 +109,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     final mappings = jsonDecode(mappingsContent) as Map<String, dynamic>;
 
     final langDir = Directory(p.join(booksDir.path, 'pt-BR'));
-    final readStatus = BookReadStatus().getReadStatus();
+    final readStatus = await BookReadStatus().getReadStatus();
 
     if (await langDir.exists()) {
       final entities = langDir.listSync();
@@ -127,7 +127,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
                 _BookData(
                   coverFile: entity,
                   title: bookInfo['title'],
-                  lastOpened: readStatus[baseName]!["lastOpened"] as String,
+                  lastOpened: readStatus?[baseName]["lastOpened"] ?? DateTime.now().toIso8601String(),
                 ),
               );
             } else {

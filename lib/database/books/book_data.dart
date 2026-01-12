@@ -25,13 +25,15 @@ class BookReadStatus {
   factory BookReadStatus() => _instance;
 
   final _logger = Logger('BookCache');
+  static const String prefsName = 'books';
   late SharedPreferencesWithCache _prefs;
 
   /// Initializes the class singleton. Must be called before everything else.
   Future<void> init() async {
     _prefs = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
+    final booksData = _prefs.getString(prefsName);
 
-    if (_prefs.getString('books') == null) {
+    if (booksData == null) {
       DateTime time = DateTime.now().subtract(const Duration(days: 180));
       int count = 0;
       final finalBookMap = json.decode(json.encode(bookMap));
@@ -42,13 +44,13 @@ class BookReadStatus {
         time = time.subtract(Duration(days: count));
       }
 
-      await _prefs.setString('books', json.encode(finalBookMap));
+      await _prefs.setString(prefsName, json.encode(finalBookMap));
     }
   }
 
   /// Get a postition for a given `bookId`.
   BookPosition getPosition(String bookId) {
-    final data = _prefs.getString('books');
+    final data = _prefs.getString(prefsName);
     if (data != null) {
       final dataJson = jsonDecode(data);
       final bookData = dataJson[bookId];
@@ -67,7 +69,7 @@ class BookReadStatus {
 
   /// Saves the position state for the `bookId`.
   Future<void> savePosition(String bookId, double zoom, Offset offset) async {
-    final data = _prefs.getString('books');
+    final data = _prefs.getString(prefsName);
     if (data != null) {
       final dataJson = jsonDecode(data);
       final bookData = dataJson[bookId];
@@ -75,27 +77,33 @@ class BookReadStatus {
       bookData['offsetX'] = offset.dx;
       bookData['offsetY'] = offset.dy;
       dataJson[bookId] = bookData;
-      await _prefs.setString('books', jsonEncode(dataJson));
+      await _prefs.setString(prefsName, jsonEncode(dataJson));
     }
   }
 
   /// Saves a book's Timestamp.
   Future<void> saveTimestamp(String bookId) async {
-    final data = _prefs.getString('books');
+    final data = _prefs.getString(prefsName);
     if (data == null) {
       _logger.severe("SharedPrefs is null while trying to save $bookId timestamp.");
       return;
     }
     final dataJson = jsonDecode(data);
     dataJson[bookId]['lastOpened'] = DateTime.now().toIso8601String();
-    await _prefs.setString('books', jsonEncode(dataJson));
+    await _prefs.setString(prefsName, jsonEncode(dataJson));
   }
 
-  Map<String, dynamic> getReadStatus() {
-    final data = _prefs.getString('books');
+  Future<Map<String, dynamic>?> getReadStatus() async {
+    String? data = _prefs.getString(prefsName);
     if (data == null) {
-      _logger.severe("SharedPrefs is null while trying to get all books status.");
-      return {};
+      _logger.severe("SharedPrefs is null while trying to get all books status. Calling init() again.");
+      await init();
+    }
+
+    data = _prefs.getString(prefsName);
+    if (data == null) {
+      _logger.severe("SharedPrefs is still null AFTER callin init(). Giving up!");
+      return null;
     }
 
     return jsonDecode(data);
