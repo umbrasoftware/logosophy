@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
-import 'package:logosophy/database/books/book_data.dart';
+import 'package:logosophy/database/books/book_status.dart';
 import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/pdf_reader.dart';
@@ -110,6 +110,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
 
     final langDir = Directory(p.join(booksDir.path, 'pt-BR'));
     final readStatus = await BookReadStatus().getReadStatus();
+    if (readStatus == null) logger.warning("Book readStatus is null. Books ordering will be confusing.");
 
     if (await langDir.exists()) {
       final entities = langDir.listSync();

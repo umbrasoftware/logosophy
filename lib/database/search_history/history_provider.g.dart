@@ -8,12 +8,18 @@ part of 'history_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Provider responsable for holding the search history. The state is always sorted by
+/// the most recent.
 
 @ProviderFor(HistoryNotifier)
 const historyProvider = HistoryNotifierProvider._();
 
+/// Provider responsable for holding the search history. The state is always sorted by
+/// the most recent.
 final class HistoryNotifierProvider
-    extends $NotifierProvider<HistoryNotifier, List<SearchResult>> {
+    extends $NotifierProvider<HistoryNotifier, List<History>> {
+  /// Provider responsable for holding the search history. The state is always sorted by
+  /// the most recent.
   const HistoryNotifierProvider._()
     : super(
         from: null,
@@ -33,28 +39,31 @@ final class HistoryNotifierProvider
   HistoryNotifier create() => HistoryNotifier();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(List<SearchResult> value) {
+  Override overrideWithValue(List<History> value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<List<SearchResult>>(value),
+      providerOverride: $SyncValueProvider<List<History>>(value),
     );
   }
 }
 
-String _$historyNotifierHash() => r'109f5050e68582f248cbe06e765b0cd4ecfcbb99';
+String _$historyNotifierHash() => r'a813cfc47c0039b7625a0fbb56db244b077af3a4';
 
-abstract class _$HistoryNotifier extends $Notifier<List<SearchResult>> {
-  List<SearchResult> build();
+/// Provider responsable for holding the search history. The state is always sorted by
+/// the most recent.
+
+abstract class _$HistoryNotifier extends $Notifier<List<History>> {
+  List<History> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<List<SearchResult>, List<SearchResult>>;
+    final ref = this.ref as $Ref<List<History>, List<History>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<List<SearchResult>, List<SearchResult>>,
-              List<SearchResult>,
+              AnyNotifier<List<History>, List<History>>,
+              List<History>,
               Object?,
               Object?
             >;

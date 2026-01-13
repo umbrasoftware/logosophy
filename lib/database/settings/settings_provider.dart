@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:logging/logging.dart';
-import 'package:logosophy/database/settings/settings_class.dart';
+import 'package:logosophy/database/settings/settings_model.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';

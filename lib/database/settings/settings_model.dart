@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'settings_class.freezed.dart';
-part 'settings_class.g.dart';
+part 'settings_model.freezed.dart';
+part 'settings_model.g.dart';
 
 @freezed
 abstract class Settings with _$Settings {

@@ -25,27 +25,31 @@ class BookReadStatus {
   factory BookReadStatus() => _instance;
 
   final _logger = Logger('BookCache');
+  bool _isInitialized = false;
   static const String prefsName = 'books';
   late SharedPreferencesWithCache _prefs;
 
   /// Initializes the class singleton. Must be called before everything else.
   Future<void> init() async {
+    if (_isInitialized) return;
     _prefs = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
     final booksData = _prefs.getString(prefsName);
 
     if (booksData == null) {
       DateTime time = DateTime.now().subtract(const Duration(days: 180));
       int count = 0;
-      final finalBookMap = json.decode(json.encode(bookMap));
+      final Map<String, dynamic> finalBookMap = json.decode(json.encode(bookMap));
 
       for (final entries in bookMap.entries) {
-        finalBookMap[entries.key]!["lastOpened"] = time.toIso8601String();
+        finalBookMap[entries.key]["lastOpened"] = time.toIso8601String();
         count++;
         time = time.subtract(Duration(days: count));
       }
 
       await _prefs.setString(prefsName, json.encode(finalBookMap));
     }
+
+    _isInitialized = true;
   }
 
   /// Get a postition for a given `bookId`.

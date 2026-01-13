@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:logging/logging.dart';
-import 'package:logosophy/pages/search_tab/search_result_class.dart';
+import 'package:logosophy/database/search_history/history_model.dart';
+import 'package:logosophy/pages/search_tab/search_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,80 +18,127 @@ class HistoryNotifier extends _$HistoryNotifier {
   late SharedPreferencesWithCache _prefs;
 
   @override
-  List<SearchResult> build() {
+  List<History> build() {
     return [];
   }
 
   /// Initializes the provider. Must be called before everything else.
   Future<void> init() async {
     _prefs = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
-    final data = _prefs.getString(prefsName);
+    final history = _prefs.getStringList(prefsName);
 
-    if (data == null || data.isEmpty) {
-      await _prefs.setString(prefsName, json.encode({}));
+    if (history == null || history.isEmpty) {
+      await _prefs.setStringList(prefsName, []);
     } else {
-      final decoded = json.decode(data) as Map<String, dynamic>;
-      _setJsonIntoState(decoded);
+      await _setPrefsIntoState(history);
     }
-  }
-
-  /// Clear this Prefs data.
-  Future<void> clear() async {
-    await _prefs.setString(prefsName, "");
-    state = [];
   }
 
   /// Receives a history already decoded in JSON, sorts it and sets into the state.
-  Future<void> _setJsonIntoState(Map<String, dynamic> decoded) async {
-    List<SearchResult> newState = [];
-    for (final map in decoded.entries) {
-      final timestamp = map.key;
-      newState.add(
-        SearchResult(
-          score: map.value[timestamp]["score"],
-          content: map.value[timestamp]["content"],
-          page: map.value[timestamp]["page"],
-          bookId: map.value[timestamp]["bookId"],
-          madeAt: timestamp,
-        ),
-      );
+  Future<void> _setPrefsIntoState(List<String> historyPrefs) async {
+    List<History> newState = [];
+    for (final entry in historyPrefs) {
+      final entryDecoded = jsonDecode(entry);
+      final query = entryDecoded["query"];
+      final timestamp = entryDecoded["timestamp"];
+
+      final List<SearchResult> results = [];
+      for (final result in entryDecoded["results"]) {
+        results.add(
+          SearchResult(
+            similarity: result["similarity"],
+            content: result["content"],
+            page: result["page"],
+            bookId: result["bookId"],
+          ),
+        );
+      }
+
+      newState.add(History(query: query, timestamp: timestamp, results: results));
     }
-    newState.sort((a, b) => DateTime.parse(b.madeAt!).compareTo(DateTime.parse(a.madeAt!)));
-    await _prefs.setString(prefsName, jsonEncode(decoded));
+    newState.sort((a, b) => DateTime.parse(b.timestamp).compareTo(DateTime.parse(a.timestamp)));
     state = newState;
   }
 
-  /// Add a new [SearchResult] into the history.
-  Future<void> addHistory(SearchResult result) async {
-    final history = _prefs.getString(prefsName);
+  /// Add a new [History] into the history.
+  Future<void> addHistory(History result) async {
+    final history = _prefs.getStringList(prefsName);
     if (history == null) {
       _logger.severe("Prefs was null while trying to add to history.");
       return;
     }
 
-    final newState = state.toList();
-    if (state.length == maxHistory) {
-      newState.removeLast();
+    if (history.length == maxHistory) {
+      history.removeLast();
     }
 
-    final historyDecoded = jsonDecode(history);
-    final resultMap = result.toJson();
-    historyDecoded[resultMap["mateAt"]] = resultMap..remove("madeAt");
+    // Check if this query already exists.
+    if (state.any((e) => e.query == result.query)) return;
 
-    _setJsonIntoState(historyDecoded);
+    final resultJson = {};
+    resultJson["query"] = result.query;
+    resultJson["timestamp"] = result.timestamp;
+
+    final List<String> resultsInJson = [];
+    for (final entry in result.results) {
+      final entryMap = {
+        "similarity": entry.similarity,
+        "content": entry.content,
+        "page": entry.page,
+        "bookId": entry.bookId,
+      };
+      resultsInJson.add(json.encode(entryMap));
+    }
+    resultJson["results"] = resultsInJson;
+    history.add(jsonEncode(resultJson));
+
+    // Settings the states and sorting.
+    await _prefs.setStringList(prefsName, history);
+    state = [...state, result];
+    await _sortAndSet();
   }
 
-  /// Delete a [SearchResult] from the history.
-  Future<void> deleteSearchResult(String timestamp) async {
-    final history = _prefs.getString(prefsName);
-    if (history == null) {
+  /// Sorts and saves the data on SharedPreferences and the Provider state.
+  Future<void> _sortAndSet() async {
+    // Sorts the history list of Strings and set its to the Prefs.
+    final historyPrefs = _prefs.getStringList(prefsName);
+    if (historyPrefs == null || historyPrefs.isEmpty) {
+      _logger.shout("History on SharedPrefs is null or empty while trying to sort.");
+      return;
+    }
+
+    historyPrefs.sort((a, b) {
+      final aJson = jsonDecode(a);
+      final bJson = jsonDecode(b);
+      return DateTime.parse(bJson["timestamp"]).compareTo(DateTime.parse(aJson["timestamp"]));
+    });
+    await _prefs.setStringList(prefsName, historyPrefs);
+
+    // Sorts the history objects and set its to the state.
+    final historyObjs = [...state];
+    historyObjs.sort((a, b) => DateTime.parse(b.timestamp).compareTo(DateTime.parse(a.timestamp)));
+    state = [...historyObjs];
+  }
+
+  /// Delete a [History] from the history and updates the SharedPrefs and Provider state.
+  Future<void> deleteHistoryItem(String timestamp) async {
+    final history = _prefs.getStringList(prefsName);
+    if (history == null || history.isEmpty) {
       _logger.severe("Prefs was null while trying to delete a history.");
       return;
     }
 
-    final historyDecoded = json.decode(history) as Map<String, dynamic>;
-    historyDecoded.remove(timestamp);
+    history.removeWhere((item) => item.contains(timestamp));
+    await _prefs.setStringList(prefsName, history);
 
-    await _setJsonIntoState(historyDecoded);
+    final historyObjs = [...state];
+    historyObjs.removeWhere((item) => item.timestamp == timestamp);
+    state = historyObjs;
+  }
+
+  /// Clear this Prefs data.
+  Future<void> clear() async {
+    await _prefs.setStringList(prefsName, []);
+    state = [];
   }
 }

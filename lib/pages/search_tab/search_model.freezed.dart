@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'search_result_class.dart';
+part of 'search_model.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -15,7 +15,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SearchResult {
 
- double get score; String get content; int get page; String get bookId; String? get madeAt;
+ double get similarity; String get content;// 2. Use @JsonKey to redirect where the parser looks for data
+@JsonKey(readValue: _readFromMetadata) int get page;// 3. Map 'bookId' (Dart) to 'book_id' (JSON) AND read from metadata
+@JsonKey(name: 'book_id', readValue: _readFromMetadata) String get bookId;
 /// Create a copy of SearchResult
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +30,16 @@ $SearchResultCopyWith<SearchResult> get copyWith => _$SearchResultCopyWithImpl<S
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SearchResult&&(identical(other.score, score) || other.score == score)&&(identical(other.content, content) || other.content == content)&&(identical(other.page, page) || other.page == page)&&(identical(other.bookId, bookId) || other.bookId == bookId)&&(identical(other.madeAt, madeAt) || other.madeAt == madeAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SearchResult&&(identical(other.similarity, similarity) || other.similarity == similarity)&&(identical(other.content, content) || other.content == content)&&(identical(other.page, page) || other.page == page)&&(identical(other.bookId, bookId) || other.bookId == bookId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,score,content,page,bookId,madeAt);
+int get hashCode => Object.hash(runtimeType,similarity,content,page,bookId);
 
 @override
 String toString() {
-  return 'SearchResult(score: $score, content: $content, page: $page, bookId: $bookId, madeAt: $madeAt)';
+  return 'SearchResult(similarity: $similarity, content: $content, page: $page, bookId: $bookId)';
 }
 
 
@@ -48,7 +50,7 @@ abstract mixin class $SearchResultCopyWith<$Res>  {
   factory $SearchResultCopyWith(SearchResult value, $Res Function(SearchResult) _then) = _$SearchResultCopyWithImpl;
 @useResult
 $Res call({
- double score, String content, int page, String bookId, String? madeAt
+ double similarity, String content,@JsonKey(readValue: _readFromMetadata) int page,@JsonKey(name: 'book_id', readValue: _readFromMetadata) String bookId
 });
 
 
@@ -65,14 +67,13 @@ class _$SearchResultCopyWithImpl<$Res>
 
 /// Create a copy of SearchResult
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? score = null,Object? content = null,Object? page = null,Object? bookId = null,Object? madeAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? similarity = null,Object? content = null,Object? page = null,Object? bookId = null,}) {
   return _then(_self.copyWith(
-score: null == score ? _self.score : score // ignore: cast_nullable_to_non_nullable
+similarity: null == similarity ? _self.similarity : similarity // ignore: cast_nullable_to_non_nullable
 as double,content: null == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
 as String,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
 as int,bookId: null == bookId ? _self.bookId : bookId // ignore: cast_nullable_to_non_nullable
-as String,madeAt: freezed == madeAt ? _self.madeAt : madeAt // ignore: cast_nullable_to_non_nullable
-as String?,
+as String,
   ));
 }
 
@@ -157,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double score,  String content,  int page,  String bookId,  String? madeAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double similarity,  String content, @JsonKey(readValue: _readFromMetadata)  int page, @JsonKey(name: 'book_id', readValue: _readFromMetadata)  String bookId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SearchResult() when $default != null:
-return $default(_that.score,_that.content,_that.page,_that.bookId,_that.madeAt);case _:
+return $default(_that.similarity,_that.content,_that.page,_that.bookId);case _:
   return orElse();
 
 }
@@ -178,10 +179,10 @@ return $default(_that.score,_that.content,_that.page,_that.bookId,_that.madeAt);
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double score,  String content,  int page,  String bookId,  String? madeAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double similarity,  String content, @JsonKey(readValue: _readFromMetadata)  int page, @JsonKey(name: 'book_id', readValue: _readFromMetadata)  String bookId)  $default,) {final _that = this;
 switch (_that) {
 case _SearchResult():
-return $default(_that.score,_that.content,_that.page,_that.bookId,_that.madeAt);case _:
+return $default(_that.similarity,_that.content,_that.page,_that.bookId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +199,10 @@ return $default(_that.score,_that.content,_that.page,_that.bookId,_that.madeAt);
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double score,  String content,  int page,  String bookId,  String? madeAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double similarity,  String content, @JsonKey(readValue: _readFromMetadata)  int page, @JsonKey(name: 'book_id', readValue: _readFromMetadata)  String bookId)?  $default,) {final _that = this;
 switch (_that) {
 case _SearchResult() when $default != null:
-return $default(_that.score,_that.content,_that.page,_that.bookId,_that.madeAt);case _:
+return $default(_that.similarity,_that.content,_that.page,_that.bookId);case _:
   return null;
 
 }
@@ -213,14 +214,15 @@ return $default(_that.score,_that.content,_that.page,_that.bookId,_that.madeAt);
 @JsonSerializable()
 
 class _SearchResult implements SearchResult {
-   _SearchResult({required this.score, required this.content, required this.page, required this.bookId, this.madeAt});
+   _SearchResult({required this.similarity, required this.content, @JsonKey(readValue: _readFromMetadata) required this.page, @JsonKey(name: 'book_id', readValue: _readFromMetadata) required this.bookId});
   factory _SearchResult.fromJson(Map<String, dynamic> json) => _$SearchResultFromJson(json);
 
-@override final  double score;
+@override final  double similarity;
 @override final  String content;
-@override final  int page;
-@override final  String bookId;
-@override final  String? madeAt;
+// 2. Use @JsonKey to redirect where the parser looks for data
+@override@JsonKey(readValue: _readFromMetadata) final  int page;
+// 3. Map 'bookId' (Dart) to 'book_id' (JSON) AND read from metadata
+@override@JsonKey(name: 'book_id', readValue: _readFromMetadata) final  String bookId;
 
 /// Create a copy of SearchResult
 /// with the given fields replaced by the non-null parameter values.
@@ -235,16 +237,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SearchResult&&(identical(other.score, score) || other.score == score)&&(identical(other.content, content) || other.content == content)&&(identical(other.page, page) || other.page == page)&&(identical(other.bookId, bookId) || other.bookId == bookId)&&(identical(other.madeAt, madeAt) || other.madeAt == madeAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SearchResult&&(identical(other.similarity, similarity) || other.similarity == similarity)&&(identical(other.content, content) || other.content == content)&&(identical(other.page, page) || other.page == page)&&(identical(other.bookId, bookId) || other.bookId == bookId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,score,content,page,bookId,madeAt);
+int get hashCode => Object.hash(runtimeType,similarity,content,page,bookId);
 
 @override
 String toString() {
-  return 'SearchResult(score: $score, content: $content, page: $page, bookId: $bookId, madeAt: $madeAt)';
+  return 'SearchResult(similarity: $similarity, content: $content, page: $page, bookId: $bookId)';
 }
 
 
@@ -255,7 +257,7 @@ abstract mixin class _$SearchResultCopyWith<$Res> implements $SearchResultCopyWi
   factory _$SearchResultCopyWith(_SearchResult value, $Res Function(_SearchResult) _then) = __$SearchResultCopyWithImpl;
 @override @useResult
 $Res call({
- double score, String content, int page, String bookId, String? madeAt
+ double similarity, String content,@JsonKey(readValue: _readFromMetadata) int page,@JsonKey(name: 'book_id', readValue: _readFromMetadata) String bookId
 });
 
 
@@ -272,14 +274,13 @@ class __$SearchResultCopyWithImpl<$Res>
 
 /// Create a copy of SearchResult
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? score = null,Object? content = null,Object? page = null,Object? bookId = null,Object? madeAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? similarity = null,Object? content = null,Object? page = null,Object? bookId = null,}) {
   return _then(_SearchResult(
-score: null == score ? _self.score : score // ignore: cast_nullable_to_non_nullable
+similarity: null == similarity ? _self.similarity : similarity // ignore: cast_nullable_to_non_nullable
 as double,content: null == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
 as String,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
 as int,bookId: null == bookId ? _self.bookId : bookId // ignore: cast_nullable_to_non_nullable
-as String,madeAt: freezed == madeAt ? _self.madeAt : madeAt // ignore: cast_nullable_to_non_nullable
-as String?,
+as String,
   ));
 }
 

@@ -5,10 +5,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logosophy/database/search_history/history_model.dart';
 import 'package:logosophy/database/search_history/history_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/pdf_reader.dart';
-import 'package:logosophy/pages/search_tab/search_result_class.dart';
+import 'package:logosophy/pages/search_tab/search_model.dart';
 import 'package:logosophy/pages/search_tab/utils.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -33,12 +34,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       final pdfFileName = '$bookId.pdf';
       return mappings['pt-BR'][pdfFileName]['title'] ?? t.searchPage.unkownBook;
     } catch (e) {
-      // Retorna um valor padrão caso a chave não seja encontrada
       return t.searchPage.unkownBook;
     }
   }
 
-  /// Simula a busca de embeddings. Substitua este método pela sua chamada real.
+  /// Performs the search.
   Future<void> _performSearch(String query) async {
     if (query.isEmpty) {
       setState(() {
@@ -58,6 +58,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       final data = List<Map<String, dynamic>>.from(queryResults!);
       final results = data.map((item) => SearchResult.fromJson(item)).toList();
 
+      final history = History(query: query, timestamp: DateTime.now().toIso8601String(), results: results);
+      await ref.read(historyProvider.notifier).addHistory(history);
+
       setState(() {
         _searchResults = results;
       });
@@ -65,6 +68,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       setState(() {
         _errorMessage = e.toString();
       });
+      rethrow;
     } finally {
       setState(() {
         _isLoading = false;
@@ -90,7 +94,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       builder: (context, asyncSnapshot) {
         return Scaffold(
           appBar: AppBar(title: Text(t.navBar.search)),
-          // drawer: _buildDrawer(),
+          drawer: _buildDrawer(),
           body: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -206,59 +210,72 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   Drawer _buildDrawer() {
     final colorScheme = Theme.of(context).colorScheme;
-    final results = ref.watch(historyProvider);
+
     return Drawer(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(color: colorScheme.surfaceContainer),
-              child: Center(
-                child: Text(
-                  "Pesquisas salvas",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  selectionColor: colorScheme.onSurface,
+      backgroundColor: colorScheme.surface,
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            height: 100,
+            decoration: BoxDecoration(color: colorScheme.surfaceContainer),
+            padding: const EdgeInsets.fromLTRB(16, 50, 16, 16),
+            child: Row(
+              children: [
+                Icon(Icons.history, color: colorScheme.primary),
+                const SizedBox(width: 12),
+                Text(
+                  "Histórico de pesquisa",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: colorScheme.onSurface),
                 ),
-              ),
+              ],
             ),
-            ListView.separated(
-              itemCount: results.length,
-              separatorBuilder: (context, index) {
-                return SizedBox(height: 12);
-              },
-              itemBuilder: (context, index) {
-                return InkWell(
-                  onTap: () {
-                    print('oi');
-                  },
-                  child: Card(
-                    color: colorScheme.surfaceContainer,
-                    margin: const EdgeInsets.all(6.0),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(results[index].madeAt!, style: TextStyle(fontSize: 11, color: colorScheme.onSurface)),
-                          Text(
-                            results[index].content,
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: colorScheme.onSurfaceVariant,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+          ),
+          Expanded(
+            child: ref.watch(historyProvider).isEmpty
+                ? Center(
+                    child: Text("Sem histórico ainda", style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                  )
+                : ListView.builder(
+                    padding: EdgeInsets.zero,
+                    itemCount: ref.watch(historyProvider).length,
+                    itemBuilder: (context, index) {
+                      final item = ref.read(historyProvider)[index];
+                      return ListTile(
+                        title: Text(
+                          _formatDate(item.timestamp),
+                          style: TextStyle(fontSize: 13, color: colorScheme.outline),
+                        ),
+                        subtitle: Text(
+                          item.query,
+                          style: TextStyle(fontSize: 15, color: colorScheme.onSurface, fontWeight: FontWeight.w500),
+                        ),
+                        trailing: IconButton(
+                          icon: Icon(Icons.close, size: 20, color: Colors.red),
+                          onPressed: () async {
+                            await ref.read(historyProvider.notifier).deleteHistoryItem(item.timestamp);
+                          },
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                          _searchController.text = item.query;
+                          _performSearch(item.query);
+                        },
+                      );
+                    },
                   ),
-                );
-                //return ListTile(title: Text("11/01/2026 21:09"), subtitle: Text());
-              },
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
+  }
+
+  String _formatDate(String isoString) {
+    try {
+      final date = DateTime.parse(isoString).toLocal();
+      return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    } catch (e) {
+      return isoString;
+    }
   }
 }
