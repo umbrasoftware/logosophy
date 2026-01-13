@@ -13,6 +13,7 @@ import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/firebase_options.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/settings_tab/utils.dart';
+import 'package:logosophy/pages/splash_pages/animated_logo.dart';
 import 'package:logosophy/router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -56,7 +57,13 @@ class _AppState extends ConsumerState<App> {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _initializationFuture,
-      builder: (context, _) {
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Directionality(
+            textDirection: TextDirection.ltr,
+            child: Material(child: Center(child: BreathingLogo())),
+          );
+        }
         return MaterialApp.router(
           title: 'Logosofia',
           debugShowCheckedModeBanner: false,
