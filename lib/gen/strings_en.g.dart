@@ -46,7 +46,6 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final TranslationsBookPageEn bookPage = TranslationsBookPageEn._(_root);
 	late final TranslationsSettingsPageEn settingsPage = TranslationsSettingsPageEn._(_root);
 	late final TranslationsSearchPageEn searchPage = TranslationsSearchPageEn._(_root);
-	late final TranslationsAuthMessagesEn authMessages = TranslationsAuthMessagesEn._(_root);
 }
 
 // Path: btnActions
@@ -287,107 +286,12 @@ class TranslationsSearchPageEn {
 
 	/// en: 'No results found'
 	String get noResultFound => 'No results found';
-}
 
-// Path: authMessages
-class TranslationsAuthMessagesEn {
-	TranslationsAuthMessagesEn._(this._root);
+	/// en: 'Search history'
+	String get searchHistory => 'Search history';
 
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-	late final TranslationsAuthMessagesPromptEn prompt = TranslationsAuthMessagesPromptEn._(_root);
-	late final TranslationsAuthMessagesErrorEn error = TranslationsAuthMessagesErrorEn._(_root);
-}
-
-// Path: authMessages.prompt
-class TranslationsAuthMessagesPromptEn {
-	TranslationsAuthMessagesPromptEn._(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Enter password'
-	String get askPassword => 'Enter password';
-
-	/// en: 'Enter email'
-	String get askEmail => 'Enter email';
-
-	/// en: 'Please authenticate to enter the app.'
-	String get askAuthenticate => 'Please authenticate to enter the app.';
-
-	/// en: 'Retype your password'
-	String get retypePassword => 'Retype your password';
-
-	/// en: 'Forgot your password?'
-	String get forgotPassword => 'Forgot your password?';
-
-	/// en: 'Already have an account? Log in.'
-	String get alreadyHaveAccount => 'Already have an account? Log in.';
-
-	/// en: 'Don't have an account? Sign up.'
-	String get dontHaveAccount => 'Don\'t have an account? Sign up.';
-}
-
-// Path: authMessages.error
-class TranslationsAuthMessagesErrorEn {
-	TranslationsAuthMessagesErrorEn._(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'An unknown error occurred. Please contact the support team.'
-	String get unknown => 'An unknown error occurred. Please contact the support team.';
-
-	/// en: 'Invalid email. Try again, please.'
-	String get emailAddressInvalid => 'Invalid email. Try again, please.';
-
-	/// en: 'This email is already in use.'
-	String get emailExists => 'This email is already in use.';
-
-	/// en: 'Confirm your account by clicking in the link sent to your email.'
-	String get emailNotConfirmed => 'Confirm your account by clicking in the link sent to your email.';
-
-	/// en: 'Your email or password is incorrect.'
-	String get invalidCredentials => 'Your email or password is incorrect.';
-
-	/// en: 'The passwords are not the same.'
-	String get passwordMismatch => 'The passwords are not the same.';
-
-	/// en: 'Your password needs to have at least 8 characters.'
-	String get passwordTooShort => 'Your password needs to have at least 8 characters.';
-
-	/// en: 'You cannot use the same password as before.'
-	String get samePassword => 'You cannot use the same password as before.';
-
-	/// en: 'Your password needs to have at least 1 upper case character, 1 lowercase, 1 number and 1 special character.'
-	String get weakPassword => 'Your password needs to have at least 1 upper case character, 1 lowercase, 1 number and 1 special character.';
-
-	/// en: 'You are making too many requests. Please try again later.'
-	String get overRequestRateLimit => 'You are making too many requests. Please try again later.';
-
-	/// en: 'Wrong password'
-	String get wrongPassword => 'Wrong password';
-
-	/// en: 'Your name cannot be bigger than 100 characters.'
-	String get nameTooLong => 'Your name cannot be bigger than 100 characters.';
-
-	/// en: 'No internet connection'
-	String get noConnection => 'No internet connection';
-
-	/// en: 'The server could not satisfy your request. Please try again later.'
-	String get unprocessableEntity => 'The server could not satisfy your request. Please try again later.';
-
-	/// en: 'Servers are overloaded right now. Please try again later.'
-	String get tooManyRequests => 'Servers are overloaded right now. Please try again later.';
-
-	/// en: 'There was an error processing your request. Please try again later.'
-	String get internalServerError => 'There was an error processing your request. Please try again later.';
-
-	/// en: 'An error occurred. Please try to login again.'
-	String get tryLoginAgain => 'An error occurred. Please try to login again.';
+	/// en: 'Not history yet'
+	String get noHistoryYet => 'Not history yet';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -460,30 +364,8 @@ extension on Translations {
 			'searchPage.typeYourSearch' => 'Type your search',
 			'searchPage.startSearch' => 'Type something to start your search',
 			'searchPage.noResultFound' => 'No results found',
-			'authMessages.prompt.askPassword' => 'Enter password',
-			'authMessages.prompt.askEmail' => 'Enter email',
-			'authMessages.prompt.askAuthenticate' => 'Please authenticate to enter the app.',
-			'authMessages.prompt.retypePassword' => 'Retype your password',
-			'authMessages.prompt.forgotPassword' => 'Forgot your password?',
-			'authMessages.prompt.alreadyHaveAccount' => 'Already have an account? Log in.',
-			'authMessages.prompt.dontHaveAccount' => 'Don\'t have an account? Sign up.',
-			'authMessages.error.unknown' => 'An unknown error occurred. Please contact the support team.',
-			'authMessages.error.emailAddressInvalid' => 'Invalid email. Try again, please.',
-			'authMessages.error.emailExists' => 'This email is already in use.',
-			'authMessages.error.emailNotConfirmed' => 'Confirm your account by clicking in the link sent to your email.',
-			'authMessages.error.invalidCredentials' => 'Your email or password is incorrect.',
-			'authMessages.error.passwordMismatch' => 'The passwords are not the same.',
-			'authMessages.error.passwordTooShort' => 'Your password needs to have at least 8 characters.',
-			'authMessages.error.samePassword' => 'You cannot use the same password as before.',
-			'authMessages.error.weakPassword' => 'Your password needs to have at least 1 upper case character, 1 lowercase, 1 number and 1 special character.',
-			'authMessages.error.overRequestRateLimit' => 'You are making too many requests. Please try again later.',
-			'authMessages.error.wrongPassword' => 'Wrong password',
-			'authMessages.error.nameTooLong' => 'Your name cannot be bigger than 100 characters.',
-			'authMessages.error.noConnection' => 'No internet connection',
-			'authMessages.error.unprocessableEntity' => 'The server could not satisfy your request. Please try again later.',
-			'authMessages.error.tooManyRequests' => 'Servers are overloaded right now. Please try again later.',
-			'authMessages.error.internalServerError' => 'There was an error processing your request. Please try again later.',
-			'authMessages.error.tryLoginAgain' => 'An error occurred. Please try to login again.',
+			'searchPage.searchHistory' => 'Search history',
+			'searchPage.noHistoryYet' => 'Not history yet',
 			_ => null,
 		};
 	}

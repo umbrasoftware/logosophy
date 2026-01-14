@@ -36,28 +36,34 @@ class HistoryNotifier extends _$HistoryNotifier {
 
   /// Receives a history already decoded in JSON, sorts it and sets into the state.
   Future<void> _setPrefsIntoState(List<String> historyPrefs) async {
-    List<History> newState = [];
-    for (final entry in historyPrefs) {
-      final entryDecoded = jsonDecode(entry);
-      final query = entryDecoded["query"];
-      final timestamp = entryDecoded["timestamp"];
+    try {
+      List<History> newState = [];
+      for (final entry in historyPrefs) {
+        final entryDecoded = jsonDecode(entry);
+        final query = entryDecoded["query"];
+        final timestamp = entryDecoded["timestamp"];
 
-      final List<SearchResult> results = [];
-      for (final result in entryDecoded["results"]) {
-        results.add(
-          SearchResult(
-            similarity: result["similarity"],
-            content: result["content"],
-            page: result["page"],
-            bookId: result["bookId"],
-          ),
-        );
+        final List<SearchResult> results = [];
+        for (final result in entryDecoded["results"]) {
+          final resultMap = jsonDecode(result);
+          results.add(
+            SearchResult(
+              similarity: resultMap["similarity"] as double,
+              content: resultMap["content"] as String,
+              page: resultMap["page"] as int,
+              bookId: resultMap["bookId"] as String,
+            ),
+          );
+        }
+
+        newState.add(History(query: query, timestamp: timestamp, results: results));
       }
-
-      newState.add(History(query: query, timestamp: timestamp, results: results));
+      newState.sort((a, b) => DateTime.parse(b.timestamp).compareTo(DateTime.parse(a.timestamp)));
+      state = newState;
+    } catch (e) {
+      _logger.shout(e.toString());
+      rethrow;
     }
-    newState.sort((a, b) => DateTime.parse(b.timestamp).compareTo(DateTime.parse(a.timestamp)));
-    state = newState;
   }
 
   /// Add a new [History] into the history.
@@ -75,11 +81,11 @@ class HistoryNotifier extends _$HistoryNotifier {
     // Check if this query already exists.
     if (state.any((e) => e.query == result.query)) return;
 
-    final resultJson = {};
+    final resultJson = <String, dynamic>{};
     resultJson["query"] = result.query;
     resultJson["timestamp"] = result.timestamp;
 
-    final List<String> resultsInJson = [];
+    final List<Map<String, dynamic>> resultsInJson = [];
     for (final entry in result.results) {
       final entryMap = {
         "similarity": entry.similarity,
@@ -87,7 +93,7 @@ class HistoryNotifier extends _$HistoryNotifier {
         "page": entry.page,
         "bookId": entry.bookId,
       };
-      resultsInJson.add(json.encode(entryMap));
+      resultsInJson.add(entryMap);
     }
     resultJson["results"] = resultsInJson;
     history.add(jsonEncode(resultJson));

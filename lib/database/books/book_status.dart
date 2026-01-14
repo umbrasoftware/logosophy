@@ -25,17 +25,16 @@ class BookReadStatus {
   factory BookReadStatus() => _instance;
 
   final _logger = Logger('BookCache');
-  bool _isInitialized = false;
   static const String prefsName = 'books';
   late SharedPreferencesWithCache _prefs;
 
   /// Initializes the class singleton. Must be called before everything else.
   Future<void> init() async {
-    if (_isInitialized) return;
+    _logger.info("INIT: Iniciando BookReadStatus...");
     _prefs = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
     final booksData = _prefs.getString(prefsName);
 
-    if (booksData == null) {
+    if (booksData == null || booksData.isEmpty) {
       DateTime time = DateTime.now().subtract(const Duration(days: 180));
       int count = 0;
       final Map<String, dynamic> finalBookMap = json.decode(json.encode(bookMap));
@@ -49,7 +48,7 @@ class BookReadStatus {
       await _prefs.setString(prefsName, json.encode(finalBookMap));
     }
 
-    _isInitialized = true;
+    _logger.info("INIT: BookReadStatus finalizado e salvo.");
   }
 
   /// Get a postition for a given `bookId`.
@@ -98,8 +97,9 @@ class BookReadStatus {
   }
 
   Future<Map<String, dynamic>?> getReadStatus() async {
+    _logger.info("GET: Tentando ler status...");
     String? data = _prefs.getString(prefsName);
-    if (data == null) {
+    if (data == null || data.isEmpty) {
       _logger.severe("SharedPrefs is null while trying to get all books status. Calling init() again.");
       await init();
     }

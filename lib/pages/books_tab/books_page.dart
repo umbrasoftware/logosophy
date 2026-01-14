@@ -11,6 +11,7 @@ import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/pdf_reader.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// A simple data class to hold book information for sorting and display.
 class _BookData {
@@ -109,8 +110,13 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     final mappings = jsonDecode(mappingsContent) as Map<String, dynamic>;
 
     final langDir = Directory(p.join(booksDir.path, 'pt-BR'));
-    final readStatus = await BookReadStatus().getReadStatus();
-    if (readStatus == null) logger.warning("Book readStatus is null. Books ordering will be confusing.");
+    var readStatus = await BookReadStatus().getReadStatus();
+    if (readStatus == null) {
+      logger.warning("Book readStatus is null. Trying again...");
+      final prefs = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
+      await prefs.setString('books', "");
+      readStatus = await BookReadStatus().getReadStatus();
+    }
 
     if (await langDir.exists()) {
       final entities = langDir.listSync();

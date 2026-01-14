@@ -5,8 +5,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:logosophy/database/search_history/history_model.dart';
 import 'package:logosophy/database/search_history/history_provider.dart';
+import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/pdf_reader.dart';
 import 'package:logosophy/pages/search_tab/search_model.dart';
@@ -68,7 +70,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       setState(() {
         _errorMessage = e.toString();
       });
-      rethrow;
     } finally {
       setState(() {
         _isLoading = false;
@@ -223,10 +224,18 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             child: Row(
               children: [
                 Icon(Icons.history, color: colorScheme.primary),
-                const SizedBox(width: 12),
+                const SizedBox(width: 4),
                 Text(
                   "Histórico de pesquisa",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: colorScheme.onSurface),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: colorScheme.onSurface),
+                ),
+                const SizedBox(width: 12),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  color: Colors.red,
+                  onPressed: () async {
+                    await ref.read(historyProvider.notifier).clear();
+                  },
                 ),
               ],
             ),
@@ -243,7 +252,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       final item = ref.read(historyProvider)[index];
                       return ListTile(
                         title: Text(
-                          _formatDate(item.timestamp),
+                          _formatDate(item.timestamp, item),
                           style: TextStyle(fontSize: 13, color: colorScheme.outline),
                         ),
                         subtitle: Text(
@@ -257,9 +266,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           },
                         ),
                         onTap: () {
-                          Navigator.pop(context);
                           _searchController.text = item.query;
-                          _performSearch(item.query);
+                          setState(() {
+                            _searchResults = item.results;
+                          });
+                          Navigator.pop(context);
                         },
                       );
                     },
@@ -270,12 +281,17 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
-  String _formatDate(String isoString) {
-    try {
-      final date = DateTime.parse(isoString).toLocal();
-      return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
-    } catch (e) {
-      return isoString;
-    }
+  String _formatDate(String isoString, History item) {
+    final date = DateFormat(
+      DateFormat.ABBR_MONTH_WEEKDAY_DAY,
+      ref.watch(settingsProvider).language,
+    ).format(DateTime.parse(item.timestamp));
+
+    final time = DateFormat(
+      DateFormat.HOUR24_MINUTE,
+      ref.watch(settingsProvider).language,
+    ).format(DateTime.parse(item.timestamp));
+
+    return "$date $time";
   }
 }

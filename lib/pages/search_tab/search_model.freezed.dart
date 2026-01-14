@@ -15,9 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SearchResult {
 
- double get similarity; String get content;// 2. Use @JsonKey to redirect where the parser looks for data
-@JsonKey(readValue: _readFromMetadata) int get page;// 3. Map 'bookId' (Dart) to 'book_id' (JSON) AND read from metadata
-@JsonKey(name: 'book_id', readValue: _readFromMetadata) String get bookId;
+ double get similarity; String get content;@JsonKey(readValue: _readFromMetadata) int get page;@JsonKey(name: 'book_id', readValue: _readFromMetadata) String get bookId;
 /// Create a copy of SearchResult
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -219,9 +217,7 @@ class _SearchResult implements SearchResult {
 
 @override final  double similarity;
 @override final  String content;
-// 2. Use @JsonKey to redirect where the parser looks for data
 @override@JsonKey(readValue: _readFromMetadata) final  int page;
-// 3. Map 'bookId' (Dart) to 'book_id' (JSON) AND read from metadata
 @override@JsonKey(name: 'book_id', readValue: _readFromMetadata) final  String bookId;
 
 /// Create a copy of SearchResult

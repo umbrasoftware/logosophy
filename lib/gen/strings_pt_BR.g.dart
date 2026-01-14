@@ -43,7 +43,6 @@ class TranslationsPtBr with BaseTranslations<AppLocale, Translations> implements
 	@override late final _TranslationsBookPagePtBr bookPage = _TranslationsBookPagePtBr._(_root);
 	@override late final _TranslationsSettingsPagePtBr settingsPage = _TranslationsSettingsPagePtBr._(_root);
 	@override late final _TranslationsSearchPagePtBr searchPage = _TranslationsSearchPagePtBr._(_root);
-	@override late final _TranslationsAuthMessagesPtBr authMessages = _TranslationsAuthMessagesPtBr._(_root);
 }
 
 // Path: btnActions
@@ -160,59 +159,8 @@ class _TranslationsSearchPagePtBr implements TranslationsSearchPageEn {
 	@override String get typeYourSearch => 'Digite sua busca';
 	@override String get startSearch => 'Digite algo para iniciar a busca';
 	@override String get noResultFound => 'Nenhum resultado encontrado';
-}
-
-// Path: authMessages
-class _TranslationsAuthMessagesPtBr implements TranslationsAuthMessagesEn {
-	_TranslationsAuthMessagesPtBr._(this._root);
-
-	final TranslationsPtBr _root; // ignore: unused_field
-
-	// Translations
-	@override late final _TranslationsAuthMessagesPromptPtBr prompt = _TranslationsAuthMessagesPromptPtBr._(_root);
-	@override late final _TranslationsAuthMessagesErrorPtBr error = _TranslationsAuthMessagesErrorPtBr._(_root);
-}
-
-// Path: authMessages.prompt
-class _TranslationsAuthMessagesPromptPtBr implements TranslationsAuthMessagesPromptEn {
-	_TranslationsAuthMessagesPromptPtBr._(this._root);
-
-	final TranslationsPtBr _root; // ignore: unused_field
-
-	// Translations
-	@override String get askPassword => 'Digite a senha';
-	@override String get askEmail => 'Digite seu email';
-	@override String get askAuthenticate => 'Por favor, se autentique para entrar no aplicativo.';
-	@override String get retypePassword => 'Digite a senha novamente';
-	@override String get forgotPassword => 'Esqueceu sua senha?';
-	@override String get alreadyHaveAccount => 'Já tem uma conta? Faça login.';
-	@override String get dontHaveAccount => 'Não tem uma conta? Cadastre-se.';
-}
-
-// Path: authMessages.error
-class _TranslationsAuthMessagesErrorPtBr implements TranslationsAuthMessagesErrorEn {
-	_TranslationsAuthMessagesErrorPtBr._(this._root);
-
-	final TranslationsPtBr _root; // ignore: unused_field
-
-	// Translations
-	@override String get unknown => 'Um erro desconhecido ocorreu. Por favor, entre em contato com a equipe de suporte.';
-	@override String get emailAddressInvalid => 'Email inválido. Tente novamente, por favor.';
-	@override String get emailExists => 'Este email já está em uso.';
-	@override String get emailNotConfirmed => 'Confirme sua conta clicando no link enviado para seu email.';
-	@override String get invalidCredentials => 'Seu email ou senha está incorreto.';
-	@override String get passwordMismatch => 'As senhas não são iguais.';
-	@override String get passwordTooShort => 'Sua senha precisa ter pelo menos 8 caracteres.';
-	@override String get samePassword => 'Você não pode usar a mesma senha de antes.';
-	@override String get weakPassword => 'Sua senha precisa ter pelo menos 1 caractere maiúsculo, 1 minúsculo, 1 número e 1 caractere especial.';
-	@override String get overRequestRateLimit => 'Você está fazendo muitas solicitações. Por favor, tente novamente mais tarde.';
-	@override String get wrongPassword => 'Senha errada';
-	@override String get nameTooLong => 'Seu nome não pode ter mais de 100 caracteres.';
-	@override String get noConnection => 'Sem conexão com a internet.';
-	@override String get unprocessableEntity => 'O servidor não pôde satisfazer sua solicitação. Por favor, tente novamente mais tarde.';
-	@override String get tooManyRequests => 'Os servidores estão sobrecarregados agora. Por favor, tente novamente mais tarde.';
-	@override String get internalServerError => 'Houve um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.';
-	@override String get tryLoginAgain => 'Um erro ocorreu. Por favor, tente fazer login novamente.';
+	@override String get searchHistory => 'Histórico de pesquisa';
+	@override String get noHistoryYet => 'Sem histórico ainda';
 }
 
 /// The flat map containing all translations for locale <pt-BR>.
@@ -285,30 +233,8 @@ extension on TranslationsPtBr {
 			'searchPage.typeYourSearch' => 'Digite sua busca',
 			'searchPage.startSearch' => 'Digite algo para iniciar a busca',
 			'searchPage.noResultFound' => 'Nenhum resultado encontrado',
-			'authMessages.prompt.askPassword' => 'Digite a senha',
-			'authMessages.prompt.askEmail' => 'Digite seu email',
-			'authMessages.prompt.askAuthenticate' => 'Por favor, se autentique para entrar no aplicativo.',
-			'authMessages.prompt.retypePassword' => 'Digite a senha novamente',
-			'authMessages.prompt.forgotPassword' => 'Esqueceu sua senha?',
-			'authMessages.prompt.alreadyHaveAccount' => 'Já tem uma conta? Faça login.',
-			'authMessages.prompt.dontHaveAccount' => 'Não tem uma conta? Cadastre-se.',
-			'authMessages.error.unknown' => 'Um erro desconhecido ocorreu. Por favor, entre em contato com a equipe de suporte.',
-			'authMessages.error.emailAddressInvalid' => 'Email inválido. Tente novamente, por favor.',
-			'authMessages.error.emailExists' => 'Este email já está em uso.',
-			'authMessages.error.emailNotConfirmed' => 'Confirme sua conta clicando no link enviado para seu email.',
-			'authMessages.error.invalidCredentials' => 'Seu email ou senha está incorreto.',
-			'authMessages.error.passwordMismatch' => 'As senhas não são iguais.',
-			'authMessages.error.passwordTooShort' => 'Sua senha precisa ter pelo menos 8 caracteres.',
-			'authMessages.error.samePassword' => 'Você não pode usar a mesma senha de antes.',
-			'authMessages.error.weakPassword' => 'Sua senha precisa ter pelo menos 1 caractere maiúsculo, 1 minúsculo, 1 número e 1 caractere especial.',
-			'authMessages.error.overRequestRateLimit' => 'Você está fazendo muitas solicitações. Por favor, tente novamente mais tarde.',
-			'authMessages.error.wrongPassword' => 'Senha errada',
-			'authMessages.error.nameTooLong' => 'Seu nome não pode ter mais de 100 caracteres.',
-			'authMessages.error.noConnection' => 'Sem conexão com a internet.',
-			'authMessages.error.unprocessableEntity' => 'O servidor não pôde satisfazer sua solicitação. Por favor, tente novamente mais tarde.',
-			'authMessages.error.tooManyRequests' => 'Os servidores estão sobrecarregados agora. Por favor, tente novamente mais tarde.',
-			'authMessages.error.internalServerError' => 'Houve um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.',
-			'authMessages.error.tryLoginAgain' => 'Um erro ocorreu. Por favor, tente fazer login novamente.',
+			'searchPage.searchHistory' => 'Histórico de pesquisa',
+			'searchPage.noHistoryYet' => 'Sem histórico ainda',
 			_ => null,
 		};
 	}

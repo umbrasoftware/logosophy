@@ -71,37 +71,8 @@
         "unkownBook": "Unkown book",
         "typeYourSearch": "Type your search",
         "startSearch": "Type something to start your search",
-        "noResultFound": "No results found"
-    },
-    "authMessages": {
-        "prompt": {
-            "askPassword": "Enter password",
-            "askEmail": "Enter email",
-            "askAuthenticate": "Please authenticate to enter the app.",
-            "retypePassword": "Retype your password",
-            "forgotPassword": "Forgot your password?",
-            "alreadyHaveAccount": "Already have an account? Log in.",
-            "dontHaveAccount": "Don't have an account? Sign up."
-        },
-        "success": {},
-        "error": {
-            "unknown": "An unknown error occurred. Please contact the support team.",
-            "emailAddressInvalid": "Invalid email. Try again, please.",
-            "emailExists": "This email is already in use.",
-            "emailNotConfirmed": "Confirm your account by clicking in the link sent to your email.",
-            "invalidCredentials": "Your email or password is incorrect.",
-            "passwordMismatch": "The passwords are not the same.",
-            "passwordTooShort": "Your password needs to have at least 8 characters.",
-            "samePassword": "You cannot use the same password as before.",
-            "weakPassword": "Your password needs to have at least 1 upper case character, 1 lowercase, 1 number and 1 special character.",
-            "overRequestRateLimit": "You are making too many requests. Please try again later.",
-            "wrongPassword": "Wrong password",
-            "nameTooLong": "Your name cannot be bigger than 100 characters.",
-            "noConnection": "No internet connection",
-            "unprocessableEntity": "The server could not satisfy your request. Please try again later.",
-            "tooManyRequests": "Servers are overloaded right now. Please try again later.",
-            "internalServerError": "There was an error processing your request. Please try again later.",
-            "tryLoginAgain": "An error occurred. Please try to login again."
-        }
+        "noResultFound": "No results found",
+        "searchHistory": "Search history",
+        "noHistoryYet": "Not history yet"
     }
 }
