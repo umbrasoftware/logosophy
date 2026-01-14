@@ -11,7 +11,6 @@ import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/pdf_reader.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// A simple data class to hold book information for sorting and display.
 class _BookData {
@@ -31,11 +30,13 @@ class BooksPage extends ConsumerStatefulWidget {
 
 class _BooksPageState extends ConsumerState<BooksPage> {
   final logger = Logger('BooksPage');
+  late Future<List<_BookData>> _bookDataFuture;
   late String language;
 
   @override
   void initState() {
     language = ref.read(settingsProvider).language;
+    _bookDataFuture = _getBooksData();
     super.initState();
   }
 
@@ -44,7 +45,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     return Scaffold(
       appBar: AppBar(title: Text(t.navBar.books)),
       body: FutureBuilder<List<_BookData>>(
-        future: _getBooksData(),
+        future: _bookDataFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -111,12 +112,6 @@ class _BooksPageState extends ConsumerState<BooksPage> {
 
     final langDir = Directory(p.join(booksDir.path, 'pt-BR'));
     var readStatus = await BookReadStatus().getReadStatus();
-    if (readStatus == null) {
-      logger.warning("Book readStatus is null. Trying again...");
-      final prefs = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
-      await prefs.setString('books', "");
-      readStatus = await BookReadStatus().getReadStatus();
-    }
 
     if (await langDir.exists()) {
       final entities = langDir.listSync();
