@@ -7,7 +7,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
-import 'package:logosophy/database/books/book_status.dart';
 import 'package:logosophy/database/search_history/history_provider.dart';
 import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/firebase_options.dart';
@@ -96,7 +95,6 @@ Future<void> initApp(WidgetRef ref) async {
 }
 
 Future<void> initProviders(WidgetRef ref) async {
-  await BookReadStatus().init();
   await ref.read(settingsProvider.notifier).init();
   await ref.read(historyProvider.notifier).init();
 }

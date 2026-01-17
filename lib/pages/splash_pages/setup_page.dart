@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
+import 'package:logosophy/database/books/book_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/main.dart';
 import 'package:logosophy/pages/splash_pages/animated_logo.dart';
@@ -26,9 +27,12 @@ enum _SetupStatus { checking, needsDownload }
 class _SetupPageState extends ConsumerState<SetupPage> {
   _SetupStatus _status = _SetupStatus.checking;
   final logger = Logger('SetupPage');
-  late Map<String, dynamic> mappings;
   bool aDownloadWasFinished = false;
   double _downloadProgress = 0.0;
+  final String language = 'pt-BR';
+
+  late Map<String, dynamic> mappings;
+  late Directory langDir;
 
   @override
   void initState() {
@@ -42,31 +46,16 @@ class _SetupPageState extends ConsumerState<SetupPage> {
   }
 
   Future<void> _performChecksAndNavigate() async {
-    // await FilesUtils.deleteDownloadedBooks(); // For testing purposes
-    final storage = supabase.client.storage;
+    logger.info("Performing checkings at the splash page.");
 
-    final appDir = await getApplicationDocumentsDirectory();
-    final booksDir = Directory(p.join(appDir.path, 'books'));
-    final mappingsFile = File(p.join(booksDir.path, 'mappings.json'));
-    if (!await mappingsFile.exists()) {
-      logger.info("mappings.json does not exists. Downloading...");
-      await booksDir.create(recursive: true);
-      final mappingsBytes = await storage.from('books').download('mapping.json');
-      await mappingsFile.writeAsBytes(mappingsBytes);
-    }
-
-    // Loads the mapping.json to a actual dart Map file
-    final content = await mappingsFile.readAsString();
-    mappings = jsonDecode(content);
-
-    final languages = await FilesUtils.getBooksFolders();
-    if (languages.isEmpty) {
+    await _checkAppDirectory();
+    if (await langDir.list().isEmpty) {
       logger.info('No books found in any language.');
       if (mounted) setState(() => _status = _SetupStatus.needsDownload);
       return;
+    } else {
+      if (mounted) GoRouter.of(context).go('/books');
     }
-
-    if (mounted) GoRouter.of(context).go('/books');
   }
 
   @override
@@ -80,12 +69,12 @@ class _SetupPageState extends ConsumerState<SetupPage> {
       case _SetupStatus.checking:
         return const Center(child: BreathingLogo());
       case _SetupStatus.needsDownload:
-        return _buildLanguageSelectionBody(mappings);
+        return _buildLanguageSelectionBody();
     }
   }
 
   /// Builds the UI for when the user needs to select a language and download books.
-  Widget _buildLanguageSelectionBody(Map<String, dynamic> mappings) {
+  Widget _buildLanguageSelectionBody() {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -95,7 +84,7 @@ class _SetupPageState extends ConsumerState<SetupPage> {
             Text(t.setup.noBooks, textAlign: TextAlign.center, style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 64),
             ElevatedButton(
-              onPressed: _downloadProgress > 0 ? null : () => _downloadLanguageBooks('pt-BR'),
+              onPressed: _downloadProgress > 0 ? null : () => _downloadLanguageBooks(language),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -130,11 +119,12 @@ class _SetupPageState extends ConsumerState<SetupPage> {
     });
 
     try {
-      await FilesUtils.downloadBooksForLanguage(languageCode, (progress) {
+      await FilesUtils.downloadBooksForLanguage(languageCode, langDir, (progress) {
         setState(() => _downloadProgress = progress);
       });
 
       if (mounted) {
+        ref.watch(bookProvider);
         setState(() {
           _downloadProgress = 1.0;
           aDownloadWasFinished = true;
@@ -147,5 +137,28 @@ class _SetupPageState extends ConsumerState<SetupPage> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }
+  }
+
+  Future<void> _checkAppDirectory() async {
+    final storage = supabase.client.storage;
+    final appDocumentsDir = await getApplicationDocumentsDirectory();
+    final booksDir = Directory(p.join(appDocumentsDir.path, 'books'));
+    if (!await booksDir.exists()) await booksDir.create(recursive: true);
+
+    final mappingsFile = File(p.join(booksDir.path, 'mappings.json'));
+    if (!await mappingsFile.exists()) {
+      logger.info("mappings.json does not exists. Downloading...");
+      final mappingsBytes = await storage.from('books').download('mapping.json');
+      await mappingsFile.writeAsBytes(mappingsBytes);
+    }
+
+    final mappingsContent = await mappingsFile.readAsString();
+    mappings = jsonDecode(mappingsContent) as Map<String, dynamic>;
+    langDir = Directory(p.join(booksDir.path, language));
+    if (!await langDir.exists()) {
+      await langDir.create(recursive: true);
+    }
+
+    logger.info("Finished cheking app directory.");
   }
 }

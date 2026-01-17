@@ -11,44 +11,18 @@ class FilesUtils {
   static final _logger = Logger('FilesUtils');
   static final storage = supabase.client.storage;
 
-  /// Get the list of book folders (languages) in the 'books' directory.
-  /// If the directory does not exist, returnan empty list.
-  static Future<List<String>> getBooksFolders() async {
-    _logger.info('Searching for books...');
-
-    // Get application files directory
-    final appDir = await getApplicationDocumentsDirectory();
-    final booksDir = Directory(join(appDir.path, 'books'));
-    if (!await booksDir.exists()) {
-      await booksDir.create(recursive: true);
-      _logger.info('Created books directory at: ${booksDir.path}');
-      return [];
-    } else {
-      _logger.info('Books directory already exists at: ${booksDir.path}');
-
-      List<String> languages = [];
-      for (final folders in booksDir.listSync()) {
-        if (folders is Directory) {
-          languages.add(basename(folders.path));
-        }
-      }
-      return languages;
-    }
-  }
-
   /// Given a language String, like 'pt-BR', goes to the books/language folder in
-  /// Firestore and downloads all PDF books and their cover images (files ending
-  /// in `_cover.png`).
-  static Future<void> downloadBooksForLanguage(String languageCode, Function(double progress) onProgress) async {
+  /// Supabase Storage and downloads a zip file containing all PDF books and their cover images.
+  static Future<void> downloadBooksForLanguage(
+    String languageCode,
+    Directory downloadDir,
+    Function(double progress) onProgress,
+  ) async {
     _logger.info('Downloading books for language: $languageCode');
 
-    final appDir = await getApplicationDocumentsDirectory();
-    final langDir = Directory(join(appDir.path, 'books', languageCode));
-    await langDir.create(recursive: true);
     final url = await storage.from('books').createSignedUrl('$languageCode/books.zip', 600);
-
     final dio = Dio();
-    final zipPath = join(langDir.path, 'books.zip');
+    final zipPath = join(downloadDir.path, 'books.zip');
     await dio.download(
       url,
       zipPath,
@@ -58,7 +32,7 @@ class FilesUtils {
     );
 
     final archive = ZipDecoder().decodeStream(InputFileStream(zipPath));
-    await extractArchiveToDisk(archive, langDir.path);
+    await extractArchiveToDisk(archive, downloadDir.path);
     await File(zipPath).delete();
   }
 

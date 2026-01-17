@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'history_provider.dart';
+part of 'book_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -11,59 +11,51 @@ part of 'history_provider.dart';
 /// Provider responsable for holding the search history. The state is always sorted by
 /// the most recent.
 
-@ProviderFor(HistoryNotifier)
-const historyProvider = HistoryNotifierProvider._();
+@ProviderFor(BookNotifier)
+const bookProvider = BookNotifierProvider._();
 
 /// Provider responsable for holding the search history. The state is always sorted by
 /// the most recent.
-final class HistoryNotifierProvider
-    extends $NotifierProvider<HistoryNotifier, List<History>> {
+final class BookNotifierProvider
+    extends $AsyncNotifierProvider<BookNotifier, List<BookData>> {
   /// Provider responsable for holding the search history. The state is always sorted by
   /// the most recent.
-  const HistoryNotifierProvider._()
+  const BookNotifierProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'historyProvider',
+        name: r'bookProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$historyNotifierHash();
+  String debugGetCreateSourceHash() => _$bookNotifierHash();
 
   @$internal
   @override
-  HistoryNotifier create() => HistoryNotifier();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(List<History> value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<List<History>>(value),
-    );
-  }
+  BookNotifier create() => BookNotifier();
 }
 
-String _$historyNotifierHash() => r'696f14c44173dd7927be4d74fcfb8561b57585f7';
+String _$bookNotifierHash() => r'6033331af7d62a8d021514acacdf14e71acba925';
 
 /// Provider responsable for holding the search history. The state is always sorted by
 /// the most recent.
 
-abstract class _$HistoryNotifier extends $Notifier<List<History>> {
-  List<History> build();
+abstract class _$BookNotifier extends $AsyncNotifier<List<BookData>> {
+  FutureOr<List<BookData>> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<List<History>, List<History>>;
+    final ref = this.ref as $Ref<AsyncValue<List<BookData>>, List<BookData>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<List<History>, List<History>>,
-              List<History>,
+              AnyNotifier<AsyncValue<List<BookData>>, List<BookData>>,
+              AsyncValue<List<BookData>>,
               Object?,
               Object?
             >;

@@ -61,7 +61,7 @@ class HistoryNotifier extends _$HistoryNotifier {
       newState.sort((a, b) => DateTime.parse(b.timestamp).compareTo(DateTime.parse(a.timestamp)));
       state = newState;
     } catch (e) {
-      _logger.shout(e.toString());
+      _logger.shout("Error setting Prefs into state: $e");
       rethrow;
     }
   }

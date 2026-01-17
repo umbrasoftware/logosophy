@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logosophy/database/books/book_status.dart';
+import 'package:logosophy/database/books/book_provider.dart';
 import 'package:pdfrx/pdfrx.dart';
 import 'package:logging/logging.dart';
 
@@ -38,17 +38,18 @@ class _PdfViewerState extends ConsumerState<PDFReader> {
           onViewerReady: (document, controller) async {
             if (widget.page != null) return;
 
-            final position = BookReadStatus().getPosition(bookId);
-            _pdfController.setZoom(position.offset, position.zoom);
-            await BookReadStatus().saveTimestamp(bookId);
+            final bookNotifier = ref.read(bookProvider.notifier);
+            final position = bookNotifier.getPosition(bookId);
+            if (position == null) return;
+            _pdfController.setZoom(Offset(position.x, position.y), position.zoom);
+            await bookNotifier.saveTimestamp(bookId);
           },
           onInteractionEnd: (details) async {
             if (widget.page != null) return;
 
             final zoom = _pdfController.currentZoom;
             final offset = _pdfController.centerPosition;
-            await BookReadStatus().savePosition(bookId, zoom, offset);
-            logger.info("Book position saved: zoom: $zoom, offset:  $offset");
+            await ref.read(bookProvider.notifier).savePosition(bookId, zoom, offset);
           },
         ),
       ),
