@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:logging/logging.dart';
+import 'package:logosophy/database/books/book_model.dart';
 import 'package:logosophy/database/search_history/history_provider.dart';
 import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/firebase_options.dart';
@@ -32,6 +34,7 @@ Future<void> main() async {
   };
 
   supabase = await Supabase.initialize(url: dotenv.env['SUPABASE_URL']!, anonKey: dotenv.env['SUPABASE_SERVICE_KEY']!);
+  await Hive.initFlutter();
   runApp(ProviderScope(child: TranslationProvider(child: App())));
 }
 
@@ -90,6 +93,7 @@ void setupLogging() {
 }
 
 Future<void> initApp(WidgetRef ref) async {
+  Hive.registerAdapter(BookDataAdapter());
   await initProviders(ref);
   await getLocale(ref);
 }

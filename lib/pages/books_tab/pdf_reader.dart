@@ -41,7 +41,8 @@ class _PdfViewerState extends ConsumerState<PDFReader> {
             final bookNotifier = ref.read(bookProvider.notifier);
             final position = bookNotifier.getPosition(bookId);
             if (position == null) return;
-            _pdfController.setZoom(Offset(position.x, position.y), position.zoom);
+
+            _pdfController.setZoom(Offset(position.x, position.y), position.zoom, duration: Duration.zero);
             await bookNotifier.saveTimestamp(bookId);
           },
           onInteractionEnd: (details) async {

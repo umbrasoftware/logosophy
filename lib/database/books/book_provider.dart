@@ -2,38 +2,36 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:logging/logging.dart';
 import 'package:logosophy/database/books/book_model.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 part 'book_provider.g.dart';
 
-/// Provider responsable for holding the search history. The state is always sorted by
-/// the most recent.
+/// Provider responsable for holding the book status. The state is always sorted by
+/// the most recent. The Provider state is always sorted.
 @Riverpod(keepAlive: true)
 class BookNotifier extends _$BookNotifier {
-  final _logger = Logger('BookCache');
-  static const String prefsName = 'books';
+  final _logger = Logger('BookNotifier');
   String language = 'pt-BR';
-  late SharedPreferencesWithCache _prefs;
+  late Box<BookData> _box;
 
   late Map<String, dynamic> mappings;
   late Directory langDir;
 
   @override
   Future<List<BookData>> build() async {
+    _box = await Hive.openBox<BookData>('books');
     await _getVariables();
 
-    _prefs = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
-    final booksPrefs = _prefs.getString(prefsName);
-    if (booksPrefs == null || booksPrefs.isEmpty || booksPrefs == '{}') {
+    if (_box.isEmpty || _box.values.isEmpty) {
       return _getStateFromScratch();
     }
 
-    return _loadState(booksPrefs);
+    return _loadState();
   }
 
   /// Get the variables for this Provider to work. It assumes everything is
@@ -55,7 +53,6 @@ class BookNotifier extends _$BookNotifier {
     DateTime time = DateTime.now().subtract(const Duration(days: 180));
     final entities = langDir.listSync();
 
-    final prefs = {};
     final List<BookData> booksData = [];
 
     for (var entity in entities) {
@@ -69,117 +66,136 @@ class BookNotifier extends _$BookNotifier {
       final bookPath = entity.path;
       final coverPath = entity.path.replaceFirst('$bookId.pdf', '${bookId}_cover.png');
       final title = mappings['pt-BR']['$bookId.pdf']['title'];
-      final lastOpened = DateTime.now().toIso8601String();
+      final lastOpened = DateTime.now();
 
-      prefs[bookId] = {
-        "bookId": bookId,
-        "bookPath": bookPath,
-        "coverPath": coverPath,
-        "title": title,
-        "lastOpened": lastOpened,
-        "x": 1.0,
-        "y": 1.0,
-        "zoom": 1.0,
-      };
-
-      booksData.add(
-        BookData(
-          bookId: bookId,
-          bookPath: bookPath,
-          coverPath: coverPath,
-          title: title,
-          lastOpened: lastOpened,
-          x: 1.0,
-          y: 1.0,
-          zoom: 1.0,
-        ),
+      final book = BookData(
+        bookId: bookId,
+        bookPath: bookPath,
+        coverPath: coverPath,
+        title: title,
+        lastOpened: lastOpened,
+        x: 1.0,
+        y: 1.0,
+        zoom: 1.0,
       );
+
+      booksData.add(book);
+      _box.add(book);
 
       daysOffset++;
       time = time.subtract(Duration(days: daysOffset));
     }
 
-    await _prefs.setString(prefsName, jsonEncode(prefs));
     return booksData;
   }
 
   /// Loads and gets this Provider state from SharedPrefs.
-  Future<List<BookData>> _loadState(String booksPrefs) async {
-    _logger.info("Getting state from SharedPrefs...");
-    final Map<String, dynamic> prefsJson = json.decode(booksPrefs);
+  Future<List<BookData>> _loadState() async {
+    _logger.info("Getting state from Hive...");
     final List<BookData> newState = [];
 
-    for (final entry in prefsJson.entries) {
-      final values = entry.value;
+    for (final book in _box.values) {
       newState.add(
         BookData(
-          bookId: entry.key,
-          coverPath: values["coverPath"],
-          bookPath: values["bookPath"],
-          title: values["title"],
-          lastOpened: values["lastOpened"],
-          x: values["x"],
-          y: values["y"],
-          zoom: values["zoom"],
+          bookId: book.bookId,
+          bookPath: book.bookPath,
+          coverPath: book.coverPath,
+          title: book.title,
+          lastOpened: book.lastOpened,
+          x: book.x,
+          y: book.y,
+          zoom: book.zoom,
         ),
       );
     }
+
+    newState.sort((a, b) => b.lastOpened.compareTo(a.lastOpened));
     return newState;
   }
 
   /// Get a postition for a given `bookId`.
   BookData? getPosition(String bookId) {
-    if (state.value == null) {
-      _logger.shout('State is null while trying to get book position.');
-      return null;
-    }
-    return state.value!.firstWhere((book) => book.bookId == bookId);
+    final bookOnBox = _getBookOnState(bookId);
+    return bookOnBox?.book;
   }
 
   /// Saves the position state for the `bookId`.
   Future<void> savePosition(String bookId, double zoom, Offset offset) async {
-    _logger.info("Cheking app directory...");
-    final prefString = _prefs.getString(prefsName);
-    if (state.value == null || prefString == null) {
-      _logger.shout('State or Prefs is null while trying to save book position.');
-      return;
-    }
+    final bookInfo = _getBookOnState(bookId);
+    if (bookInfo == null) return;
 
-    // Update the SharedPrefs.
-    final prefsJson = jsonDecode(prefString);
-    final bookMap = prefsJson[bookId];
-    bookMap['zoom'] = zoom;
-    bookMap['offsetX'] = offset.dx;
-    bookMap['offsetY'] = offset.dy;
-    prefsJson[bookId] = bookMap;
-    await _prefs.setString(prefsName, jsonEncode(prefsJson));
+    int index = bookInfo.index;
+    final newBook = bookInfo.book.copyWith(zoom: zoom, x: offset.dx, y: offset.dy);
+
+    // Update the Hive box.
+    await _box.put(newBook.bookId, newBook);
 
     // Update the state.
-    final modifiableState = [...state.value!];
-    final index = modifiableState.indexWhere((book) => book.bookId == bookId);
-    if (index == -1) return;
-
-    final newBookData = modifiableState[index].copyWith(x: offset.dx, y: offset.dy, zoom: zoom);
-    modifiableState[index] = newBookData;
+    final modifiableState = [...state.requireValue];
+    modifiableState[index] = newBook;
     state = AsyncData(modifiableState);
   }
 
   /// Saves a book's Timestamp.
   Future<void> saveTimestamp(String bookId) async {
-    final data = _prefs.getString(prefsName);
-    if (data == null || !state.hasValue) {
-      _logger.severe("SharedPrefs or state is null while trying to save $bookId timestamp.");
-      return;
-    }
-    final now = DateTime.now().toIso8601String();
-    final dataJson = jsonDecode(data);
-    dataJson[bookId]['lastOpened'] = now;
-    await _prefs.setString(prefsName, jsonEncode(dataJson));
+    final bookOnState = _getBookOnState(bookId);
+    if (bookOnState == null) return;
 
-    final newState = [...state.requireValue];
-    final index = newState.indexWhere((book) => book.bookId == bookId);
-    newState[index] = newState[index].copyWith(lastOpened: now);
-    newState.sort((a, b) => DateTime.parse(b.lastOpened).compareTo(DateTime.parse(a.lastOpened)));
-    state = AsyncData(newState);
+    final now = DateTime.now();
+    final index = bookOnState.index;
+    final newBook = state.requireValue[index].copyWith(lastOpened: now);
+
+    // Updates both the box...
+    await _box.put(newBook.bookId, newBook);
+
+    // and the Provider.
+    final modifiableState = [...state.requireValue];
+    modifiableState[index] = newBook;
+    modifiableState.sort((a, b) => b.lastOpened.compareTo(a.lastOpened));
+    state = AsyncData(modifiableState);
   }
+
+  /// Returns the book index and the [BookData] object by it's bookId, if found on [state].
+  /// Null otherwise.
+  BookInfo? _getBookOnState(String bookId) {
+    if (!_isDataIntegrityOk()) return null;
+
+    for (int i = 0; i < state.requireValue.length; i++) {
+      final book = state.requireValue[i];
+      if (book.bookId == bookId) {
+        return BookInfo(i, book);
+      }
+    }
+
+    _logger.shout("Book $bookId could not be found in the box.");
+    return null;
+  }
+
+  /// Checks the data integrity for both the box and the Provider. Returns True on success.
+  /// It logs if anything goes wrong.
+  bool _isDataIntegrityOk() {
+    if (_box.isEmpty || _box.values.isEmpty) {
+      _logger.shout("The box has not been initialized yet.");
+      return false;
+    }
+
+    if (state.hasError) {
+      _logger.shout("The Provider is in '.hasError' state: ${state.error}");
+      return false;
+    }
+
+    if (state.isLoading) {
+      _logger.shout("The Provider is still loading.");
+      return false;
+    }
+
+    return true;
+  }
+}
+
+class BookInfo {
+  BookInfo(this.index, this.book);
+
+  int index;
+  BookData book;
 }

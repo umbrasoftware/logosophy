@@ -27,7 +27,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     }
 
     if (provider.hasError) {
-      return const Center(child: Text("Error in book provider."));
+      return Center(child: Text("Error in book provider: ${provider.error}"));
     }
 
     return Scaffold(

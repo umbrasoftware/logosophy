@@ -8,18 +8,18 @@ part of 'book_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Provider responsable for holding the search history. The state is always sorted by
-/// the most recent.
+/// Provider responsable for holding the book status. The state is always sorted by
+/// the most recent. It suposses both the Box and the State contains the [BookData] at the same index.
 
 @ProviderFor(BookNotifier)
 const bookProvider = BookNotifierProvider._();
 
-/// Provider responsable for holding the search history. The state is always sorted by
-/// the most recent.
+/// Provider responsable for holding the book status. The state is always sorted by
+/// the most recent. It suposses both the Box and the State contains the [BookData] at the same index.
 final class BookNotifierProvider
     extends $AsyncNotifierProvider<BookNotifier, List<BookData>> {
-  /// Provider responsable for holding the search history. The state is always sorted by
-  /// the most recent.
+  /// Provider responsable for holding the book status. The state is always sorted by
+  /// the most recent. It suposses both the Box and the State contains the [BookData] at the same index.
   const BookNotifierProvider._()
     : super(
         from: null,
@@ -39,10 +39,10 @@ final class BookNotifierProvider
   BookNotifier create() => BookNotifier();
 }
 
-String _$bookNotifierHash() => r'6033331af7d62a8d021514acacdf14e71acba925';
+String _$bookNotifierHash() => r'99dab37dac2432d1e6f4077ed8d2ad4b4edf223d';
 
-/// Provider responsable for holding the search history. The state is always sorted by
-/// the most recent.
+/// Provider responsable for holding the book status. The state is always sorted by
+/// the most recent. It suposses both the Box and the State contains the [BookData] at the same index.
 
 abstract class _$BookNotifier extends $AsyncNotifier<List<BookData>> {
   FutureOr<List<BookData>> build();

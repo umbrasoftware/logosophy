@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$BookData {
 
- String get bookId; String get coverPath; String get bookPath; String get title; String get lastOpened; double get x; double get y; double get zoom;
+@HiveField(0) String get bookId;@HiveField(1) String get coverPath;@HiveField(2) String get bookPath;@HiveField(3) String get title;@HiveField(4) DateTime get lastOpened;@HiveField(5) double get x;@HiveField(6) double get y;@HiveField(7) double get zoom;
 /// Create a copy of BookData
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $BookDataCopyWith<$Res>  {
   factory $BookDataCopyWith(BookData value, $Res Function(BookData) _then) = _$BookDataCopyWithImpl;
 @useResult
 $Res call({
- String bookId, String coverPath, String bookPath, String title, String lastOpened, double x, double y, double zoom
+@HiveField(0) String bookId,@HiveField(1) String coverPath,@HiveField(2) String bookPath,@HiveField(3) String title,@HiveField(4) DateTime lastOpened,@HiveField(5) double x,@HiveField(6) double y,@HiveField(7) double zoom
 });
 
 
@@ -72,7 +72,7 @@ as String,coverPath: null == coverPath ? _self.coverPath : coverPath // ignore: 
 as String,bookPath: null == bookPath ? _self.bookPath : bookPath // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,lastOpened: null == lastOpened ? _self.lastOpened : lastOpened // ignore: cast_nullable_to_non_nullable
-as String,x: null == x ? _self.x : x // ignore: cast_nullable_to_non_nullable
+as DateTime,x: null == x ? _self.x : x // ignore: cast_nullable_to_non_nullable
 as double,y: null == y ? _self.y : y // ignore: cast_nullable_to_non_nullable
 as double,zoom: null == zoom ? _self.zoom : zoom // ignore: cast_nullable_to_non_nullable
 as double,
@@ -160,7 +160,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String bookId,  String coverPath,  String bookPath,  String title,  String lastOpened,  double x,  double y,  double zoom)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@HiveField(0)  String bookId, @HiveField(1)  String coverPath, @HiveField(2)  String bookPath, @HiveField(3)  String title, @HiveField(4)  DateTime lastOpened, @HiveField(5)  double x, @HiveField(6)  double y, @HiveField(7)  double zoom)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _BookData() when $default != null:
 return $default(_that.bookId,_that.coverPath,_that.bookPath,_that.title,_that.lastOpened,_that.x,_that.y,_that.zoom);case _:
@@ -181,7 +181,7 @@ return $default(_that.bookId,_that.coverPath,_that.bookPath,_that.title,_that.la
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String bookId,  String coverPath,  String bookPath,  String title,  String lastOpened,  double x,  double y,  double zoom)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@HiveField(0)  String bookId, @HiveField(1)  String coverPath, @HiveField(2)  String bookPath, @HiveField(3)  String title, @HiveField(4)  DateTime lastOpened, @HiveField(5)  double x, @HiveField(6)  double y, @HiveField(7)  double zoom)  $default,) {final _that = this;
 switch (_that) {
 case _BookData():
 return $default(_that.bookId,_that.coverPath,_that.bookPath,_that.title,_that.lastOpened,_that.x,_that.y,_that.zoom);case _:
@@ -201,7 +201,7 @@ return $default(_that.bookId,_that.coverPath,_that.bookPath,_that.title,_that.la
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String bookId,  String coverPath,  String bookPath,  String title,  String lastOpened,  double x,  double y,  double zoom)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@HiveField(0)  String bookId, @HiveField(1)  String coverPath, @HiveField(2)  String bookPath, @HiveField(3)  String title, @HiveField(4)  DateTime lastOpened, @HiveField(5)  double x, @HiveField(6)  double y, @HiveField(7)  double zoom)?  $default,) {final _that = this;
 switch (_that) {
 case _BookData() when $default != null:
 return $default(_that.bookId,_that.coverPath,_that.bookPath,_that.title,_that.lastOpened,_that.x,_that.y,_that.zoom);case _:
@@ -216,17 +216,17 @@ return $default(_that.bookId,_that.coverPath,_that.bookPath,_that.title,_that.la
 @JsonSerializable()
 
 class _BookData implements BookData {
-   _BookData({required this.bookId, required this.coverPath, required this.bookPath, required this.title, required this.lastOpened, required this.x, required this.y, required this.zoom});
+   _BookData({@HiveField(0) required this.bookId, @HiveField(1) required this.coverPath, @HiveField(2) required this.bookPath, @HiveField(3) required this.title, @HiveField(4) required this.lastOpened, @HiveField(5) required this.x, @HiveField(6) required this.y, @HiveField(7) required this.zoom});
   factory _BookData.fromJson(Map<String, dynamic> json) => _$BookDataFromJson(json);
 
-@override final  String bookId;
-@override final  String coverPath;
-@override final  String bookPath;
-@override final  String title;
-@override final  String lastOpened;
-@override final  double x;
-@override final  double y;
-@override final  double zoom;
+@override@HiveField(0) final  String bookId;
+@override@HiveField(1) final  String coverPath;
+@override@HiveField(2) final  String bookPath;
+@override@HiveField(3) final  String title;
+@override@HiveField(4) final  DateTime lastOpened;
+@override@HiveField(5) final  double x;
+@override@HiveField(6) final  double y;
+@override@HiveField(7) final  double zoom;
 
 /// Create a copy of BookData
 /// with the given fields replaced by the non-null parameter values.
@@ -261,7 +261,7 @@ abstract mixin class _$BookDataCopyWith<$Res> implements $BookDataCopyWith<$Res>
   factory _$BookDataCopyWith(_BookData value, $Res Function(_BookData) _then) = __$BookDataCopyWithImpl;
 @override @useResult
 $Res call({
- String bookId, String coverPath, String bookPath, String title, String lastOpened, double x, double y, double zoom
+@HiveField(0) String bookId,@HiveField(1) String coverPath,@HiveField(2) String bookPath,@HiveField(3) String title,@HiveField(4) DateTime lastOpened,@HiveField(5) double x,@HiveField(6) double y,@HiveField(7) double zoom
 });
 
 
@@ -285,7 +285,7 @@ as String,coverPath: null == coverPath ? _self.coverPath : coverPath // ignore: 
 as String,bookPath: null == bookPath ? _self.bookPath : bookPath // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,lastOpened: null == lastOpened ? _self.lastOpened : lastOpened // ignore: cast_nullable_to_non_nullable
-as String,x: null == x ? _self.x : x // ignore: cast_nullable_to_non_nullable
+as DateTime,x: null == x ? _self.x : x // ignore: cast_nullable_to_non_nullable
 as double,y: null == y ? _self.y : y // ignore: cast_nullable_to_non_nullable
 as double,zoom: null == zoom ? _self.zoom : zoom // ignore: cast_nullable_to_non_nullable
 as double,

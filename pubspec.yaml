@@ -4,7 +4,7 @@ description: "A new Flutter project."
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev.
 
-version: 0.3.9+28
+version: 0.3.9+30
 
 environment:
   sdk: ^3.8.1
@@ -39,6 +39,7 @@ dependencies:
   archive: ^4.0.7
   firebase_core: ^4.3.0
   dio: ^5.9.0
+  hive_ce_flutter: ^2.3.4
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +53,7 @@ dev_dependencies:
   riverpod_lint: ^3.0.1
   lints: ^6.0.0
   custom_lint: ^0.8.0
+  hive_ce_generator: ^1.10.0
 
 flutter:
   uses-material-design: true
