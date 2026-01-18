@@ -44,6 +44,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
         itemBuilder: (context, index) {
           final book = provider.requireValue[index];
           return InkWell(
+            key: ValueKey(book.bookId),
             onTap: () {
               GoRouter.of(context).push('/pdfviewer', extra: ReaderArgs(book.bookPath, page: null));
             },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logosophy/database/books/book_provider.dart';
+import 'package:path/path.dart' as p;
 import 'package:pdfrx/pdfrx.dart';
 import 'package:logging/logging.dart';
 
@@ -23,7 +24,8 @@ class _PdfViewerState extends ConsumerState<PDFReader> {
 
   @override
   void initState() {
-    bookId = widget.filePath.split('/').last.replaceFirst(".pdf", "");
+    final fileName = p.basename(widget.filePath);
+    bookId = fileName.split(".")[0];
     super.initState();
   }
 
