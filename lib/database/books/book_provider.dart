@@ -80,12 +80,13 @@ class BookNotifier extends _$BookNotifier {
       );
 
       booksData.add(book);
-      _box.add(book);
+      await _box.put(book.bookId, book);
 
       daysOffset++;
       time = time.subtract(Duration(days: daysOffset));
     }
 
+    booksData.sort((a, b) => b.lastOpened.compareTo(a.lastOpened));
     return booksData;
   }
 
