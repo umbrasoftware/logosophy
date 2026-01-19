@@ -4,15 +4,24 @@
 
 import 'package:hive_ce/hive.dart';
 import 'package:logosophy/database/books/book_model.dart';
+import 'package:logosophy/database/search_history/history_model.dart';
+import 'package:logosophy/database/search_history/search_model.dart';
+import 'package:logosophy/database/settings/settings_model.dart';
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(BookDataAdapter());
+    registerAdapter(HistoryAdapter());
+    registerAdapter(SearchResultAdapter());
+    registerAdapter(SettingsAdapter());
   }
 }
 
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
     registerAdapter(BookDataAdapter());
+    registerAdapter(HistoryAdapter());
+    registerAdapter(SearchResultAdapter());
+    registerAdapter(SettingsAdapter());
   }
 }

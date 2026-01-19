@@ -124,7 +124,7 @@ class _SetupPageState extends ConsumerState<SetupPage> {
       });
 
       if (mounted) {
-        ref.watch(bookProvider);
+        await ref.watch(bookProvider.future);
         setState(() {
           _downloadProgress = 1.0;
           aDownloadWasFinished = true;

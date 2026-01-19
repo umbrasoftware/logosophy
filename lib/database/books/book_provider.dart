@@ -27,7 +27,7 @@ class BookNotifier extends _$BookNotifier {
     _box = await Hive.openBox<BookData>('books');
     await _getVariables();
 
-    if (_box.isEmpty || _box.values.isEmpty) {
+    if (_box.isEmpty) {
       return _getStateFromScratch();
     }
 
@@ -174,7 +174,7 @@ class BookNotifier extends _$BookNotifier {
   /// Checks the data integrity for both the box and the Provider. Returns True on success.
   /// It logs if anything goes wrong.
   bool _isDataIntegrityOk() {
-    if (_box.isEmpty || _box.values.isEmpty) {
+    if (_box.isEmpty) {
       _logger.shout("The box has not been initialized yet.");
       return false;
     }

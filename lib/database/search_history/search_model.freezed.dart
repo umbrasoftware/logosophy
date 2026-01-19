@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SearchResult {
 
- double get similarity; String get content;@JsonKey(readValue: _readFromMetadata) int get page;@JsonKey(name: 'book_id', readValue: _readFromMetadata) String get bookId;
+@HiveField(0) double get similarity;@HiveField(1) String get content;@HiveField(2)@JsonKey(readValue: _readFromMetadata) int get page;@HiveField(3)@JsonKey(name: 'book_id', readValue: _readFromMetadata) String get bookId;
 /// Create a copy of SearchResult
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $SearchResultCopyWith<$Res>  {
   factory $SearchResultCopyWith(SearchResult value, $Res Function(SearchResult) _then) = _$SearchResultCopyWithImpl;
 @useResult
 $Res call({
- double similarity, String content,@JsonKey(readValue: _readFromMetadata) int page,@JsonKey(name: 'book_id', readValue: _readFromMetadata) String bookId
+@HiveField(0) double similarity,@HiveField(1) String content,@HiveField(2)@JsonKey(readValue: _readFromMetadata) int page,@HiveField(3)@JsonKey(name: 'book_id', readValue: _readFromMetadata) String bookId
 });
 
 
@@ -156,7 +156,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double similarity,  String content, @JsonKey(readValue: _readFromMetadata)  int page, @JsonKey(name: 'book_id', readValue: _readFromMetadata)  String bookId)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@HiveField(0)  double similarity, @HiveField(1)  String content, @HiveField(2)@JsonKey(readValue: _readFromMetadata)  int page, @HiveField(3)@JsonKey(name: 'book_id', readValue: _readFromMetadata)  String bookId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SearchResult() when $default != null:
 return $default(_that.similarity,_that.content,_that.page,_that.bookId);case _:
@@ -177,7 +177,7 @@ return $default(_that.similarity,_that.content,_that.page,_that.bookId);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double similarity,  String content, @JsonKey(readValue: _readFromMetadata)  int page, @JsonKey(name: 'book_id', readValue: _readFromMetadata)  String bookId)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@HiveField(0)  double similarity, @HiveField(1)  String content, @HiveField(2)@JsonKey(readValue: _readFromMetadata)  int page, @HiveField(3)@JsonKey(name: 'book_id', readValue: _readFromMetadata)  String bookId)  $default,) {final _that = this;
 switch (_that) {
 case _SearchResult():
 return $default(_that.similarity,_that.content,_that.page,_that.bookId);case _:
@@ -197,7 +197,7 @@ return $default(_that.similarity,_that.content,_that.page,_that.bookId);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double similarity,  String content, @JsonKey(readValue: _readFromMetadata)  int page, @JsonKey(name: 'book_id', readValue: _readFromMetadata)  String bookId)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@HiveField(0)  double similarity, @HiveField(1)  String content, @HiveField(2)@JsonKey(readValue: _readFromMetadata)  int page, @HiveField(3)@JsonKey(name: 'book_id', readValue: _readFromMetadata)  String bookId)?  $default,) {final _that = this;
 switch (_that) {
 case _SearchResult() when $default != null:
 return $default(_that.similarity,_that.content,_that.page,_that.bookId);case _:
@@ -212,13 +212,13 @@ return $default(_that.similarity,_that.content,_that.page,_that.bookId);case _:
 @JsonSerializable()
 
 class _SearchResult implements SearchResult {
-   _SearchResult({required this.similarity, required this.content, @JsonKey(readValue: _readFromMetadata) required this.page, @JsonKey(name: 'book_id', readValue: _readFromMetadata) required this.bookId});
+   _SearchResult({@HiveField(0) required this.similarity, @HiveField(1) required this.content, @HiveField(2)@JsonKey(readValue: _readFromMetadata) required this.page, @HiveField(3)@JsonKey(name: 'book_id', readValue: _readFromMetadata) required this.bookId});
   factory _SearchResult.fromJson(Map<String, dynamic> json) => _$SearchResultFromJson(json);
 
-@override final  double similarity;
-@override final  String content;
-@override@JsonKey(readValue: _readFromMetadata) final  int page;
-@override@JsonKey(name: 'book_id', readValue: _readFromMetadata) final  String bookId;
+@override@HiveField(0) final  double similarity;
+@override@HiveField(1) final  String content;
+@override@HiveField(2)@JsonKey(readValue: _readFromMetadata) final  int page;
+@override@HiveField(3)@JsonKey(name: 'book_id', readValue: _readFromMetadata) final  String bookId;
 
 /// Create a copy of SearchResult
 /// with the given fields replaced by the non-null parameter values.
@@ -253,7 +253,7 @@ abstract mixin class _$SearchResultCopyWith<$Res> implements $SearchResultCopyWi
   factory _$SearchResultCopyWith(_SearchResult value, $Res Function(_SearchResult) _then) = __$SearchResultCopyWithImpl;
 @override @useResult
 $Res call({
- double similarity, String content,@JsonKey(readValue: _readFromMetadata) int page,@JsonKey(name: 'book_id', readValue: _readFromMetadata) String bookId
+@HiveField(0) double similarity,@HiveField(1) String content,@HiveField(2)@JsonKey(readValue: _readFromMetadata) int page,@HiveField(3)@JsonKey(name: 'book_id', readValue: _readFromMetadata) String bookId
 });
 
 

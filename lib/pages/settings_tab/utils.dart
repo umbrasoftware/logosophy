@@ -5,7 +5,7 @@ import 'package:logosophy/gen/strings.g.dart';
 
 class SettingsUtils {
   static String getLocaleName(WidgetRef ref) {
-    switch (ref.read(settingsProvider).language) {
+    switch (ref.read(settingsProvider).requireValue.language) {
       case 'pt-BR':
         return t.settingsPage.portuguese;
       case 'en':
@@ -16,7 +16,7 @@ class SettingsUtils {
   }
 
   static String getThemeName(WidgetRef ref) {
-    switch (ref.read(settingsProvider).theme) {
+    switch (ref.read(settingsProvider).requireValue.theme) {
       case 'light':
         return t.settingsPage.light;
       case 'dark':
@@ -27,7 +27,7 @@ class SettingsUtils {
   }
 
   static ThemeMode getThemeMode(WidgetRef ref) {
-    return switch (ref.watch(settingsProvider).theme) {
+    return switch (ref.watch(settingsProvider).requireValue.theme) {
       'light' => ThemeMode.light,
       'dark' => ThemeMode.dark,
       _ => ThemeMode.system,

@@ -11,7 +11,7 @@ import 'package:logosophy/database/search_history/history_provider.dart';
 import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/pdf_reader.dart';
-import 'package:logosophy/pages/search_tab/search_model.dart';
+import 'package:logosophy/database/search_history/search_model.dart';
 import 'package:logosophy/pages/search_tab/utils.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -29,15 +29,57 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   bool _isLoading = false;
   String? _errorMessage;
   late Map<String, dynamic> mappings;
+  late List<History> provider;
 
-  /// Retorna o título do livro com base no book_id, usando o mapa fornecido.
-  String _getBookTitle(String bookId) {
-    try {
-      final pdfFileName = '$bookId.pdf';
-      return mappings['pt-BR'][pdfFileName]['title'] ?? t.searchPage.unkownBook;
-    } catch (e) {
-      return t.searchPage.unkownBook;
-    }
+  @override
+  Widget build(BuildContext context) {
+    provider = ref.watch(historyProvider).requireValue;
+
+    final colorScheme = Theme.of(context).colorScheme;
+    return FutureBuilder(
+      future: getMappings(),
+      builder: (context, asyncSnapshot) {
+        return Scaffold(
+          appBar: AppBar(title: Text(t.navBar.search)),
+          drawer: _buildDrawer(),
+          body: _buildBody(colorScheme),
+        );
+      },
+    );
+  }
+
+  Padding _buildBody(ColorScheme colorScheme) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              labelText: t.searchPage.typeYourSearch,
+              labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+              suffixIcon: IconButton(
+                icon: Icon(Icons.search, color: colorScheme.onSurface),
+                onPressed: () => _performSearch(_searchController.text),
+              ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: BorderSide(color: colorScheme.outline),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: BorderSide(color: colorScheme.primary, width: 2),
+              ),
+            ),
+            style: TextStyle(color: colorScheme.onSurface),
+            onSubmitted: (value) => _performSearch(value),
+          ),
+          const SizedBox(height: 20),
+          Expanded(child: _buildResultsView(colorScheme)),
+        ],
+      ),
+    );
   }
 
   /// Performs the search.
@@ -60,7 +102,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       final data = List<Map<String, dynamic>>.from(queryResults!);
       final results = data.map((item) => SearchResult.fromJson(item)).toList();
 
-      final history = History(query: query, timestamp: DateTime.now().toIso8601String(), results: results);
+      final history = History(query: query, timestamp: DateTime.now(), results: results);
       await ref.read(historyProvider.notifier).addHistory(history);
 
       setState(() {
@@ -75,61 +117,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         _isLoading = false;
       });
     }
-  }
-
-  Future<void> getMappings() async {
-    final appDir = await getApplicationDocumentsDirectory();
-    final booksDir = Directory(p.join(appDir.path, 'books'));
-    final mappingsFile = File(p.join(booksDir.path, 'mappings.json'));
-
-    final content = await mappingsFile.readAsString();
-    mappings = jsonDecode(content);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return FutureBuilder(
-      future: getMappings(),
-      builder: (context, asyncSnapshot) {
-        return Scaffold(
-          appBar: AppBar(title: Text(t.navBar.search)),
-          drawer: _buildDrawer(),
-          body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    labelText: t.searchPage.typeYourSearch,
-                    labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
-                    suffixIcon: IconButton(
-                      icon: Icon(Icons.search, color: colorScheme.onSurface),
-                      onPressed: () => _performSearch(_searchController.text),
-                    ),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(color: colorScheme.outline),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(color: colorScheme.primary, width: 2),
-                    ),
-                  ),
-                  style: TextStyle(color: colorScheme.onSurface),
-                  onSubmitted: (value) => _performSearch(value),
-                ),
-                const SizedBox(height: 20),
-                Expanded(child: _buildResultsView(colorScheme)),
-              ],
-            ),
-          ),
-        );
-      },
-    );
   }
 
   Widget _buildResultsView(ColorScheme colorScheme) {
@@ -159,7 +146,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       itemCount: _searchResults.length,
       itemBuilder: (context, index) {
         final result = _searchResults[index];
-        final bookTitle = _getBookTitle(result.bookId);
+        final bookTitle = SearchUtils.getBookTitle(result.bookId, mappings);
 
         return GestureDetector(
           onTap: () async {
@@ -226,7 +213,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 Icon(Icons.history, color: colorScheme.primary),
                 const SizedBox(width: 4),
                 Text(
-                  "Histórico de pesquisa",
+                  t.searchPage.searchHistory,
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: colorScheme.onSurface),
                 ),
                 const SizedBox(width: 12),
@@ -241,56 +228,63 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             ),
           ),
           Expanded(
-            child: ref.watch(historyProvider).isEmpty
+            child: provider.isEmpty
                 ? Center(
-                    child: Text("Sem histórico ainda", style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                    child: Text(t.searchPage.noHistoryYet, style: TextStyle(color: colorScheme.onSurfaceVariant)),
                   )
-                : ListView.builder(
-                    padding: EdgeInsets.zero,
-                    itemCount: ref.watch(historyProvider).length,
-                    itemBuilder: (context, index) {
-                      final item = ref.read(historyProvider)[index];
-                      return ListTile(
-                        title: Text(
-                          _formatDate(item.timestamp, item),
-                          style: TextStyle(fontSize: 13, color: colorScheme.outline),
-                        ),
-                        subtitle: Text(
-                          item.query,
-                          style: TextStyle(fontSize: 15, color: colorScheme.onSurface, fontWeight: FontWeight.w500),
-                        ),
-                        trailing: IconButton(
-                          icon: Icon(Icons.close, size: 20, color: Colors.red),
-                          onPressed: () async {
-                            await ref.read(historyProvider.notifier).deleteHistoryItem(item.timestamp);
-                          },
-                        ),
-                        onTap: () {
-                          _searchController.text = item.query;
-                          setState(() {
-                            _searchResults = item.results;
-                          });
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
+                : _buildSearchWidgets(colorScheme),
           ),
         ],
       ),
     );
   }
 
-  String _formatDate(String isoString, History item) {
-    final date = DateFormat(
-      DateFormat.ABBR_MONTH_WEEKDAY_DAY,
-      ref.watch(settingsProvider).language,
-    ).format(DateTime.parse(item.timestamp));
+  ListView _buildSearchWidgets(ColorScheme colorScheme) {
+    return ListView.builder(
+      padding: EdgeInsets.zero,
+      itemCount: provider.length,
+      itemBuilder: (context, index) {
+        final item = provider[index];
+        return ListTile(
+          title: Text(_formatDate(item), style: TextStyle(fontSize: 13, color: colorScheme.outline)),
+          subtitle: Text(
+            item.query,
+            style: TextStyle(fontSize: 15, color: colorScheme.onSurface, fontWeight: FontWeight.w500),
+          ),
+          trailing: IconButton(
+            icon: Icon(Icons.close, size: 20, color: Colors.red),
+            onPressed: () async {
+              await ref.read(historyProvider.notifier).deleteHistoryItem(item.timestamp);
+            },
+          ),
+          onTap: () {
+            _searchController.text = item.query;
+            setState(() {
+              _searchResults = item.results;
+            });
+            Navigator.pop(context);
+          },
+        );
+      },
+    );
+  }
 
-    final time = DateFormat(
-      DateFormat.HOUR24_MINUTE,
-      ref.watch(settingsProvider).language,
-    ).format(DateTime.parse(item.timestamp));
+  /// Gets the book mappings from storage.
+  Future<void> getMappings() async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final booksDir = Directory(p.join(appDir.path, 'books'));
+    final mappingsFile = File(p.join(booksDir.path, 'mappings.json'));
+
+    final content = await mappingsFile.readAsString();
+    mappings = jsonDecode(content);
+  }
+
+  /// Formats the date for display, given a [History] item.
+  String _formatDate(History item) {
+    final language = ref.watch(settingsProvider).requireValue.language;
+
+    final date = DateFormat(DateFormat.ABBR_MONTH_WEEKDAY_DAY, language).format(item.timestamp);
+    final time = DateFormat(DateFormat.HOUR24_MINUTE, language).format(item.timestamp);
 
     return "$date $time";
   }

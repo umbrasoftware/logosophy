@@ -59,7 +59,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         return AlertDialog(
           title: Text(t.settingsPage.selectLanguage),
           content: RadioGroup<String>(
-            groupValue: ref.watch(settingsProvider).language,
+            groupValue: ref.watch(settingsProvider).requireValue.language,
             onChanged: (String? value) async {
               if (value != null) {
                 await _changeLocale(context, value);
@@ -93,7 +93,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       builder: (context) => AlertDialog(
         title: Text(t.settingsPage.selectTheme),
         content: RadioGroup<String>(
-          groupValue: ref.watch(settingsProvider).theme,
+          groupValue: ref.watch(settingsProvider).requireValue.theme,
           onChanged: (String? value) async {
             if (value != null) {
               await ref.read(settingsProvider.notifier).changeTheme(value);

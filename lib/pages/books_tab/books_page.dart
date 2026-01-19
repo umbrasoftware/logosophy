@@ -7,7 +7,6 @@ import 'package:logging/logging.dart';
 import 'package:logosophy/database/books/book_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/pdf_reader.dart';
-import 'package:logosophy/pages/splash_pages/animated_logo.dart';
 
 class BooksPage extends ConsumerStatefulWidget {
   const BooksPage({super.key});
@@ -21,14 +20,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = ref.watch(bookProvider);
-    if (provider.isLoading) {
-      return const Center(child: BreathingLogo());
-    }
-
-    if (provider.hasError) {
-      return Center(child: Text("Error in book provider: ${provider.error}"));
-    }
+    final provider = ref.watch(bookProvider).requireValue;
 
     return Scaffold(
       appBar: AppBar(title: Text(t.navBar.books)),
@@ -40,9 +32,9 @@ class _BooksPageState extends ConsumerState<BooksPage> {
           mainAxisSpacing: 8.0,
           childAspectRatio: 0.7,
         ),
-        itemCount: provider.requireValue.length,
+        itemCount: provider.length,
         itemBuilder: (context, index) {
-          final book = provider.requireValue[index];
+          final book = provider[index];
           return InkWell(
             key: ValueKey(book.bookId),
             onTap: () {

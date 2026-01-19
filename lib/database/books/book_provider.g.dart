@@ -9,17 +9,17 @@ part of 'book_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Provider responsable for holding the book status. The state is always sorted by
-/// the most recent. It suposses both the Box and the State contains the [BookData] at the same index.
+/// the most recent. The Provider state is always sorted.
 
 @ProviderFor(BookNotifier)
 const bookProvider = BookNotifierProvider._();
 
 /// Provider responsable for holding the book status. The state is always sorted by
-/// the most recent. It suposses both the Box and the State contains the [BookData] at the same index.
+/// the most recent. The Provider state is always sorted.
 final class BookNotifierProvider
     extends $AsyncNotifierProvider<BookNotifier, List<BookData>> {
   /// Provider responsable for holding the book status. The state is always sorted by
-  /// the most recent. It suposses both the Box and the State contains the [BookData] at the same index.
+  /// the most recent. The Provider state is always sorted.
   const BookNotifierProvider._()
     : super(
         from: null,
@@ -39,10 +39,10 @@ final class BookNotifierProvider
   BookNotifier create() => BookNotifier();
 }
 
-String _$bookNotifierHash() => r'99dab37dac2432d1e6f4077ed8d2ad4b4edf223d';
+String _$bookNotifierHash() => r'3734773b1d613273dfac3960c9436ce171e1f9ff';
 
 /// Provider responsable for holding the book status. The state is always sorted by
-/// the most recent. It suposses both the Box and the State contains the [BookData] at the same index.
+/// the most recent. The Provider state is always sorted.
 
 abstract class _$BookNotifier extends $AsyncNotifier<List<BookData>> {
   FutureOr<List<BookData>> build();

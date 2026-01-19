@@ -1,10 +1,7 @@
-import 'dart:convert';
-
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:logging/logging.dart';
 import 'package:logosophy/database/search_history/history_model.dart';
-import 'package:logosophy/pages/search_tab/search_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 part 'history_provider.g.dart';
 
@@ -13,138 +10,81 @@ part 'history_provider.g.dart';
 @Riverpod(keepAlive: true)
 class HistoryNotifier extends _$HistoryNotifier {
   final _logger = Logger('HistoryNotifier');
-  static const String prefsName = 'history';
   static const int maxHistory = 20;
-  late SharedPreferencesWithCache _prefs;
+  late Box<History> _box;
 
   @override
-  List<History> build() {
-    return [];
-  }
-
-  /// Initializes the provider. Must be called before everything else.
-  Future<void> init() async {
-    _prefs = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
-    final history = _prefs.getStringList(prefsName);
-
-    if (history == null || history.isEmpty) {
-      await _prefs.setStringList(prefsName, []);
+  Future<List<History>> build() async {
+    _box = await Hive.openBox<History>('history');
+    if (_box.isEmpty) {
+      return [];
     } else {
-      await _setPrefsIntoState(history);
+      return _getState();
     }
   }
 
-  /// Receives a history already decoded in JSON, sorts it and sets into the state.
-  Future<void> _setPrefsIntoState(List<String> historyPrefs) async {
-    try {
-      List<History> newState = [];
-      for (final entry in historyPrefs) {
-        final entryDecoded = jsonDecode(entry);
-        final query = entryDecoded["query"];
-        final timestamp = entryDecoded["timestamp"];
-
-        final List<SearchResult> results = [];
-        for (final result in entryDecoded["results"]) {
-          final resultMap = jsonDecode(result);
-          results.add(
-            SearchResult(
-              similarity: resultMap["similarity"] as double,
-              content: resultMap["content"] as String,
-              page: resultMap["page"] as int,
-              bookId: resultMap["bookId"] as String,
-            ),
-          );
-        }
-
-        newState.add(History(query: query, timestamp: timestamp, results: results));
-      }
-      newState.sort((a, b) => DateTime.parse(b.timestamp).compareTo(DateTime.parse(a.timestamp)));
-      state = newState;
-    } catch (e) {
-      _logger.shout("Error setting Prefs into state: $e");
-      rethrow;
+  /// Gets the state from the Hive box.
+  Future<List<History>> _getState() async {
+    List<History> newState = [];
+    for (final history in _box.values) {
+      newState.add(history);
     }
+    newState.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    return newState;
   }
 
   /// Add a new [History] into the history.
   Future<void> addHistory(History result) async {
-    final history = _prefs.getStringList(prefsName);
-    if (history == null) {
-      _logger.severe("Prefs was null while trying to add to history.");
-      return;
+    if (!_isDataIntegrityOk()) return;
+    if (state.requireValue.any((e) => e.query == result.query)) return;
+
+    final modifiableState = [...state.requireValue];
+    while (_box.length >= maxHistory) {
+      // Sort to find the oldest
+      final historyInBox = _box.values.toList();
+      historyInBox.sort((a, b) => a.timestamp.compareTo(b.timestamp)); // Oldest first
+      final oldestItem = historyInBox.first;
+
+      await _box.delete(oldestItem.timestamp.toIso8601String());
+      modifiableState.removeWhere((e) => e.timestamp == oldestItem.timestamp);
     }
 
-    if (history.length == maxHistory) {
-      history.removeLast();
-    }
+    await _box.put(result.timestamp.toIso8601String(), result);
+    modifiableState.add(result);
+    modifiableState.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
-    // Check if this query already exists.
-    if (state.any((e) => e.query == result.query)) return;
-
-    final resultJson = <String, dynamic>{};
-    resultJson["query"] = result.query;
-    resultJson["timestamp"] = result.timestamp;
-
-    final List<Map<String, dynamic>> resultsInJson = [];
-    for (final entry in result.results) {
-      final entryMap = {
-        "similarity": entry.similarity,
-        "content": entry.content,
-        "page": entry.page,
-        "bookId": entry.bookId,
-      };
-      resultsInJson.add(entryMap);
-    }
-    resultJson["results"] = resultsInJson;
-    history.add(jsonEncode(resultJson));
-
-    // Settings the states and sorting.
-    await _prefs.setStringList(prefsName, history);
-    state = [...state, result];
-    await _sortAndSet();
+    state = AsyncData(modifiableState);
   }
 
-  /// Sorts and saves the data on SharedPreferences and the Provider state.
-  Future<void> _sortAndSet() async {
-    // Sorts the history list of Strings and set its to the Prefs.
-    final historyPrefs = _prefs.getStringList(prefsName);
-    if (historyPrefs == null || historyPrefs.isEmpty) {
-      _logger.shout("History on SharedPrefs is null or empty while trying to sort.");
-      return;
-    }
+  /// Delete a [History] from the history.
+  Future<void> deleteHistoryItem(DateTime timestamp) async {
+    if (!_isDataIntegrityOk()) return;
 
-    historyPrefs.sort((a, b) {
-      final aJson = jsonDecode(a);
-      final bJson = jsonDecode(b);
-      return DateTime.parse(bJson["timestamp"]).compareTo(DateTime.parse(aJson["timestamp"]));
-    });
-    await _prefs.setStringList(prefsName, historyPrefs);
+    await _box.delete(timestamp.toIso8601String());
 
-    // Sorts the history objects and set its to the state.
-    final historyObjs = [...state];
-    historyObjs.sort((a, b) => DateTime.parse(b.timestamp).compareTo(DateTime.parse(a.timestamp)));
-    state = [...historyObjs];
+    final modifiableState = [...state.requireValue];
+    modifiableState.removeWhere((item) => item.timestamp == timestamp);
+    state = AsyncData(modifiableState);
   }
 
-  /// Delete a [History] from the history and updates the SharedPrefs and Provider state.
-  Future<void> deleteHistoryItem(String timestamp) async {
-    final history = _prefs.getStringList(prefsName);
-    if (history == null || history.isEmpty) {
-      _logger.severe("Prefs was null while trying to delete a history.");
-      return;
-    }
-
-    history.removeWhere((item) => item.contains(timestamp));
-    await _prefs.setStringList(prefsName, history);
-
-    final historyObjs = [...state];
-    historyObjs.removeWhere((item) => item.timestamp == timestamp);
-    state = historyObjs;
-  }
-
-  /// Clear this Prefs data.
+  /// Clear this box data.
   Future<void> clear() async {
-    await _prefs.setStringList(prefsName, []);
-    state = [];
+    await _box.clear();
+    state = AsyncData([]);
+  }
+
+  /// Verifies the Provider state.
+  bool _isDataIntegrityOk() {
+    if (state.hasError) {
+      _logger.shout("The Provider is in '.hasError' state: ${state.error}");
+      return false;
+    }
+
+    if (state.isLoading) {
+      _logger.shout("The Provider is still loading.");
+      return false;
+    }
+
+    return true;
   }
 }

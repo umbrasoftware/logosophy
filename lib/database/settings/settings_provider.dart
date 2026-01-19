@@ -1,81 +1,91 @@
-import 'dart:convert';
-
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:logging/logging.dart';
 import 'package:logosophy/database/settings/settings_model.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 part 'settings_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 class SettingsNotifier extends _$SettingsNotifier {
   final _logger = Logger('SettingsNotifier');
-  static const String prefsName = 'settings';
-  late SharedPreferencesWithCache _prefs;
+  late Box<Settings> _box;
+  static const String _key = 'app_settings';
 
   @override
-  Settings build() {
-    return Settings.fromJson({});
+  Future<Settings> build() async {
+    _box = await Hive.openBox<Settings>('settings');
+
+    if (_box.isEmpty) {
+      return _getDefaultConfigs();
+    } else {
+      return _getState();
+    }
   }
 
-  /// Initializes the provider. Must be called before everything else.
-  Future<void> init() async {
-    try {
-      _prefs = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
-      final diskData = _prefs.getString(prefsName);
+  /// Get the default [Settings] config.
+  Future<Settings> _getDefaultConfigs() async {
+    final deviceLocale = LocaleSettings.useDeviceLocaleSync();
+    final settings = Settings(language: deviceLocale.languageCode);
 
-      if (diskData == null) {
-        final defaultConfig = _getDefaultConfigs();
-        await _prefs.setString(prefsName, json.encode(defaultConfig));
-        state = Settings.fromJson(defaultConfig);
-      } else {
-        final decoded = json.decode(diskData);
-        state = Settings.fromJson(decoded);
-      }
-    } catch (e, st) {
-      _logger.severe("ERROR in SettingsNotifier.init(): $e");
-      _logger.severe("StackTrace: $st");
-      rethrow;
+    await _box.put(_key, settings);
+    return settings;
+  }
+
+  /// Get the state from the Hive box.
+  Settings _getState() {
+    if (!_isDataIntegrityOk()) return Settings(language: 'pt-BR');
+
+    final settings = _box.get(_key);
+    if (settings == null) {
+      _logger.shout("Settings from Hive is null despite data integrity passed.");
+      return Settings(language: 'pt-BR');
     }
+
+    return settings;
   }
 
   /// Changes the language in the provider and SharedPreferences.
   Future<void> changeLanguage(String language) async {
-    final settings = _prefs.getString(prefsName);
-    if (settings == null) {
-      _logger.shout("Prefs on disk is null while trying to change language.");
-      return;
-    }
+    if (!_isDataIntegrityOk()) return;
 
-    final jsonData = json.decode(settings);
-    jsonData["language"] = language;
-    await _prefs.setString(prefsName, json.encode(jsonData));
+    final current = state.requireValue;
+    final newSettings = current.copyWith(language: language);
     await LocaleSettings.setLocaleRaw(language);
 
-    state = state.copyWith(language: language);
+    await _box.put(_key, newSettings);
+    state = AsyncData(newSettings);
   }
 
   /// Changes the theme in the provider and SharedPreferences.
   Future<void> changeTheme(String theme) async {
-    final settings = _prefs.getString(prefsName);
-    if (settings == null) {
-      _logger.shout("Prefs on disk is null while trying to change theme.");
-      return;
-    }
+    if (!_isDataIntegrityOk()) return;
 
-    final jsonObj = json.decode(settings);
-    jsonObj["theme"] = theme;
-    await _prefs.setString(prefsName, json.encode(jsonObj));
+    final current = state.requireValue;
+    final newSettings = current.copyWith(theme: theme);
 
-    state = state.copyWith(theme: theme);
+    await _box.put(_key, newSettings);
+    state = AsyncData(newSettings);
   }
 
-  /// Get the default configuration. Locale is get by what is being used in the device.
-  Map<String, dynamic> _getDefaultConfigs() {
-    final deviceLocale = LocaleSettings.useDeviceLocaleSync();
-    final settings = {"language": deviceLocale.languageCode, "theme": 'system', "overrideBookState": false};
+  /// Checks the data integrity for both the box and the Provider. Returns True on success.
+  /// It logs if anything goes wrong.
+  bool _isDataIntegrityOk() {
+    if (_box.isEmpty) {
+      _logger.shout("The box has not been initialized yet.");
+      return false;
+    }
 
-    return settings;
+    if (state.hasError) {
+      _logger.shout("The Provider is in '.hasError' state: ${state.error}");
+      return false;
+    }
+
+    if (state.isLoading) {
+      _logger.shout("The Provider is still loading.");
+      return false;
+    }
+
+    return true;
   }
 }

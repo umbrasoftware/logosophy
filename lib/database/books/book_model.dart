@@ -5,7 +5,7 @@ part 'book_model.freezed.dart';
 part 'book_model.g.dart';
 
 @freezed
-@HiveType(typeId: 0) // 1. Add HiveType with a unique ID
+@HiveType(typeId: 0)
 abstract class BookData with _$BookData {
   factory BookData({
     @HiveField(0) required final String bookId,

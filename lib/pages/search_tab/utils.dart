@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
+import 'package:logosophy/gen/strings.g.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SearchUtils {
@@ -52,5 +53,11 @@ class SearchUtils {
       _logger.warning('Error calling search: ${response.statusCode}: ${response.body}');
       return null;
     }
+  }
+
+  /// Returns the book title given the `bookId`.
+  static String getBookTitle(String bookId, Map<dynamic, dynamic> mappings) {
+    final pdfFileName = '$bookId.pdf';
+    return mappings['pt-BR'][pdfFileName]['title'] ?? t.searchPage.unkownBook;
   }
 }

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Settings {
 
- String get language; String get theme; bool get overrideBookState;
+@HiveField(0) String get language;@HiveField(1) String get theme;
 /// Create a copy of Settings
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $SettingsCopyWith<Settings> get copyWith => _$SettingsCopyWithImpl<Settings>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Settings&&(identical(other.language, language) || other.language == language)&&(identical(other.theme, theme) || other.theme == theme)&&(identical(other.overrideBookState, overrideBookState) || other.overrideBookState == overrideBookState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Settings&&(identical(other.language, language) || other.language == language)&&(identical(other.theme, theme) || other.theme == theme));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,language,theme,overrideBookState);
+int get hashCode => Object.hash(runtimeType,language,theme);
 
 @override
 String toString() {
-  return 'Settings(language: $language, theme: $theme, overrideBookState: $overrideBookState)';
+  return 'Settings(language: $language, theme: $theme)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $SettingsCopyWith<$Res>  {
   factory $SettingsCopyWith(Settings value, $Res Function(Settings) _then) = _$SettingsCopyWithImpl;
 @useResult
 $Res call({
- String language, String theme, bool overrideBookState
+@HiveField(0) String language,@HiveField(1) String theme
 });
 
 
@@ -65,12 +65,11 @@ class _$SettingsCopyWithImpl<$Res>
 
 /// Create a copy of Settings
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? language = null,Object? theme = null,Object? overrideBookState = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? language = null,Object? theme = null,}) {
   return _then(_self.copyWith(
 language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
 as String,theme: null == theme ? _self.theme : theme // ignore: cast_nullable_to_non_nullable
-as String,overrideBookState: null == overrideBookState ? _self.overrideBookState : overrideBookState // ignore: cast_nullable_to_non_nullable
-as bool,
+as String,
   ));
 }
 
@@ -155,10 +154,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String language,  String theme,  bool overrideBookState)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@HiveField(0)  String language, @HiveField(1)  String theme)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Settings() when $default != null:
-return $default(_that.language,_that.theme,_that.overrideBookState);case _:
+return $default(_that.language,_that.theme);case _:
   return orElse();
 
 }
@@ -176,10 +175,10 @@ return $default(_that.language,_that.theme,_that.overrideBookState);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String language,  String theme,  bool overrideBookState)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@HiveField(0)  String language, @HiveField(1)  String theme)  $default,) {final _that = this;
 switch (_that) {
 case _Settings():
-return $default(_that.language,_that.theme,_that.overrideBookState);case _:
+return $default(_that.language,_that.theme);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +195,10 @@ return $default(_that.language,_that.theme,_that.overrideBookState);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String language,  String theme,  bool overrideBookState)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@HiveField(0)  String language, @HiveField(1)  String theme)?  $default,) {final _that = this;
 switch (_that) {
 case _Settings() when $default != null:
-return $default(_that.language,_that.theme,_that.overrideBookState);case _:
+return $default(_that.language,_that.theme);case _:
   return null;
 
 }
@@ -211,12 +210,11 @@ return $default(_that.language,_that.theme,_that.overrideBookState);case _:
 @JsonSerializable()
 
 class _Settings implements Settings {
-   _Settings({this.language = '', this.theme = 'system', this.overrideBookState = false});
+   _Settings({@HiveField(0) required this.language, @HiveField(1) this.theme = 'system'});
   factory _Settings.fromJson(Map<String, dynamic> json) => _$SettingsFromJson(json);
 
-@override@JsonKey() final  String language;
-@override@JsonKey() final  String theme;
-@override@JsonKey() final  bool overrideBookState;
+@override@HiveField(0) final  String language;
+@override@JsonKey()@HiveField(1) final  String theme;
 
 /// Create a copy of Settings
 /// with the given fields replaced by the non-null parameter values.
@@ -231,16 +229,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Settings&&(identical(other.language, language) || other.language == language)&&(identical(other.theme, theme) || other.theme == theme)&&(identical(other.overrideBookState, overrideBookState) || other.overrideBookState == overrideBookState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Settings&&(identical(other.language, language) || other.language == language)&&(identical(other.theme, theme) || other.theme == theme));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,language,theme,overrideBookState);
+int get hashCode => Object.hash(runtimeType,language,theme);
 
 @override
 String toString() {
-  return 'Settings(language: $language, theme: $theme, overrideBookState: $overrideBookState)';
+  return 'Settings(language: $language, theme: $theme)';
 }
 
 
@@ -251,7 +249,7 @@ abstract mixin class _$SettingsCopyWith<$Res> implements $SettingsCopyWith<$Res>
   factory _$SettingsCopyWith(_Settings value, $Res Function(_Settings) _then) = __$SettingsCopyWithImpl;
 @override @useResult
 $Res call({
- String language, String theme, bool overrideBookState
+@HiveField(0) String language,@HiveField(1) String theme
 });
 
 
@@ -268,12 +266,11 @@ class __$SettingsCopyWithImpl<$Res>
 
 /// Create a copy of Settings
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? language = null,Object? theme = null,Object? overrideBookState = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? language = null,Object? theme = null,}) {
   return _then(_Settings(
 language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
 as String,theme: null == theme ? _self.theme : theme // ignore: cast_nullable_to_non_nullable
-as String,overrideBookState: null == overrideBookState ? _self.overrideBookState : overrideBookState // ignore: cast_nullable_to_non_nullable
-as bool,
+as String,
   ));
 }
 

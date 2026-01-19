@@ -17,7 +17,7 @@ const historyProvider = HistoryNotifierProvider._();
 /// Provider responsable for holding the search history. The state is always sorted by
 /// the most recent.
 final class HistoryNotifierProvider
-    extends $NotifierProvider<HistoryNotifier, List<History>> {
+    extends $AsyncNotifierProvider<HistoryNotifier, List<History>> {
   /// Provider responsable for holding the search history. The state is always sorted by
   /// the most recent.
   const HistoryNotifierProvider._()
@@ -37,33 +37,25 @@ final class HistoryNotifierProvider
   @$internal
   @override
   HistoryNotifier create() => HistoryNotifier();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(List<History> value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<List<History>>(value),
-    );
-  }
 }
 
-String _$historyNotifierHash() => r'696f14c44173dd7927be4d74fcfb8561b57585f7';
+String _$historyNotifierHash() => r'4da602dc550fc48715833f158acc10f21fe378d9';
 
 /// Provider responsable for holding the search history. The state is always sorted by
 /// the most recent.
 
-abstract class _$HistoryNotifier extends $Notifier<List<History>> {
-  List<History> build();
+abstract class _$HistoryNotifier extends $AsyncNotifier<List<History>> {
+  FutureOr<List<History>> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<List<History>, List<History>>;
+    final ref = this.ref as $Ref<AsyncValue<List<History>>, List<History>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<List<History>, List<History>>,
-              List<History>,
+              AnyNotifier<AsyncValue<List<History>>, List<History>>,
+              AsyncValue<List<History>>,
               Object?,
               Object?
             >;

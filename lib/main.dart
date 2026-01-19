@@ -9,10 +9,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:logging/logging.dart';
 import 'package:logosophy/database/books/book_model.dart';
+import 'package:logosophy/database/search_history/history_model.dart';
 import 'package:logosophy/database/search_history/history_provider.dart';
+import 'package:logosophy/database/settings/settings_model.dart';
 import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/firebase_options.dart';
 import 'package:logosophy/gen/strings.g.dart';
+import 'package:logosophy/database/search_history/search_model.dart';
 import 'package:logosophy/pages/settings_tab/utils.dart';
 import 'package:logosophy/pages/splash_pages/animated_logo.dart';
 import 'package:logosophy/router.dart';
@@ -60,10 +63,7 @@ class _AppState extends ConsumerState<App> {
       future: _initializationFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return const Directionality(
-            textDirection: TextDirection.ltr,
-            child: Material(child: Center(child: BreathingLogo())),
-          );
+          return Material(child: Center(child: BreathingLogo()));
         }
         return MaterialApp.router(
           title: 'Logosofia',
@@ -92,18 +92,25 @@ void setupLogging() {
   });
 }
 
+/// Do the required app initialization procedures.
 Future<void> initApp(WidgetRef ref) async {
   Hive.registerAdapter(BookDataAdapter());
+  Hive.registerAdapter(HistoryAdapter());
+  Hive.registerAdapter(SearchResultAdapter());
+  Hive.registerAdapter(SettingsAdapter());
+
   await initProviders(ref);
   await getLocale(ref);
 }
 
+/// Force the initialization of Providers by watching them.
 Future<void> initProviders(WidgetRef ref) async {
-  await ref.read(settingsProvider.notifier).init();
-  await ref.read(historyProvider.notifier).init();
+  await ref.read(settingsProvider.future);
+  await ref.read(historyProvider.future);
 }
 
+/// Get the device language.
 Future<void> getLocale(WidgetRef ref) async {
-  final locale = ref.read(settingsProvider).language;
+  final locale = ref.read(settingsProvider).requireValue.language;
   await LocaleSettings.setLocaleRaw(locale, listenToDeviceLocale: true);
 }

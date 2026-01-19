@@ -290,8 +290,8 @@ class TranslationsSearchPageEn {
 	/// en: 'Search history'
 	String get searchHistory => 'Search history';
 
-	/// en: 'Not history yet'
-	String get noHistoryYet => 'Not history yet';
+	/// en: 'No search history yet'
+	String get noHistoryYet => 'No search history yet';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -365,7 +365,7 @@ extension on Translations {
 			'searchPage.startSearch' => 'Type something to start your search',
 			'searchPage.noResultFound' => 'No results found',
 			'searchPage.searchHistory' => 'Search history',
-			'searchPage.noHistoryYet' => 'Not history yet',
+			'searchPage.noHistoryYet' => 'No search history yet',
 			_ => null,
 		};
 	}
