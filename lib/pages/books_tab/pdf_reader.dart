@@ -54,6 +54,8 @@ class _PdfViewerState extends ConsumerState<PDFReader> {
             final offset = _pdfController.centerPosition;
             await ref.read(bookProvider.notifier).savePosition(bookId, zoom, offset);
           },
+          scrollPhysics: FixedOverscrollPhysics(maxOverscroll: 100),
+          scrollPhysicsScale: BouncingScrollPhysics(),
         ),
       ),
     );

@@ -5,7 +5,7 @@ import 'package:logosophy/gen/strings.g.dart';
 
 class SettingsUtils {
   static String getLocaleName(WidgetRef ref) {
-    switch (ref.read(settingsProvider).requireValue.language) {
+    switch (ref.watch(settingsProvider).requireValue.language) {
       case 'pt-BR':
         return t.settingsPage.portuguese;
       case 'en':

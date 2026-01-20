@@ -209,16 +209,19 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             decoration: BoxDecoration(color: colorScheme.surfaceContainer),
             padding: const EdgeInsets.fromLTRB(16, 50, 16, 16),
             child: Row(
+              mainAxisAlignment: .spaceBetween,
+              crossAxisAlignment: .end,
               children: [
                 Icon(Icons.history, color: colorScheme.primary),
-                const SizedBox(width: 4),
+                const SizedBox(width: 4.0),
                 Text(
                   t.searchPage.searchHistory,
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: colorScheme.onSurface),
                 ),
-                const SizedBox(width: 12),
+                Spacer(),
                 IconButton(
                   icon: const Icon(Icons.delete),
+                  iconSize: 28,
                   color: Colors.red,
                   onPressed: () async {
                     await ref.read(historyProvider.notifier).clear();
