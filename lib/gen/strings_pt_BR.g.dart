@@ -161,6 +161,7 @@ class _TranslationsSearchPagePtBr implements TranslationsSearchPageEn {
 	@override String get noResultFound => 'Nenhum resultado encontrado';
 	@override String get searchHistory => 'Histórico de pesquisa';
 	@override String get noHistoryYet => 'Sem histórico de pesquisa ainda';
+	@override String get search => 'Pesquisar...';
 }
 
 /// The flat map containing all translations for locale <pt-BR>.
@@ -235,6 +236,7 @@ extension on TranslationsPtBr {
 			'searchPage.noResultFound' => 'Nenhum resultado encontrado',
 			'searchPage.searchHistory' => 'Histórico de pesquisa',
 			'searchPage.noHistoryYet' => 'Sem histórico de pesquisa ainda',
+			'searchPage.search' => 'Pesquisar...',
 			_ => null,
 		};
 	}

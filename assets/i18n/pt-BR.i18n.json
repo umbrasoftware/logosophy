@@ -73,6 +73,7 @@
         "startSearch": "Digite algo para iniciar a busca",
         "noResultFound": "Nenhum resultado encontrado",
         "searchHistory": "Histórico de pesquisa",
-        "noHistoryYet": "Sem histórico de pesquisa ainda"
+        "noHistoryYet": "Sem histórico de pesquisa ainda",
+        "search": "Pesquisar..."
     }
 }

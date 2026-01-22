@@ -15,7 +15,13 @@ final GoRouter router = GoRouter(
   initialLocation: '/loading',
   routes: [
     GoRoute(path: '/loading', builder: (context, state) => const SetupPage()),
-    StatefulShellRoute.indexedStack(
+    StatefulShellRoute(
+      navigatorContainerBuilder: (context, navigationShell, children) {
+        return _SlidingBranchContainer(
+          navigationShell: navigationShell,
+          children: children,
+        );
+      },
       builder: (context, state, navigationShell) {
         return _ScaffoldWithNavBar(navigationShell: navigationShell);
       },
@@ -40,6 +46,73 @@ final GoRouter router = GoRouter(
     ),
   ],
 );
+
+class _SlidingBranchContainer extends StatefulWidget {
+  const _SlidingBranchContainer({required this.navigationShell, required this.children});
+
+  final StatefulNavigationShell navigationShell;
+  final List<Widget> children;
+
+  @override
+  State<_SlidingBranchContainer> createState() => _SlidingBranchContainerState();
+}
+
+class _SlidingBranchContainerState extends State<_SlidingBranchContainer> {
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: widget.navigationShell.currentIndex);
+  }
+
+  @override
+  void didUpdateWidget(covariant _SlidingBranchContainer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.navigationShell.currentIndex != _pageController.page?.round()) {
+      _pageController.jumpToPage(widget.navigationShell.currentIndex);
+    }
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PageView(
+      controller: _pageController,
+      physics: const ClampingScrollPhysics(),
+      onPageChanged: (index) {
+        if (index != widget.navigationShell.currentIndex) {
+          widget.navigationShell.goBranch(index, initialLocation: false);
+        }
+      },
+      children: widget.children.map((child) => _KeepAlivePage(child: child)).toList(),
+    );
+  }
+}
+
+class _KeepAlivePage extends StatefulWidget {
+  const _KeepAlivePage({required this.child});
+  final Widget child;
+
+  @override
+  State<_KeepAlivePage> createState() => _KeepAlivePageState();
+}
+
+class _KeepAlivePageState extends State<_KeepAlivePage> with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}
 
 class _ScaffoldWithNavBar extends StatelessWidget {
   const _ScaffoldWithNavBar({required this.navigationShell});

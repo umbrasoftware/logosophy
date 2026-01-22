@@ -292,6 +292,9 @@ class TranslationsSearchPageEn {
 
 	/// en: 'No search history yet'
 	String get noHistoryYet => 'No search history yet';
+
+	/// en: 'Search...'
+	String get search => 'Search...';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -366,6 +369,7 @@ extension on Translations {
 			'searchPage.noResultFound' => 'No results found',
 			'searchPage.searchHistory' => 'Search history',
 			'searchPage.noHistoryYet' => 'No search history yet',
+			'searchPage.search' => 'Search...',
 			_ => null,
 		};
 	}
