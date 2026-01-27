@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/settings_tab/utils.dart';
@@ -44,6 +45,19 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               subtitle: Text(SettingsUtils.getThemeName(ref), style: TextStyle(color: colorScheme.onSurfaceVariant)),
               trailing: Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
               onTap: _showThemeDialog,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            color: colorScheme.surfaceContainer,
+            child: ListTile(
+              textColor: colorScheme.onSurface,
+              iconColor: colorScheme.onSurface,
+              leading: const Icon(Icons.contact_support),
+              title: Text(t.feedbackPage.contactUs),
+              subtitle: Text(t.feedbackPage.desc, style: TextStyle(color: colorScheme.onSurfaceVariant)),
+              trailing: Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
+              onTap: () => GoRouter.of(context).push('/support'),
             ),
           ),
         ],

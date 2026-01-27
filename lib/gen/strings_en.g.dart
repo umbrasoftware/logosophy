@@ -46,6 +46,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final TranslationsBookPageEn bookPage = TranslationsBookPageEn._(_root);
 	late final TranslationsSettingsPageEn settingsPage = TranslationsSettingsPageEn._(_root);
 	late final TranslationsSearchPageEn searchPage = TranslationsSearchPageEn._(_root);
+	late final TranslationsFeedbackPageEn feedbackPage = TranslationsFeedbackPageEn._(_root);
 }
 
 // Path: btnActions
@@ -112,6 +113,9 @@ class TranslationsBtnActionsEn {
 
 	/// en: 'Apply'
 	String get apply => 'Apply';
+
+	/// en: 'Send'
+	String get send => 'Send';
 }
 
 // Path: setup
@@ -297,6 +301,42 @@ class TranslationsSearchPageEn {
 	String get search => 'Search...';
 }
 
+// Path: feedbackPage
+class TranslationsFeedbackPageEn {
+	TranslationsFeedbackPageEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Contact Us'
+	String get contactUs => 'Contact Us';
+
+	/// en: 'Give a suggestion or report a problem'
+	String get desc => 'Give a suggestion or report a problem';
+
+	/// en: 'Name'
+	String get name => 'Name';
+
+	/// en: 'Message'
+	String get message => 'Message';
+
+	/// en: 'Type a bit more, please.'
+	String get typeMore => 'Type a bit more, please.';
+
+	/// en: 'Is a problem?'
+	String get isProblem => 'Is a problem?';
+
+	/// en: 'Can we contact you?'
+	String get canContact => 'Can we contact you?';
+
+	/// en: 'Thank you for your message.'
+	String get okMessage => 'Thank you for your message.';
+
+	/// en: 'An error happened. Please check your connection and try again.'
+	String get errorMessage => 'An error happened. Please check your connection and try again.';
+}
+
 /// The flat map containing all translations for locale <en>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -324,6 +364,7 @@ extension on Translations {
 			'btnActions.delete' => 'Delete',
 			'btnActions.confirmDelete' => 'Confirm delete',
 			'btnActions.apply' => 'Apply',
+			'btnActions.send' => 'Send',
 			'setup.noBooks' => 'It seems you don\'t have any books yet. Please select a language for the books to start using the app!',
 			'setup.starting' => 'Starting download',
 			'setup.downloadingBooks' => 'Downloading books',
@@ -370,6 +411,15 @@ extension on Translations {
 			'searchPage.searchHistory' => 'Search history',
 			'searchPage.noHistoryYet' => 'No search history yet',
 			'searchPage.search' => 'Search...',
+			'feedbackPage.contactUs' => 'Contact Us',
+			'feedbackPage.desc' => 'Give a suggestion or report a problem',
+			'feedbackPage.name' => 'Name',
+			'feedbackPage.message' => 'Message',
+			'feedbackPage.typeMore' => 'Type a bit more, please.',
+			'feedbackPage.isProblem' => 'Is a problem?',
+			'feedbackPage.canContact' => 'Can we contact you?',
+			'feedbackPage.okMessage' => 'Thank you for your message.',
+			'feedbackPage.errorMessage' => 'An error happened. Please check your connection and try again.',
 			_ => null,
 		};
 	}

@@ -43,6 +43,7 @@ class TranslationsPtBr with BaseTranslations<AppLocale, Translations> implements
 	@override late final _TranslationsBookPagePtBr bookPage = _TranslationsBookPagePtBr._(_root);
 	@override late final _TranslationsSettingsPagePtBr settingsPage = _TranslationsSettingsPagePtBr._(_root);
 	@override late final _TranslationsSearchPagePtBr searchPage = _TranslationsSearchPagePtBr._(_root);
+	@override late final _TranslationsFeedbackPagePtBr feedbackPage = _TranslationsFeedbackPagePtBr._(_root);
 }
 
 // Path: btnActions
@@ -71,6 +72,7 @@ class _TranslationsBtnActionsPtBr implements TranslationsBtnActionsEn {
 	@override String get delete => 'Deletar';
 	@override String get confirmDelete => 'Confirmar Exclusão';
 	@override String get apply => 'Aplicar';
+	@override String get send => 'Enviar';
 }
 
 // Path: setup
@@ -164,6 +166,24 @@ class _TranslationsSearchPagePtBr implements TranslationsSearchPageEn {
 	@override String get search => 'Pesquisar...';
 }
 
+// Path: feedbackPage
+class _TranslationsFeedbackPagePtBr implements TranslationsFeedbackPageEn {
+	_TranslationsFeedbackPagePtBr._(this._root);
+
+	final TranslationsPtBr _root; // ignore: unused_field
+
+	// Translations
+	@override String get contactUs => 'Fale Conosco';
+	@override String get desc => 'Dê sugestão ou relate um problema';
+	@override String get name => 'Nome';
+	@override String get message => 'Mensagem';
+	@override String get typeMore => 'Escreva um pouco mais, por favor.';
+	@override String get isProblem => 'É um problema?';
+	@override String get canContact => 'Podemos entrar em contato?';
+	@override String get okMessage => 'Obrigado pela sua mensagem.';
+	@override String get errorMessage => 'Ocorreu um erro. Verifique sua conexão e tente novamente.';
+}
+
 /// The flat map containing all translations for locale <pt-BR>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -191,6 +211,7 @@ extension on TranslationsPtBr {
 			'btnActions.delete' => 'Deletar',
 			'btnActions.confirmDelete' => 'Confirmar Exclusão',
 			'btnActions.apply' => 'Aplicar',
+			'btnActions.send' => 'Enviar',
 			'setup.noBooks' => 'Parece que você não tem nenhum livro ainda. Por favor, selecione uma língua para os livros para começar a usar o aplicativo!',
 			'setup.starting' => 'Iniciando download',
 			'setup.downloadingBooks' => 'Baixando livros',
@@ -237,6 +258,15 @@ extension on TranslationsPtBr {
 			'searchPage.searchHistory' => 'Histórico de pesquisa',
 			'searchPage.noHistoryYet' => 'Sem histórico de pesquisa ainda',
 			'searchPage.search' => 'Pesquisar...',
+			'feedbackPage.contactUs' => 'Fale Conosco',
+			'feedbackPage.desc' => 'Dê sugestão ou relate um problema',
+			'feedbackPage.name' => 'Nome',
+			'feedbackPage.message' => 'Mensagem',
+			'feedbackPage.typeMore' => 'Escreva um pouco mais, por favor.',
+			'feedbackPage.isProblem' => 'É um problema?',
+			'feedbackPage.canContact' => 'Podemos entrar em contato?',
+			'feedbackPage.okMessage' => 'Obrigado pela sua mensagem.',
+			'feedbackPage.errorMessage' => 'Ocorreu um erro. Verifique sua conexão e tente novamente.',
 			_ => null,
 		};
 	}

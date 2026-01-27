@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/pdf_reader.dart';
+import 'package:logosophy/pages/settings_tab/support_page.dart';
 import 'package:logosophy/pages/splash_pages/setup_page.dart';
 
 import 'pages/books_tab/books_page.dart';
@@ -17,10 +18,7 @@ final GoRouter router = GoRouter(
     GoRoute(path: '/loading', builder: (context, state) => const SetupPage()),
     StatefulShellRoute(
       navigatorContainerBuilder: (context, navigationShell, children) {
-        return _SlidingBranchContainer(
-          navigationShell: navigationShell,
-          children: children,
-        );
+        return _SlidingBranchContainer(navigationShell: navigationShell, children: children);
       },
       builder: (context, state, navigationShell) {
         return _ScaffoldWithNavBar(navigationShell: navigationShell);
@@ -42,6 +40,12 @@ final GoRouter router = GoRouter(
       builder: (context, state) {
         final extra = state.extra as ReaderArgs;
         return PDFReader(filePath: extra.path, page: extra.page);
+      },
+    ),
+    GoRoute(
+      path: '/support',
+      builder: (context, state) {
+        return SupportPage();
       },
     ),
   ],

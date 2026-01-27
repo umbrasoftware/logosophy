@@ -18,7 +18,8 @@
         "add": "Add",
         "delete": "Delete",
         "confirmDelete": "Confirm delete",
-        "apply": "Apply"
+        "apply": "Apply",
+        "send": "Send"
     },
     "setup": {
         "noBooks": "It seems you don't have any books yet. Please select a language for the books to start using the app!",
@@ -75,5 +76,16 @@
         "searchHistory": "Search history",
         "noHistoryYet": "No search history yet",
         "search": "Search..."
+    },
+    "feedbackPage": {
+        "contactUs": "Contact Us",
+        "desc": "Give a suggestion or report a problem",
+        "name": "Name",
+        "message": "Message",
+        "typeMore": "Type a bit more, please.",
+        "isProblem": "Is a problem?",
+        "canContact": "Can we contact you?",
+        "okMessage": "Thank you for your message.",
+        "errorMessage": "An error happened. Please check your connection and try again."
     }
 }

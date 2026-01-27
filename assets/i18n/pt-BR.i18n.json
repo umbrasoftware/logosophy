@@ -18,7 +18,8 @@
         "add": "Adicionar",
         "delete": "Deletar",
         "confirmDelete": "Confirmar Exclusão",
-        "apply": "Aplicar"
+        "apply": "Aplicar",
+        "send": "Enviar"
     },
     "setup": {
         "noBooks": "Parece que você não tem nenhum livro ainda. Por favor, selecione uma língua para os livros para começar a usar o aplicativo!",
@@ -75,5 +76,16 @@
         "searchHistory": "Histórico de pesquisa",
         "noHistoryYet": "Sem histórico de pesquisa ainda",
         "search": "Pesquisar..."
+    },
+    "feedbackPage": {
+        "contactUs": "Fale Conosco",
+        "desc": "Dê sugestão ou relate um problema",
+        "name": "Nome",
+        "message": "Mensagem",
+        "typeMore": "Escreva um pouco mais, por favor.",
+        "isProblem": "É um problema?",
+        "canContact": "Podemos entrar em contato?",
+        "okMessage": "Obrigado pela sua mensagem.",
+        "errorMessage": "Ocorreu um erro. Verifique sua conexão e tente novamente."
     }
 }
