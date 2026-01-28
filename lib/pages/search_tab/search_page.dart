@@ -38,7 +38,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    history = ref.watch(historyProvider).requireValue;
+    final historyProviderStatus = ref.watch(historyProvider);
+    if (historyProviderStatus.isLoading) {
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    history = historyProviderStatus.requireValue;
     filter = ref.watch(searchFilterProvider);
     _isFilterActive = filter.includeOnlyIds.isNotEmpty || filter.excludeOnlyIds.isNotEmpty;
 

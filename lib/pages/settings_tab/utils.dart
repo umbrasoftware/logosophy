@@ -27,7 +27,10 @@ class SettingsUtils {
   }
 
   static ThemeMode getThemeMode(WidgetRef ref) {
-    return switch (ref.watch(settingsProvider).requireValue.theme) {
+    final provider = ref.watch(settingsProvider);
+    if (provider.isLoading || provider.hasError) return ThemeMode.system;
+
+    return switch (provider.requireValue.theme) {
       'light' => ThemeMode.light,
       'dark' => ThemeMode.dark,
       _ => ThemeMode.system,
