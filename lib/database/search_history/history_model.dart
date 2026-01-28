@@ -12,6 +12,7 @@ abstract class History with _$History {
     @HiveField(0) required final String query,
     @HiveField(1) required final DateTime timestamp,
     @HiveField(2) @Default([]) final List<SearchResult> results,
+    @HiveField(3) @Default(false) final bool wasFiltered,
   }) = _History;
 
   factory History.fromJson(Map<String, dynamic> json) => _$HistoryFromJson(json);

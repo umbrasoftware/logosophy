@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
+import 'package:logosophy/database/search_filter/search_filter_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -30,7 +32,7 @@ class SearchUtils {
     }
   }
 
-  static Future<List<Map<String, dynamic>>?> similaritySearch(List<double> queryEmbedding, int k) async {
+  static Future<List<Map<String, dynamic>>?> similaritySearch(List<double> queryEmbedding, int k, WidgetRef ref) async {
     final supabaseUrl = dotenv.env['SUPABASE_URL']!;
     final supabaseAnonKey = dotenv.env['SUPABASE_SERVICE_KEY']!;
 
@@ -42,7 +44,17 @@ class SearchUtils {
       'Content-Type': 'application/json',
     };
 
-    final body = jsonEncode({'query_embedding': queryEmbedding, 'match_count': k, 'filter': {}});
+    final filterState = ref.read(searchFilterProvider);
+    final List<String>? includeList = filterState.includeOnlyIds.isNotEmpty ? filterState.includeOnlyIds : null;
+    final List<String>? excludeList = filterState.excludeOnlyIds.isNotEmpty ? filterState.excludeOnlyIds : null;
+
+    final body = jsonEncode({
+      'query_embedding': queryEmbedding,
+      'match_count': k,
+      'include_book_ids': includeList,
+      'exclude_book_ids': excludeList,
+    });
+
     final response = await http.post(url, headers: headers, body: body);
 
     if (response.statusCode == 200) {

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$History {
 
-@HiveField(0) String get query;@HiveField(1) DateTime get timestamp;@HiveField(2) List<SearchResult> get results;
+@HiveField(0) String get query;@HiveField(1) DateTime get timestamp;@HiveField(2) List<SearchResult> get results;@HiveField(3) bool get wasFiltered;
 /// Create a copy of History
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $HistoryCopyWith<History> get copyWith => _$HistoryCopyWithImpl<History>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is History&&(identical(other.query, query) || other.query == query)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&const DeepCollectionEquality().equals(other.results, results));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is History&&(identical(other.query, query) || other.query == query)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&const DeepCollectionEquality().equals(other.results, results)&&(identical(other.wasFiltered, wasFiltered) || other.wasFiltered == wasFiltered));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,query,timestamp,const DeepCollectionEquality().hash(results));
+int get hashCode => Object.hash(runtimeType,query,timestamp,const DeepCollectionEquality().hash(results),wasFiltered);
 
 @override
 String toString() {
-  return 'History(query: $query, timestamp: $timestamp, results: $results)';
+  return 'History(query: $query, timestamp: $timestamp, results: $results, wasFiltered: $wasFiltered)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $HistoryCopyWith<$Res>  {
   factory $HistoryCopyWith(History value, $Res Function(History) _then) = _$HistoryCopyWithImpl;
 @useResult
 $Res call({
-@HiveField(0) String query,@HiveField(1) DateTime timestamp,@HiveField(2) List<SearchResult> results
+@HiveField(0) String query,@HiveField(1) DateTime timestamp,@HiveField(2) List<SearchResult> results,@HiveField(3) bool wasFiltered
 });
 
 
@@ -65,12 +65,13 @@ class _$HistoryCopyWithImpl<$Res>
 
 /// Create a copy of History
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? query = null,Object? timestamp = null,Object? results = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? query = null,Object? timestamp = null,Object? results = null,Object? wasFiltered = null,}) {
   return _then(_self.copyWith(
 query: null == query ? _self.query : query // ignore: cast_nullable_to_non_nullable
 as String,timestamp: null == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable
 as DateTime,results: null == results ? _self.results : results // ignore: cast_nullable_to_non_nullable
-as List<SearchResult>,
+as List<SearchResult>,wasFiltered: null == wasFiltered ? _self.wasFiltered : wasFiltered // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@HiveField(0)  String query, @HiveField(1)  DateTime timestamp, @HiveField(2)  List<SearchResult> results)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@HiveField(0)  String query, @HiveField(1)  DateTime timestamp, @HiveField(2)  List<SearchResult> results, @HiveField(3)  bool wasFiltered)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _History() when $default != null:
-return $default(_that.query,_that.timestamp,_that.results);case _:
+return $default(_that.query,_that.timestamp,_that.results,_that.wasFiltered);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.query,_that.timestamp,_that.results);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@HiveField(0)  String query, @HiveField(1)  DateTime timestamp, @HiveField(2)  List<SearchResult> results)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@HiveField(0)  String query, @HiveField(1)  DateTime timestamp, @HiveField(2)  List<SearchResult> results, @HiveField(3)  bool wasFiltered)  $default,) {final _that = this;
 switch (_that) {
 case _History():
-return $default(_that.query,_that.timestamp,_that.results);case _:
+return $default(_that.query,_that.timestamp,_that.results,_that.wasFiltered);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +197,10 @@ return $default(_that.query,_that.timestamp,_that.results);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@HiveField(0)  String query, @HiveField(1)  DateTime timestamp, @HiveField(2)  List<SearchResult> results)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@HiveField(0)  String query, @HiveField(1)  DateTime timestamp, @HiveField(2)  List<SearchResult> results, @HiveField(3)  bool wasFiltered)?  $default,) {final _that = this;
 switch (_that) {
 case _History() when $default != null:
-return $default(_that.query,_that.timestamp,_that.results);case _:
+return $default(_that.query,_that.timestamp,_that.results,_that.wasFiltered);case _:
   return null;
 
 }
@@ -211,7 +212,7 @@ return $default(_that.query,_that.timestamp,_that.results);case _:
 @JsonSerializable()
 
 class _History implements History {
-   _History({@HiveField(0) required this.query, @HiveField(1) required this.timestamp, @HiveField(2) final  List<SearchResult> results = const []}): _results = results;
+   _History({@HiveField(0) required this.query, @HiveField(1) required this.timestamp, @HiveField(2) final  List<SearchResult> results = const [], @HiveField(3) this.wasFiltered = false}): _results = results;
   factory _History.fromJson(Map<String, dynamic> json) => _$HistoryFromJson(json);
 
 @override@HiveField(0) final  String query;
@@ -223,6 +224,7 @@ class _History implements History {
   return EqualUnmodifiableListView(_results);
 }
 
+@override@JsonKey()@HiveField(3) final  bool wasFiltered;
 
 /// Create a copy of History
 /// with the given fields replaced by the non-null parameter values.
@@ -237,16 +239,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _History&&(identical(other.query, query) || other.query == query)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&const DeepCollectionEquality().equals(other._results, _results));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _History&&(identical(other.query, query) || other.query == query)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&const DeepCollectionEquality().equals(other._results, _results)&&(identical(other.wasFiltered, wasFiltered) || other.wasFiltered == wasFiltered));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,query,timestamp,const DeepCollectionEquality().hash(_results));
+int get hashCode => Object.hash(runtimeType,query,timestamp,const DeepCollectionEquality().hash(_results),wasFiltered);
 
 @override
 String toString() {
-  return 'History(query: $query, timestamp: $timestamp, results: $results)';
+  return 'History(query: $query, timestamp: $timestamp, results: $results, wasFiltered: $wasFiltered)';
 }
 
 
@@ -257,7 +259,7 @@ abstract mixin class _$HistoryCopyWith<$Res> implements $HistoryCopyWith<$Res> {
   factory _$HistoryCopyWith(_History value, $Res Function(_History) _then) = __$HistoryCopyWithImpl;
 @override @useResult
 $Res call({
-@HiveField(0) String query,@HiveField(1) DateTime timestamp,@HiveField(2) List<SearchResult> results
+@HiveField(0) String query,@HiveField(1) DateTime timestamp,@HiveField(2) List<SearchResult> results,@HiveField(3) bool wasFiltered
 });
 
 
@@ -274,12 +276,13 @@ class __$HistoryCopyWithImpl<$Res>
 
 /// Create a copy of History
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? query = null,Object? timestamp = null,Object? results = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? query = null,Object? timestamp = null,Object? results = null,Object? wasFiltered = null,}) {
   return _then(_History(
 query: null == query ? _self.query : query // ignore: cast_nullable_to_non_nullable
 as String,timestamp: null == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable
 as DateTime,results: null == results ? _self._results : results // ignore: cast_nullable_to_non_nullable
-as List<SearchResult>,
+as List<SearchResult>,wasFiltered: null == wasFiltered ? _self.wasFiltered : wasFiltered // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

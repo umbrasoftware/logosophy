@@ -87,5 +87,13 @@
         "canContact": "Can we contact you?",
         "okMessage": "Thank you for your message.",
         "errorMessage": "An error happened. Please check your connection and try again."
+    },
+    "filter": {
+        "activateFilters": "You have filters active.",
+        "includeOnly": "Include only these books on the search:",
+        "excludeOnly": "Exclude only these books on the search:",
+        "clear": "Clear filters",
+        "alreadyAdded": "The book $title have already been added.",
+        "selectBook": "Select a book"
     }
 }

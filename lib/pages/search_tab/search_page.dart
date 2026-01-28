@@ -6,12 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:logosophy/database/search_filter/search_filter_model.dart';
+import 'package:logosophy/database/search_filter/search_filter_provider.dart';
 import 'package:logosophy/database/search_history/history_model.dart';
 import 'package:logosophy/database/search_history/history_provider.dart';
 import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/pdf_reader.dart';
 import 'package:logosophy/database/search_history/search_model.dart';
+import 'package:logosophy/pages/search_tab/filter_sheet.dart';
 import 'package:logosophy/pages/search_tab/utils.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -27,20 +30,32 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   List<SearchResult> _searchResults = [];
   bool _isLoading = false;
+  bool _isFilterActive = false;
   String? _errorMessage;
   late Map<String, dynamic> mappings;
-  late List<History> provider;
+  late List<History> history;
+  late SearchFilter filter;
 
   @override
   Widget build(BuildContext context) {
-    provider = ref.watch(historyProvider).requireValue;
+    history = ref.watch(historyProvider).requireValue;
+    filter = ref.watch(searchFilterProvider);
+    _isFilterActive = filter.includeOnlyIds.isNotEmpty || filter.excludeOnlyIds.isNotEmpty;
 
     final colorScheme = Theme.of(context).colorScheme;
     return FutureBuilder(
       future: getMappings(),
       builder: (context, asyncSnapshot) {
         return Scaffold(
-          appBar: AppBar(title: Text(t.navBar.search)),
+          appBar: AppBar(
+            title: Text(t.navBar.search),
+            actions: [
+              IconButton(
+                onPressed: _buildFilterSheet,
+                icon: Icon(Icons.filter_list_alt, color: _isFilterActive ? colorScheme.primary : null),
+              ),
+            ],
+          ),
           drawer: _buildDrawer(),
           body: _buildBody(colorScheme),
         );
@@ -98,11 +113,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
     try {
       final embeddings = await SearchUtils.createEmbedding(query);
-      final queryResults = await SearchUtils.similaritySearch(embeddings!, 20);
+      final queryResults = await SearchUtils.similaritySearch(embeddings!, 20, ref);
       final data = List<Map<String, dynamic>>.from(queryResults!);
       final results = data.map((item) => SearchResult.fromJson(item)).toList();
 
-      final history = History(query: query, timestamp: DateTime.now(), results: results);
+      final history = History(query: query, timestamp: DateTime.now(), results: results, wasFiltered: _isFilterActive);
       await ref.read(historyProvider.notifier).addHistory(history);
 
       setState(() {
@@ -121,7 +136,15 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   Widget _buildResultsView(ColorScheme colorScheme) {
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator(color: colorScheme.primary));
+      return Center(
+        child: Column(
+          mainAxisAlignment: .spaceEvenly,
+          children: [
+            _isFilterActive ? Text(t.filter.activateFilters) : SizedBox.shrink(),
+            CircularProgressIndicator(color: colorScheme.primary),
+          ],
+        ),
+      );
     }
 
     if (_errorMessage != null) {
@@ -231,7 +254,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             ),
           ),
           Expanded(
-            child: provider.isEmpty
+            child: this.history.isEmpty
                 ? Center(
                     child: Text(t.searchPage.noHistoryYet, style: TextStyle(color: colorScheme.onSurfaceVariant)),
                   )
@@ -245,15 +268,17 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   ListView _buildSearchWidgets(ColorScheme colorScheme) {
     return ListView.builder(
       padding: EdgeInsets.zero,
-      itemCount: provider.length,
+      itemCount: history.length,
       itemBuilder: (context, index) {
-        final item = provider[index];
+        final item = history[index];
         return ListTile(
-          title: Text(_formatDate(item), style: TextStyle(fontSize: 13, color: colorScheme.outline)),
+          title: Text(_formatDate(item), style: TextStyle(fontSize: 12, color: colorScheme.outline)),
           subtitle: Text(
             item.query,
             style: TextStyle(fontSize: 15, color: colorScheme.onSurface, fontWeight: FontWeight.w500),
+            overflow: .clip,
           ),
+          leading: item.wasFiltered ? Icon(Icons.filter_list_alt, color: colorScheme.primary) : null,
           trailing: IconButton(
             icon: Icon(Icons.close, size: 20, color: Colors.red),
             onPressed: () async {
@@ -290,5 +315,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     final time = DateFormat(DateFormat.HOUR24_MINUTE, language).format(item.timestamp);
 
     return "$date $time";
+  }
+
+  void _buildFilterSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return FilterSheet(mappings: mappings);
+      },
+    );
   }
 }

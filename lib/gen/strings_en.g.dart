@@ -47,6 +47,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final TranslationsSettingsPageEn settingsPage = TranslationsSettingsPageEn._(_root);
 	late final TranslationsSearchPageEn searchPage = TranslationsSearchPageEn._(_root);
 	late final TranslationsFeedbackPageEn feedbackPage = TranslationsFeedbackPageEn._(_root);
+	late final TranslationsFilterEn filter = TranslationsFilterEn._(_root);
 }
 
 // Path: btnActions
@@ -337,6 +338,33 @@ class TranslationsFeedbackPageEn {
 	String get errorMessage => 'An error happened. Please check your connection and try again.';
 }
 
+// Path: filter
+class TranslationsFilterEn {
+	TranslationsFilterEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'You have filters active.'
+	String get activateFilters => 'You have filters active.';
+
+	/// en: 'Include only these books on the search:'
+	String get includeOnly => 'Include only these books on the search:';
+
+	/// en: 'Exclude only these books on the search:'
+	String get excludeOnly => 'Exclude only these books on the search:';
+
+	/// en: 'Clear filters'
+	String get clear => 'Clear filters';
+
+	/// en: 'The book $title have already been added.'
+	String alreadyAdded({required Object title}) => 'The book ${title} have already been added.';
+
+	/// en: 'Select a book'
+	String get selectBook => 'Select a book';
+}
+
 /// The flat map containing all translations for locale <en>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -420,6 +448,12 @@ extension on Translations {
 			'feedbackPage.canContact' => 'Can we contact you?',
 			'feedbackPage.okMessage' => 'Thank you for your message.',
 			'feedbackPage.errorMessage' => 'An error happened. Please check your connection and try again.',
+			'filter.activateFilters' => 'You have filters active.',
+			'filter.includeOnly' => 'Include only these books on the search:',
+			'filter.excludeOnly' => 'Exclude only these books on the search:',
+			'filter.clear' => 'Clear filters',
+			'filter.alreadyAdded' => ({required Object title}) => 'The book ${title} have already been added.',
+			'filter.selectBook' => 'Select a book',
 			_ => null,
 		};
 	}

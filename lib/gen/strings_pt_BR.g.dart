@@ -44,6 +44,7 @@ class TranslationsPtBr with BaseTranslations<AppLocale, Translations> implements
 	@override late final _TranslationsSettingsPagePtBr settingsPage = _TranslationsSettingsPagePtBr._(_root);
 	@override late final _TranslationsSearchPagePtBr searchPage = _TranslationsSearchPagePtBr._(_root);
 	@override late final _TranslationsFeedbackPagePtBr feedbackPage = _TranslationsFeedbackPagePtBr._(_root);
+	@override late final _TranslationsFilterPtBr filter = _TranslationsFilterPtBr._(_root);
 }
 
 // Path: btnActions
@@ -184,6 +185,21 @@ class _TranslationsFeedbackPagePtBr implements TranslationsFeedbackPageEn {
 	@override String get errorMessage => 'Ocorreu um erro. Verifique sua conexão e tente novamente.';
 }
 
+// Path: filter
+class _TranslationsFilterPtBr implements TranslationsFilterEn {
+	_TranslationsFilterPtBr._(this._root);
+
+	final TranslationsPtBr _root; // ignore: unused_field
+
+	// Translations
+	@override String get activateFilters => 'Você tem filtros ativados.';
+	@override String get includeOnly => 'Incluir apenas estes livros na pesquisa:';
+	@override String get excludeOnly => 'Excluir apenas estes livros na pesquisa:';
+	@override String get clear => 'Limpar filtros';
+	@override String alreadyAdded({required Object title}) => 'O livro ${title} já foi adicionado.';
+	@override String get selectBook => 'Selecione um livro';
+}
+
 /// The flat map containing all translations for locale <pt-BR>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -267,6 +283,12 @@ extension on TranslationsPtBr {
 			'feedbackPage.canContact' => 'Podemos entrar em contato?',
 			'feedbackPage.okMessage' => 'Obrigado pela sua mensagem.',
 			'feedbackPage.errorMessage' => 'Ocorreu um erro. Verifique sua conexão e tente novamente.',
+			'filter.activateFilters' => 'Você tem filtros ativados.',
+			'filter.includeOnly' => 'Incluir apenas estes livros na pesquisa:',
+			'filter.excludeOnly' => 'Excluir apenas estes livros na pesquisa:',
+			'filter.clear' => 'Limpar filtros',
+			'filter.alreadyAdded' => ({required Object title}) => 'O livro ${title} já foi adicionado.',
+			'filter.selectBook' => 'Selecione um livro',
 			_ => null,
 		};
 	}
