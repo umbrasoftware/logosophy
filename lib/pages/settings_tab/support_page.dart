@@ -98,6 +98,7 @@ class _SupportPageState extends State<SupportPage> {
     );
   }
 
+  /// Submits the form to database.
   Future<void> onSubmit() async {
     final deviceInfoPlugin = DeviceInfoPlugin();
     final deviceInfo = await deviceInfoPlugin.deviceInfo;

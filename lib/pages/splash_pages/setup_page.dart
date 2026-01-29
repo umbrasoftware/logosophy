@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:country_flags/country_flags.dart';
@@ -26,13 +25,12 @@ enum _SetupStatus { checking, needsDownload }
 
 class _SetupPageState extends ConsumerState<SetupPage> {
   _SetupStatus _status = _SetupStatus.checking;
-  final logger = Logger('SetupPage');
-  bool aDownloadWasFinished = false;
+  final _logger = Logger('SetupPage');
+  bool _aDownloadWasFinished = false;
   double _downloadProgress = 0.0;
-  final String language = 'pt-BR';
+  final String _language = 'pt-BR';
 
-  late Map<String, dynamic> mappings;
-  late Directory langDir;
+  late Directory _langDir;
 
   @override
   void initState() {
@@ -45,12 +43,13 @@ class _SetupPageState extends ConsumerState<SetupPage> {
     super.dispose();
   }
 
+  /// Performs the checks at the startup and navigates to the books page when ready.
   Future<void> _performChecksAndNavigate() async {
-    logger.info("Performing checkings at the splash page.");
+    _logger.info("Performing checkings at the splash page.");
 
     await _checkAppDirectory();
-    if (await langDir.list().isEmpty) {
-      logger.info('No books found in any language.');
+    if (await _langDir.list().isEmpty) {
+      _logger.info('No books found in any language.');
       if (mounted) setState(() => _status = _SetupStatus.needsDownload);
       return;
     } else {
@@ -84,7 +83,7 @@ class _SetupPageState extends ConsumerState<SetupPage> {
             Text(t.setup.noBooks, textAlign: TextAlign.center, style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 64),
             ElevatedButton(
-              onPressed: _downloadProgress > 0 ? null : () => _downloadLanguageBooks(language),
+              onPressed: _downloadProgress > 0 ? null : () => _downloadLanguageBooks(_language),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -104,7 +103,7 @@ class _SetupPageState extends ConsumerState<SetupPage> {
             ),
             const SizedBox(height: 64),
             ElevatedButton(
-              onPressed: aDownloadWasFinished ? () => GoRouter.of(context).go('/books') : null,
+              onPressed: _aDownloadWasFinished ? () => GoRouter.of(context).go('/books') : null,
               child: Text(t.btnActions.continueAction),
             ),
           ],
@@ -113,13 +112,14 @@ class _SetupPageState extends ConsumerState<SetupPage> {
     );
   }
 
+  /// Starts download of the book for a given language.
   Future<void> _downloadLanguageBooks(String languageCode) async {
     setState(() {
       _downloadProgress = 0.0001;
     });
 
     try {
-      await FilesUtils.downloadBooksForLanguage(languageCode, langDir, (progress) {
+      await FilesUtils.downloadBooksForLanguage(languageCode, _langDir, (progress) {
         setState(() => _downloadProgress = progress);
       });
 
@@ -127,11 +127,11 @@ class _SetupPageState extends ConsumerState<SetupPage> {
         await ref.watch(bookProvider.future);
         setState(() {
           _downloadProgress = 1.0;
-          aDownloadWasFinished = true;
+          _aDownloadWasFinished = true;
         });
       }
     } catch (e) {
-      logger.severe('Error downloading books: $e');
+      _logger.severe('Error downloading books: $e');
       if (mounted) {
         setState(() => _downloadProgress = 0.0);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
@@ -139,6 +139,7 @@ class _SetupPageState extends ConsumerState<SetupPage> {
     }
   }
 
+  /// Checks the app directory and downloads the mappings file, if required.
   Future<void> _checkAppDirectory() async {
     final storage = supabase.client.storage;
     final appDocumentsDir = await getApplicationDocumentsDirectory();
@@ -147,18 +148,16 @@ class _SetupPageState extends ConsumerState<SetupPage> {
 
     final mappingsFile = File(p.join(booksDir.path, 'mappings.json'));
     if (!await mappingsFile.exists()) {
-      logger.info("mappings.json does not exists. Downloading...");
+      _logger.info("mappings.json does not exists. Downloading...");
       final mappingsBytes = await storage.from('books').download('mapping.json');
       await mappingsFile.writeAsBytes(mappingsBytes);
     }
 
-    final mappingsContent = await mappingsFile.readAsString();
-    mappings = jsonDecode(mappingsContent) as Map<String, dynamic>;
-    langDir = Directory(p.join(booksDir.path, language));
-    if (!await langDir.exists()) {
-      await langDir.create(recursive: true);
+    _langDir = Directory(p.join(booksDir.path, _language));
+    if (!await _langDir.exists()) {
+      await _langDir.create(recursive: true);
     }
 
-    logger.info("Finished cheking app directory.");
+    _logger.info("Finished cheking app directory.");
   }
 }

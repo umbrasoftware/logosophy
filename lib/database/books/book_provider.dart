@@ -19,8 +19,8 @@ class BookNotifier extends _$BookNotifier {
   String language = 'pt-BR';
   late Box<BookData> _box;
 
-  late Map<String, dynamic> mappings;
-  late Directory langDir;
+  late Map<String, dynamic> _mappings;
+  late Directory _langDir;
 
   @override
   Future<List<BookData>> build() async {
@@ -39,11 +39,11 @@ class BookNotifier extends _$BookNotifier {
   Future<void> _getVariables() async {
     final appDocumentsDir = await getApplicationDocumentsDirectory();
     final booksDir = Directory(p.join(appDocumentsDir.path, 'books'));
-    langDir = Directory(p.join(booksDir.path, language));
+    _langDir = Directory(p.join(booksDir.path, language));
 
     final mappingsFile = File(p.join(booksDir.path, 'mappings.json'));
     final mappingsContent = await mappingsFile.readAsString();
-    mappings = jsonDecode(mappingsContent);
+    _mappings = jsonDecode(mappingsContent);
   }
 
   /// Get this Provider state and set SharedPrefs.
@@ -51,7 +51,7 @@ class BookNotifier extends _$BookNotifier {
     _logger.info("Starting Provider from fresh state.");
     int daysOffset = 1;
     DateTime time = DateTime.now().subtract(const Duration(days: 180));
-    final entities = langDir.listSync();
+    final entities = _langDir.listSync();
 
     final List<BookData> booksData = [];
 
@@ -65,7 +65,7 @@ class BookNotifier extends _$BookNotifier {
 
       final bookPath = entity.path;
       final coverPath = entity.path.replaceFirst('$bookId.pdf', '${bookId}_cover.png');
-      final title = mappings['pt-BR']['$bookId.pdf']['title'];
+      final title = _mappings['pt-BR']['$bookId.pdf']['title'];
       final lastOpened = DateTime.now();
 
       final book = BookData(
@@ -159,8 +159,6 @@ class BookNotifier extends _$BookNotifier {
   /// Returns the book index and the [BookData] object by it's bookId, if found on [state].
   /// Null otherwise.
   BookInfo? _getBookOnState(String bookId) {
-    if (!_isDataIntegrityOk()) return null;
-
     for (int i = 0; i < state.requireValue.length; i++) {
       final book = state.requireValue[i];
       if (book.bookId == bookId) {
@@ -170,27 +168,6 @@ class BookNotifier extends _$BookNotifier {
 
     _logger.shout("Book $bookId could not be found in the box.");
     return null;
-  }
-
-  /// Checks the data integrity for both the box and the Provider. Returns True on success.
-  /// It logs if anything goes wrong.
-  bool _isDataIntegrityOk() {
-    if (_box.isEmpty) {
-      _logger.shout("The box has not been initialized yet.");
-      return false;
-    }
-
-    if (state.hasError) {
-      _logger.shout("The Provider is in '.hasError' state: ${state.error}");
-      return false;
-    }
-
-    if (state.isLoading) {
-      _logger.shout("The Provider is still loading.");
-      return false;
-    }
-
-    return true;
   }
 }
 

@@ -1,5 +1,4 @@
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
-import 'package:logging/logging.dart';
 import 'package:logosophy/database/search_history/history_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -9,7 +8,6 @@ part 'history_provider.g.dart';
 /// the most recent.
 @Riverpod(keepAlive: true)
 class HistoryNotifier extends _$HistoryNotifier {
-  final _logger = Logger('HistoryNotifier');
   static const int maxHistory = 20;
   late Box<History> _box;
 
@@ -35,7 +33,6 @@ class HistoryNotifier extends _$HistoryNotifier {
 
   /// Add a new [History] into the history.
   Future<void> addHistory(History result) async {
-    if (!_isDataIntegrityOk()) return;
     if (state.requireValue.any((e) => e.query == result.query)) return;
 
     final modifiableState = [...state.requireValue];
@@ -58,8 +55,6 @@ class HistoryNotifier extends _$HistoryNotifier {
 
   /// Delete a [History] from the history.
   Future<void> deleteHistoryItem(DateTime timestamp) async {
-    if (!_isDataIntegrityOk()) return;
-
     await _box.delete(timestamp.toIso8601String());
 
     final modifiableState = [...state.requireValue];
@@ -71,20 +66,5 @@ class HistoryNotifier extends _$HistoryNotifier {
   Future<void> clear() async {
     await _box.clear();
     state = AsyncData([]);
-  }
-
-  /// Verifies the Provider state.
-  bool _isDataIntegrityOk() {
-    if (state.hasError) {
-      _logger.shout("The Provider is in '.hasError' state: ${state.error}");
-      return false;
-    }
-
-    if (state.isLoading) {
-      _logger.shout("The Provider is still loading.");
-      return false;
-    }
-
-    return true;
   }
 }

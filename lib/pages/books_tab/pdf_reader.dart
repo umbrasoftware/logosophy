@@ -4,7 +4,6 @@ import 'package:logosophy/database/books/book_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:path/path.dart' as p;
 import 'package:pdfrx/pdfrx.dart';
-import 'package:logging/logging.dart';
 
 class PDFReader extends ConsumerStatefulWidget {
   const PDFReader({super.key, required this.filePath, this.page});
@@ -17,10 +16,8 @@ class PDFReader extends ConsumerStatefulWidget {
 }
 
 class _PdfViewerState extends ConsumerState<PDFReader> {
-  final logger = Logger('PDF Viewer');
-
   bool isDocumentLoaded = false;
-  late String bookId;
+  late String _bookId;
   final _pdfController = PdfViewerController();
   PdfTextSearcher? _textSearcher;
   final _searchController = TextEditingController();
@@ -36,7 +33,7 @@ class _PdfViewerState extends ConsumerState<PDFReader> {
   @override
   void initState() {
     final fileName = p.basename(widget.filePath);
-    bookId = fileName.split(".")[0];
+    _bookId = fileName.split(".")[0];
     super.initState();
   }
 
@@ -68,18 +65,18 @@ class _PdfViewerState extends ConsumerState<PDFReader> {
             if (widget.page != null) return;
 
             final bookNotifier = ref.read(bookProvider.notifier);
-            final position = bookNotifier.getPosition(bookId);
+            final position = bookNotifier.getPosition(_bookId);
             if (position == null) return;
 
             _pdfController.setZoom(Offset(position.x, position.y), position.zoom, duration: Duration.zero);
-            await bookNotifier.saveTimestamp(bookId);
+            await bookNotifier.saveTimestamp(_bookId);
           },
           onInteractionEnd: (details) async {
             if (widget.page != null) return;
 
             final zoom = _pdfController.currentZoom;
             final offset = _pdfController.centerPosition;
-            await ref.read(bookProvider.notifier).savePosition(bookId, zoom, offset);
+            await ref.read(bookProvider.notifier).savePosition(_bookId, zoom, offset);
           },
           scrollPhysics: const FixedOverscrollPhysics(maxOverscroll: 100),
           scrollPhysicsScale: const BouncingScrollPhysics(),
@@ -88,6 +85,7 @@ class _PdfViewerState extends ConsumerState<PDFReader> {
     );
   }
 
+  /// Build the AppBar, which mostly contain the seach feature.
   PreferredSizeWidget _buildAppBar() {
     if (_isSearchActive && _textSearcher != null) {
       final textSearcher = _textSearcher!;
@@ -167,6 +165,7 @@ class _PdfViewerState extends ConsumerState<PDFReader> {
   }
 }
 
+/// The PDFReader class arguments.
 class ReaderArgs {
   ReaderArgs(this.path, {this.page});
 

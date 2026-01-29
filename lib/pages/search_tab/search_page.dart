@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:logosophy/database/search_filter/search_filter_model.dart';
+import 'package:logging/logging.dart';
 import 'package:logosophy/database/search_filter/search_filter_provider.dart';
 import 'package:logosophy/database/search_history/history_model.dart';
 import 'package:logosophy/database/search_history/history_provider.dart';
@@ -27,47 +27,58 @@ class SearchPage extends ConsumerStatefulWidget {
 }
 
 class _SearchPageState extends ConsumerState<SearchPage> {
+  final _logger = Logger('SearchPage');
   final TextEditingController _searchController = TextEditingController();
   List<SearchResult> _searchResults = [];
   bool _isLoading = false;
   bool _isFilterActive = false;
   String? _errorMessage;
   late Map<String, dynamic> mappings;
-  late List<History> history;
-  late SearchFilter filter;
+  late List<History> _history;
 
   @override
   Widget build(BuildContext context) {
-    final historyProviderStatus = ref.watch(historyProvider);
-    if (historyProviderStatus.isLoading) {
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
-    history = historyProviderStatus.requireValue;
-    filter = ref.watch(searchFilterProvider);
-    _isFilterActive = filter.includeOnlyIds.isNotEmpty || filter.excludeOnlyIds.isNotEmpty;
-
-    final colorScheme = Theme.of(context).colorScheme;
-    return FutureBuilder(
-      future: getMappings(),
-      builder: (context, asyncSnapshot) {
+    final historyAsync = ref.watch(historyProvider);
+    return historyAsync.when(
+      loading: () => Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (err, stack) {
+        _logger.shout("$err, $stack");
         return Scaffold(
-          appBar: AppBar(
-            title: Text(t.navBar.search),
-            actions: [
-              IconButton(
-                onPressed: _buildFilterSheet,
-                icon: Icon(Icons.filter_list_alt, color: _isFilterActive ? colorScheme.primary : null),
-              ),
-            ],
+          body: Center(
+            child: Text(err.toString(), style: TextStyle(color: Colors.red)),
           ),
-          drawer: _buildDrawer(),
-          body: _buildBody(colorScheme),
+        );
+      },
+      data: (historyData) {
+        _history = historyData;
+
+        final filter = ref.watch(searchFilterProvider);
+        _isFilterActive = filter.includeOnlyIds.isNotEmpty || filter.excludeOnlyIds.isNotEmpty;
+
+        final colorScheme = Theme.of(context).colorScheme;
+        return FutureBuilder(
+          future: getMappings(),
+          builder: (context, asyncSnapshot) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(t.navBar.search),
+                actions: [
+                  IconButton(
+                    onPressed: _buildFilterSheet,
+                    icon: Icon(Icons.filter_list_alt, color: _isFilterActive ? colorScheme.primary : null),
+                  ),
+                ],
+              ),
+              drawer: _buildDrawer(),
+              body: _buildBody(colorScheme),
+            );
+          },
         );
       },
     );
   }
 
+  /// Build the main page body.
   Padding _buildBody(ColorScheme colorScheme) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -139,6 +150,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
   }
 
+  /// Shows the results on the screen.
   Widget _buildResultsView(ColorScheme colorScheme) {
     if (_isLoading) {
       return Center(
@@ -224,6 +236,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
+  /// Build the Drawer, that shows the seach history.
   Drawer _buildDrawer() {
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -259,7 +272,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             ),
           ),
           Expanded(
-            child: this.history.isEmpty
+            child: _history.isEmpty
                 ? Center(
                     child: Text(t.searchPage.noHistoryYet, style: TextStyle(color: colorScheme.onSurfaceVariant)),
                   )
@@ -270,12 +283,13 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
+  /// Build the search history widgets.
   ListView _buildSearchWidgets(ColorScheme colorScheme) {
     return ListView.builder(
       padding: EdgeInsets.zero,
-      itemCount: history.length,
+      itemCount: _history.length,
       itemBuilder: (context, index) {
-        final item = history[index];
+        final item = _history[index];
         return ListTile(
           title: Text(_formatDate(item), style: TextStyle(fontSize: 12, color: colorScheme.outline)),
           subtitle: Text(
@@ -322,6 +336,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     return "$date $time";
   }
 
+  /// Calls the BottomSheet to let the use choose the filters.
   void _buildFilterSheet() {
     showModalBottomSheet(
       context: context,

@@ -13,11 +13,11 @@ class FilterSheet extends ConsumerStatefulWidget {
 }
 
 class _FilterSheetState extends ConsumerState<FilterSheet> {
-  late Map<String, dynamic> mappings;
+  late Map<String, dynamic> _mappings;
 
   @override
   void initState() {
-    mappings = widget.mappings;
+    _mappings = widget.mappings;
     super.initState();
   }
 
@@ -126,6 +126,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
     );
   }
 
+  /// Show a dialog for the user to choose a book and updates the filters.
   Future<void> chooseBook(bool isToInclude) async {
     final filterProvider = ref.read(searchFilterProvider.notifier);
     final filter = ref.read(searchFilterProvider);
@@ -143,12 +144,14 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
     }
   }
 
+  /// Using the mappings file, get a book title by it's id.
   String getBookTitle(String bookId) {
-    return mappings['pt-BR']['$bookId.pdf']['title'];
+    return _mappings['pt-BR']['$bookId.pdf']['title'];
   }
 
+  /// Shows the book dialog on the screen.
   Future<String?> showPickBookDialog(BuildContext context) async {
-    final Map<String, dynamic> booksMap = mappings['pt-BR'];
+    final Map<String, dynamic> booksMap = _mappings['pt-BR'];
     final sortedEntries = booksMap.entries.toList()..sort((a, b) => a.key.compareTo(b.key));
 
     return showDialog<String>(

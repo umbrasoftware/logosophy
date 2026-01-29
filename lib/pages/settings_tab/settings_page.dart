@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logging/logging.dart';
+import 'package:logosophy/database/settings/settings_model.dart';
 import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/settings_tab/utils.dart';
@@ -13,10 +15,32 @@ class SettingsPage extends ConsumerStatefulWidget {
 }
 
 class _SettingsPageState extends ConsumerState<SettingsPage> {
+  final _logger = Logger('SettingsPage');
+  late Settings _settings;
+
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final settingsAsync = ref.watch(settingsProvider);
+    return settingsAsync.when(
+      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (err, stack) {
+        _logger.shout("$err, $stack");
+        return Scaffold(
+          body: Center(
+            child: Text(err.toString(), style: TextStyle(color: Colors.red)),
+          ),
+        );
+      },
+      data: (settingsData) {
+        _settings = settingsData;
+        return _buildBody();
+      },
+    );
+  }
 
+  /// Build the main body.
+  Scaffold _buildBody() {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(t.settingsPage.settings)),
       body: ListView(
@@ -73,7 +97,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         return AlertDialog(
           title: Text(t.settingsPage.selectLanguage),
           content: RadioGroup<String>(
-            groupValue: ref.watch(settingsProvider).requireValue.language,
+            groupValue: _settings.language,
             onChanged: (String? value) async {
               if (value != null) {
                 await _changeLocale(context, value);
@@ -107,7 +131,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       builder: (context) => AlertDialog(
         title: Text(t.settingsPage.selectTheme),
         content: RadioGroup<String>(
-          groupValue: ref.watch(settingsProvider).requireValue.theme,
+          groupValue: _settings.theme,
           onChanged: (String? value) async {
             if (value != null) {
               await ref.read(settingsProvider.notifier).changeTheme(value);

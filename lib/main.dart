@@ -107,6 +107,7 @@ Future<void> initApp(WidgetRef ref) async {
 Future<void> initProviders(WidgetRef ref) async {
   await ref.read(settingsProvider.future);
   await ref.read(historyProvider.future);
+  // bookProvider is awaited in the setup_page.dart
 }
 
 /// Get the device language.

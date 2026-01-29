@@ -6,12 +6,11 @@ import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:logosophy/database/search_filter/search_filter_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SearchUtils {
   static final _logger = Logger('SearchUtils');
-  final supabase = Supabase.instance.client;
 
+  /// Create the embeddings for a given text.
   static Future<List<double>?> createEmbedding(String text) async {
     final apiKey = dotenv.env['OPENAI_API_KEY']!;
     final url = Uri.parse('https://api.openai.com/v1/embeddings');
@@ -32,6 +31,7 @@ class SearchUtils {
     }
   }
 
+  /// Calls the Edge Function from Postgree database fo perform the similarity search.
   static Future<List<Map<String, dynamic>>?> similaritySearch(List<double> queryEmbedding, int k, WidgetRef ref) async {
     final supabaseUrl = dotenv.env['SUPABASE_URL']!;
     final supabaseAnonKey = dotenv.env['SUPABASE_SERVICE_KEY']!;

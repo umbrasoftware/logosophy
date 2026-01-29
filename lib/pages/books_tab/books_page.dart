@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
+import 'package:logosophy/database/books/book_model.dart';
 import 'package:logosophy/database/books/book_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/pdf_reader.dart';
-import 'package:logosophy/pages/splash_pages/animated_logo.dart';
 
 class BooksPage extends ConsumerStatefulWidget {
   const BooksPage({super.key});
@@ -17,15 +17,33 @@ class BooksPage extends ConsumerStatefulWidget {
 }
 
 class _BooksPageState extends ConsumerState<BooksPage> {
-  final logger = Logger('BooksPage');
+  final _logger = Logger('BooksPage');
+  late List<BookData> _books;
 
   @override
   Widget build(BuildContext context) {
-    final provider = ref.watch(bookProvider);
-    if (provider.isLoading) {
-      return Scaffold(body: Center(child: BreathingLogo()));
-    }
+    TranslationProvider.of(context);
+    final bookAsync = ref.watch(bookProvider);
 
+    return bookAsync.when(
+      loading: () => Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (err, stack) {
+        _logger.shout("$err, $stack");
+        return Scaffold(
+          body: Center(
+            child: Text(err.toString(), style: TextStyle(color: Colors.red)),
+          ),
+        );
+      },
+      data: (bookData) {
+        _books = bookData;
+        return _buildBody();
+      },
+    );
+  }
+
+  /// Build the main body.
+  Scaffold _buildBody() {
     return Scaffold(
       appBar: AppBar(title: Text(t.navBar.books)),
       body: GridView.builder(
@@ -36,9 +54,9 @@ class _BooksPageState extends ConsumerState<BooksPage> {
           mainAxisSpacing: 8.0,
           childAspectRatio: 0.7,
         ),
-        itemCount: provider.requireValue.length,
+        itemCount: _books.length,
         itemBuilder: (context, index) {
-          final book = provider.requireValue[index];
+          final book = _books[index];
           return InkWell(
             key: ValueKey(book.bookId),
             onTap: () {
@@ -51,7 +69,7 @@ class _BooksPageState extends ConsumerState<BooksPage> {
                 File(book.coverPath),
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
-                  logger.severe('Error loading image: ${book.coverPath}', error, stackTrace);
+                  _logger.severe('Error loading image: ${book.coverPath}', error, stackTrace);
                   return const Center(child: Icon(Icons.broken_image, size: 40));
                 },
               ),

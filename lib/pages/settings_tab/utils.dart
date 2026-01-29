@@ -4,8 +4,12 @@ import 'package:logosophy/database/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 
 class SettingsUtils {
+  /// Get the locale code.
   static String getLocaleName(WidgetRef ref) {
-    switch (ref.watch(settingsProvider).requireValue.language) {
+    final provider = ref.watch(settingsProvider);
+    if (provider.isLoading || provider.hasError) return t.settingsPage.portuguese;
+
+    switch (provider.requireValue.language) {
       case 'pt-BR':
         return t.settingsPage.portuguese;
       case 'en':
@@ -15,6 +19,7 @@ class SettingsUtils {
     }
   }
 
+  /// Get the theme name: Ex: light, dark, system.
   static String getThemeName(WidgetRef ref) {
     switch (ref.read(settingsProvider).requireValue.theme) {
       case 'light':
@@ -26,6 +31,8 @@ class SettingsUtils {
     }
   }
 
+  /// Get's the [ThemeMode] from the Provider. If not available,
+  /// returns [ThemeData.system] instead.
   static ThemeMode getThemeMode(WidgetRef ref) {
     final provider = ref.watch(settingsProvider);
     if (provider.isLoading || provider.hasError) return ThemeMode.system;
