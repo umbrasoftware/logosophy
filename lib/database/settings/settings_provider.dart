@@ -26,7 +26,7 @@ class SettingsNotifier extends _$SettingsNotifier {
 
   /// Get the default [Settings] config.
   Future<Settings> _getDefaultConfigs() async {
-    final deviceLocale = LocaleSettings.useDeviceLocaleSync();
+    final deviceLocale = await LocaleSettings.useDeviceLocale();
     final settings = Settings(language: deviceLocale.languageCode);
 
     await _box.put(_key, settings);
