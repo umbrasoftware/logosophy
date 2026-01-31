@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
-import 'package:logosophy/database/search_history/search_model.dart';
+import 'package:logosophy/providers/search_history/search_model.dart';
 
 part 'history_model.freezed.dart';
 part 'history_model.g.dart';

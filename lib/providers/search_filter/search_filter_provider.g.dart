@@ -8,12 +8,15 @@ part of 'search_filter_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Provider responsible for managing the state of the seach filters.
 
 @ProviderFor(SearchFilterNotifier)
 const searchFilterProvider = SearchFilterNotifierProvider._();
 
+/// Provider responsible for managing the state of the seach filters.
 final class SearchFilterNotifierProvider
     extends $NotifierProvider<SearchFilterNotifier, SearchFilter> {
+  /// Provider responsible for managing the state of the seach filters.
   const SearchFilterNotifierProvider._()
     : super(
         from: null,
@@ -43,6 +46,8 @@ final class SearchFilterNotifierProvider
 
 String _$searchFilterNotifierHash() =>
     r'8e1d4d50668d29215c8b7e1932b91cfc57952078';
+
+/// Provider responsible for managing the state of the seach filters.
 
 abstract class _$SearchFilterNotifier extends $Notifier<SearchFilter> {
   SearchFilter build();

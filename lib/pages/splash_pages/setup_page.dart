@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
-import 'package:logosophy/database/books/book_provider.dart';
+import 'package:logosophy/providers/books/book_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
-import 'package:logosophy/main.dart';
 import 'package:logosophy/pages/splash_pages/animated_logo.dart';
 import 'package:logosophy/pages/splash_pages/utils.dart';
+import 'package:logosophy/providers/mappings/mappings_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -141,17 +141,11 @@ class _SetupPageState extends ConsumerState<SetupPage> {
 
   /// Checks the app directory and downloads the mappings file, if required.
   Future<void> _checkAppDirectory() async {
-    final storage = supabase.client.storage;
     final appDocumentsDir = await getApplicationDocumentsDirectory();
     final booksDir = Directory(p.join(appDocumentsDir.path, 'books'));
-    if (!await booksDir.exists()) await booksDir.create(recursive: true);
 
-    final mappingsFile = File(p.join(booksDir.path, 'mappings.json'));
-    if (!await mappingsFile.exists()) {
-      _logger.info("mappings.json does not exists. Downloading...");
-      final mappingsBytes = await storage.from('books').download('mapping.json');
-      await mappingsFile.writeAsBytes(mappingsBytes);
-    }
+    // This provider will create the bookDir directory, if does not exist.
+    await ref.read(mappingsProvider.future);
 
     _langDir = Directory(p.join(booksDir.path, _language));
     if (!await _langDir.exists()) {

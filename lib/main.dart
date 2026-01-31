@@ -8,14 +8,14 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:logging/logging.dart';
-import 'package:logosophy/database/books/book_model.dart';
-import 'package:logosophy/database/search_history/history_model.dart';
-import 'package:logosophy/database/search_history/history_provider.dart';
-import 'package:logosophy/database/settings/settings_model.dart';
-import 'package:logosophy/database/settings/settings_provider.dart';
+import 'package:logosophy/providers/books/book_model.dart';
+import 'package:logosophy/providers/search_history/history_model.dart';
+import 'package:logosophy/providers/search_history/history_provider.dart';
+import 'package:logosophy/providers/settings/settings_model.dart';
+import 'package:logosophy/providers/settings/settings_provider.dart';
 import 'package:logosophy/firebase_options.dart';
 import 'package:logosophy/gen/strings.g.dart';
-import 'package:logosophy/database/search_history/search_model.dart';
+import 'package:logosophy/providers/search_history/search_model.dart';
 import 'package:logosophy/pages/settings_tab/utils.dart';
 import 'package:logosophy/pages/splash_pages/animated_logo.dart';
 import 'package:logosophy/router.dart';
@@ -86,7 +86,7 @@ void setupLogging() {
   // print the logs to the console.
   Logger.root.level = Level.INFO;
   Logger.root.onRecord.listen((record) {
-    if (record.level == Level.SEVERE || record.level == Level.SHOUT) {
+    if (!kDebugMode || record.level == Level.SEVERE || record.level == Level.SHOUT) {
       FirebaseCrashlytics.instance.log('${record.loggerName}: ${record.message}');
     }
   });

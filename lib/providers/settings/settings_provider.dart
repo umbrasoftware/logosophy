@@ -1,6 +1,6 @@
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:logging/logging.dart';
-import 'package:logosophy/database/settings/settings_model.dart';
+import 'package:logosophy/providers/settings/settings_model.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -58,6 +58,15 @@ class SettingsNotifier extends _$SettingsNotifier {
   Future<void> changeTheme(String theme) async {
     final current = state.requireValue;
     final newSettings = current.copyWith(theme: theme);
+
+    await _box.put(_key, newSettings);
+    state = AsyncData(newSettings);
+  }
+
+  /// Changes the theme in the provider and SharedPreferences.
+  Future<void> changeFontSize(double newSize) async {
+    final current = state.requireValue;
+    final newSettings = current.copyWith(fontSize: newSize);
 
     await _box.put(_key, newSettings);
     state = AsyncData(newSettings);

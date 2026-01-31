@@ -1,5 +1,5 @@
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
-import 'package:logosophy/database/search_history/history_model.dart';
+import 'package:logosophy/providers/search_history/history_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'history_provider.g.dart';

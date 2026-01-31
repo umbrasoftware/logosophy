@@ -149,6 +149,10 @@ class _TranslationsSettingsPagePtBr implements TranslationsSettingsPageEn {
 	@override String get dark => 'Escuro';
 	@override String get system => 'Sistema';
 	@override String get selectTheme => 'Selecionar tema';
+	@override String get fontSize => 'Tamanho da fonte';
+	@override String get changeFontSize => 'Mude o tamanho da fonte';
+	@override String get bookTitle => 'Título do livro';
+	@override String get fontBookSnippet => 'Exemplo do tamanho da fonte de um trecho do livro, que irá aparecer na página de pesquisa. Apenas para fins de demonstração.';
 }
 
 // Path: searchPage
@@ -267,6 +271,10 @@ extension on TranslationsPtBr {
 			'settingsPage.dark' => 'Escuro',
 			'settingsPage.system' => 'Sistema',
 			'settingsPage.selectTheme' => 'Selecionar tema',
+			'settingsPage.fontSize' => 'Tamanho da fonte',
+			'settingsPage.changeFontSize' => 'Mude o tamanho da fonte',
+			'settingsPage.bookTitle' => 'Título do livro',
+			'settingsPage.fontBookSnippet' => 'Exemplo do tamanho da fonte de um trecho do livro, que irá aparecer na página de pesquisa. Apenas para fins de demonstração.',
 			'searchPage.unkownBook' => 'Livro desconhecido',
 			'searchPage.typeYourSearch' => 'Digite sua busca',
 			'searchPage.startSearch' => 'Digite algo para iniciar a busca',

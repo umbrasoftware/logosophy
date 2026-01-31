@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
-import 'package:logosophy/database/books/book_model.dart';
-import 'package:logosophy/database/books/book_provider.dart';
+import 'package:logosophy/app_utils.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/pdf_reader.dart';
+import 'package:logosophy/providers/books/book_model.dart';
+import 'package:logosophy/providers/books/book_provider.dart';
 
 class BooksPage extends ConsumerStatefulWidget {
   const BooksPage({super.key});
@@ -25,25 +26,13 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     TranslationProvider.of(context);
     final bookAsync = ref.watch(bookProvider);
 
-    return bookAsync.when(
-      loading: () => Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (err, stack) {
-        _logger.shout("$err, $stack");
-        return Scaffold(
-          body: Center(
-            child: Text(err.toString(), style: TextStyle(color: Colors.red)),
-          ),
-        );
-      },
-      data: (bookData) {
-        _books = bookData;
-        return _buildBody();
-      },
-    );
-  }
+    final loadingScreen = AppUtils.buildLoadingPage([bookAsync]);
+    if (loadingScreen != null) return loadingScreen;
 
-  /// Build the main body.
-  Scaffold _buildBody() {
+    final errorScreen = AppUtils.buildErrorPage([bookAsync]);
+    if (errorScreen != null) return errorScreen;
+
+    _books = bookAsync.requireValue;
     return Scaffold(
       appBar: AppBar(title: Text(t.navBar.books)),
       body: GridView.builder(

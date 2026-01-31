@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logosophy/database/books/book_provider.dart';
+import 'package:logosophy/providers/books/book_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:path/path.dart' as p;
 import 'package:pdfrx/pdfrx.dart';

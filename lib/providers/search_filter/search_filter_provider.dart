@@ -1,4 +1,4 @@
-import 'package:logosophy/database/search_filter/search_filter_model.dart';
+import 'package:logosophy/providers/search_filter/search_filter_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'search_filter_provider.g.dart';

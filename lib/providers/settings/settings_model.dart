@@ -7,7 +7,11 @@ part 'settings_model.g.dart';
 @freezed
 @HiveType(typeId: 3)
 abstract class Settings with _$Settings {
-  factory Settings({@HiveField(0) required String language, @HiveField(1) @Default('system') String theme}) = _Settings;
+  factory Settings({
+    @HiveField(0) required String language,
+    @HiveField(1) @Default('system') String theme,
+    @HiveField(2) @Default(0.0) double fontSize,
+  }) = _Settings;
 
   factory Settings.fromJson(Map<String, dynamic> json) => _$SettingsFromJson(json);
 }

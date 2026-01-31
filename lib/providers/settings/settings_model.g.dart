@@ -19,17 +19,20 @@ class SettingsAdapter extends TypeAdapter<Settings> {
     return Settings(
       language: fields[0] as String,
       theme: fields[1] == null ? 'system' : fields[1] as String,
+      fontSize: fields[2] == null ? 0.0 : (fields[2] as num).toDouble(),
     );
   }
 
   @override
   void write(BinaryWriter writer, Settings obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.language)
       ..writeByte(1)
-      ..write(obj.theme);
+      ..write(obj.theme)
+      ..writeByte(2)
+      ..write(obj.fontSize);
   }
 
   @override
@@ -50,9 +53,11 @@ class SettingsAdapter extends TypeAdapter<Settings> {
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
   language: json['language'] as String,
   theme: json['theme'] as String? ?? 'system',
+  fontSize: (json['fontSize'] as num?)?.toDouble() ?? 0.0,
 );
 
 Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
   'language': instance.language,
   'theme': instance.theme,
+  'fontSize': instance.fontSize,
 };

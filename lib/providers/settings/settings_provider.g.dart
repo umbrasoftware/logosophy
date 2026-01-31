@@ -8,12 +8,15 @@ part of 'settings_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Provider responsible for holding the state of the app settings.
 
 @ProviderFor(SettingsNotifier)
 const settingsProvider = SettingsNotifierProvider._();
 
+/// Provider responsible for holding the state of the app settings.
 final class SettingsNotifierProvider
     extends $AsyncNotifierProvider<SettingsNotifier, Settings> {
+  /// Provider responsible for holding the state of the app settings.
   const SettingsNotifierProvider._()
     : super(
         from: null,
@@ -33,7 +36,9 @@ final class SettingsNotifierProvider
   SettingsNotifier create() => SettingsNotifier();
 }
 
-String _$settingsNotifierHash() => r'e4ee968a8de6938888d10f3901b08b64b11d48ce';
+String _$settingsNotifierHash() => r'893c7234c8d2744515404c0f8d558ddceafe53ac';
+
+/// Provider responsible for holding the state of the app settings.
 
 abstract class _$SettingsNotifier extends $AsyncNotifier<Settings> {
   FutureOr<Settings> build();

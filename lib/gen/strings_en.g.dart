@@ -270,6 +270,18 @@ class TranslationsSettingsPageEn {
 
 	/// en: 'Select theme'
 	String get selectTheme => 'Select theme';
+
+	/// en: 'Font size'
+	String get fontSize => 'Font size';
+
+	/// en: 'Change the font size'
+	String get changeFontSize => 'Change the font size';
+
+	/// en: 'Book title'
+	String get bookTitle => 'Book title';
+
+	/// en: 'Example of the font size of a passage from the book, which will appear on the search page. For demonstration purposes only.'
+	String get fontBookSnippet => 'Example of the font size of a passage from the book, which will appear on the search page. For demonstration purposes only.';
 }
 
 // Path: searchPage
@@ -432,6 +444,10 @@ extension on Translations {
 			'settingsPage.dark' => 'Dark',
 			'settingsPage.system' => 'System',
 			'settingsPage.selectTheme' => 'Select theme',
+			'settingsPage.fontSize' => 'Font size',
+			'settingsPage.changeFontSize' => 'Change the font size',
+			'settingsPage.bookTitle' => 'Book title',
+			'settingsPage.fontBookSnippet' => 'Example of the font size of a passage from the book, which will appear on the search page. For demonstration purposes only.',
 			'searchPage.unkownBook' => 'Unkown book',
 			'searchPage.typeYourSearch' => 'Type your search',
 			'searchPage.startSearch' => 'Type something to start your search',

@@ -1,19 +1,19 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:logging/logging.dart';
-import 'package:logosophy/database/search_filter/search_filter_provider.dart';
-import 'package:logosophy/database/search_history/history_model.dart';
-import 'package:logosophy/database/search_history/history_provider.dart';
-import 'package:logosophy/database/settings/settings_provider.dart';
+import 'package:logosophy/app_utils.dart';
+import 'package:logosophy/providers/mappings/mappings_provider.dart';
+import 'package:logosophy/providers/search_filter/search_filter_provider.dart';
+import 'package:logosophy/providers/search_history/history_model.dart';
+import 'package:logosophy/providers/search_history/history_provider.dart';
+import 'package:logosophy/providers/settings/settings_model.dart';
+import 'package:logosophy/providers/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/books_tab/pdf_reader.dart';
-import 'package:logosophy/database/search_history/search_model.dart';
+import 'package:logosophy/providers/search_history/search_model.dart';
 import 'package:logosophy/pages/search_tab/filter_sheet.dart';
 import 'package:logosophy/pages/search_tab/utils.dart';
 import 'package:path/path.dart' as p;
@@ -27,59 +27,54 @@ class SearchPage extends ConsumerStatefulWidget {
 }
 
 class _SearchPageState extends ConsumerState<SearchPage> {
-  final _logger = Logger('SearchPage');
   final TextEditingController _searchController = TextEditingController();
   List<SearchResult> _searchResults = [];
   bool _isLoading = false;
   bool _isFilterActive = false;
   String? _errorMessage;
-  late Map<String, dynamic> mappings;
+  late Map<String, dynamic> _mappings;
   late List<History> _history;
+  late Settings _settings;
 
   @override
   Widget build(BuildContext context) {
     final historyAsync = ref.watch(historyProvider);
-    return historyAsync.when(
-      loading: () => Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (err, stack) {
-        _logger.shout("$err, $stack");
-        return Scaffold(
-          body: Center(
-            child: Text(err.toString(), style: TextStyle(color: Colors.red)),
+    final settingsAsync = ref.watch(settingsProvider);
+    final mappingsAsync = ref.watch(mappingsProvider);
+
+    final loadingPage = AppUtils.buildLoadingPage([historyAsync, settingsAsync, mappingsAsync]);
+    if (loadingPage != null) return loadingPage;
+
+    final errorPage = AppUtils.buildErrorPage([historyAsync, settingsAsync, mappingsAsync]);
+    if (errorPage != null) return errorPage;
+
+    _history = historyAsync.requireValue;
+    _settings = settingsAsync.requireValue;
+    _mappings = mappingsAsync.requireValue;
+
+    final filter = ref.watch(searchFilterProvider);
+    _isFilterActive = filter.includeOnlyIds.isNotEmpty || filter.excludeOnlyIds.isNotEmpty;
+
+    final colorScheme = Theme.of(context).colorScheme;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(t.navBar.search),
+        actions: [
+          IconButton(
+            onPressed: _buildFilterSheet,
+            icon: Icon(Icons.filter_list_alt, color: _isFilterActive ? colorScheme.primary : null),
           ),
-        );
-      },
-      data: (historyData) {
-        _history = historyData;
-
-        final filter = ref.watch(searchFilterProvider);
-        _isFilterActive = filter.includeOnlyIds.isNotEmpty || filter.excludeOnlyIds.isNotEmpty;
-
-        final colorScheme = Theme.of(context).colorScheme;
-        return FutureBuilder(
-          future: getMappings(),
-          builder: (context, asyncSnapshot) {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text(t.navBar.search),
-                actions: [
-                  IconButton(
-                    onPressed: _buildFilterSheet,
-                    icon: Icon(Icons.filter_list_alt, color: _isFilterActive ? colorScheme.primary : null),
-                  ),
-                ],
-              ),
-              drawer: _buildDrawer(),
-              body: _buildBody(colorScheme),
-            );
-          },
-        );
-      },
+        ],
+      ),
+      drawer: _buildDrawer(),
+      body: _buildBody(),
     );
   }
 
   /// Build the main page body.
-  Padding _buildBody(ColorScheme colorScheme) {
+  Padding _buildBody() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -186,7 +181,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       itemCount: _searchResults.length,
       itemBuilder: (context, index) {
         final result = _searchResults[index];
-        final bookTitle = SearchUtils.getBookTitle(result.bookId, mappings);
+        final bookTitle = SearchUtils.getBookTitle(result.bookId, _mappings);
 
         return GestureDetector(
           onTap: () async {
@@ -207,11 +202,15 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 children: [
                   Text(
                     bookTitle,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.onSurface),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16 + _settings.fontSize,
+                      color: colorScheme.onSurface,
+                    ),
                   ),
                   Text(
                     t.bookPage.page(page: result.page),
-                    style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                    style: TextStyle(fontSize: 12 + _settings.fontSize, color: colorScheme.onSurfaceVariant),
                   ),
                   const SizedBox(height: 12),
                   Container(
@@ -224,7 +223,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     ),
                     child: Text(
                       result.content,
-                      style: TextStyle(fontSize: 13, color: colorScheme.onSurface, fontStyle: FontStyle.italic),
+                      style: TextStyle(
+                        fontSize: 13 + _settings.fontSize,
+                        color: colorScheme.onSurface,
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
                   ),
                 ],
@@ -291,10 +294,17 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       itemBuilder: (context, index) {
         final item = _history[index];
         return ListTile(
-          title: Text(_formatDate(item), style: TextStyle(fontSize: 12, color: colorScheme.outline)),
+          title: Text(
+            _formatDate(item),
+            style: TextStyle(fontSize: 11 + _settings.fontSize, color: colorScheme.outline),
+          ),
           subtitle: Text(
             item.query,
-            style: TextStyle(fontSize: 15, color: colorScheme.onSurface, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              fontSize: 15 + _settings.fontSize,
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.w500,
+            ),
             overflow: .clip,
           ),
           leading: item.wasFiltered ? Icon(Icons.filter_list_alt, color: colorScheme.primary) : null,
@@ -316,16 +326,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
-  /// Gets the book mappings from storage.
-  Future<void> getMappings() async {
-    final appDir = await getApplicationDocumentsDirectory();
-    final booksDir = Directory(p.join(appDir.path, 'books'));
-    final mappingsFile = File(p.join(booksDir.path, 'mappings.json'));
-
-    final content = await mappingsFile.readAsString();
-    mappings = jsonDecode(content);
-  }
-
   /// Formats the date for display, given a [History] item.
   String _formatDate(History item) {
     final language = ref.watch(settingsProvider).requireValue.language;
@@ -341,7 +341,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        return FilterSheet(mappings: mappings);
+        return FilterSheet();
       },
     );
   }

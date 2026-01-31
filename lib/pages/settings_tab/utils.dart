@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logosophy/database/settings/settings_provider.dart';
+import 'package:logosophy/providers/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 
 class SettingsUtils {

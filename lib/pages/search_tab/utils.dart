@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
-import 'package:logosophy/database/search_filter/search_filter_provider.dart';
+import 'package:logosophy/providers/search_filter/search_filter_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 
 class SearchUtils {

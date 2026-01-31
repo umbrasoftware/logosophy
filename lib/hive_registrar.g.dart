@@ -3,10 +3,10 @@
 // Check in to version control
 
 import 'package:hive_ce/hive.dart';
-import 'package:logosophy/database/books/book_model.dart';
-import 'package:logosophy/database/search_history/history_model.dart';
-import 'package:logosophy/database/search_history/search_model.dart';
-import 'package:logosophy/database/settings/settings_model.dart';
+import 'package:logosophy/providers/books/book_model.dart';
+import 'package:logosophy/providers/search_history/history_model.dart';
+import 'package:logosophy/providers/search_history/search_model.dart';
+import 'package:logosophy/providers/settings/settings_model.dart';
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {

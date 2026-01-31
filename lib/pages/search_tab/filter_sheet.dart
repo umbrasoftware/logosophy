@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logosophy/database/search_filter/search_filter_provider.dart';
+import 'package:logosophy/providers/mappings/mappings_provider.dart';
+import 'package:logosophy/providers/search_filter/search_filter_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 
 class FilterSheet extends ConsumerStatefulWidget {
-  const FilterSheet({super.key, required this.mappings});
-
-  final Map<String, dynamic> mappings;
+  const FilterSheet({super.key});
 
   @override
   ConsumerState<FilterSheet> createState() => _FilterSheetState();
@@ -17,7 +16,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
 
   @override
   void initState() {
-    _mappings = widget.mappings;
+    _mappings = ref.read(mappingsProvider).requireValue;
     super.initState();
   }
 

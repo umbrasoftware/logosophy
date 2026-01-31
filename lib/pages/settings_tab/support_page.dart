@@ -16,7 +16,7 @@ class _SupportPageState extends State<SupportPage> {
   final _messageController = TextEditingController();
   bool _isProblem = false;
   bool _canContact = true;
-  bool _isMessage = true;
+  bool _isMessage = false;
   bool _isSending = false;
 
   @override
@@ -34,6 +34,7 @@ class _SupportPageState extends State<SupportPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(t.feedbackPage.contactUs)),
       body: Padding(
@@ -56,7 +57,8 @@ class _SupportPageState extends State<SupportPage> {
               decoration: InputDecoration(border: const OutlineInputBorder(), labelText: t.feedbackPage.message),
               onChanged: (value) {
                 setState(() {
-                  _isMessage = _messageController.text.trim().length < 20;
+                  final length = _messageController.text.trim().length;
+                  _isMessage = length > 0 && length < 20;
                 });
               },
             ),
@@ -90,6 +92,7 @@ class _SupportPageState extends State<SupportPage> {
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: _isMessage ? null : onSubmit,
+              style: ElevatedButton.styleFrom(backgroundColor: colorScheme.surfaceContainer),
               child: _isSending ? CircularProgressIndicator() : Text(t.btnActions.send),
             ),
           ],

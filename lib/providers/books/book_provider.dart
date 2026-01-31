@@ -4,7 +4,7 @@ import 'dart:ui';
 
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:logging/logging.dart';
-import 'package:logosophy/database/books/book_model.dart';
+import 'package:logosophy/providers/books/book_model.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

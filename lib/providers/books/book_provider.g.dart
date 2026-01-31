@@ -39,7 +39,7 @@ final class BookNotifierProvider
   BookNotifier create() => BookNotifier();
 }
 
-String _$bookNotifierHash() => r'4a34d5a3df65983190957dc865eb2ef6f58e2ec3';
+String _$bookNotifierHash() => r'7ab9c92030cc70321cd53f32ddd524b9e8436f5d';
 
 /// Provider responsable for holding the book status. The state is always sorted by
 /// the most recent. The Provider state is always sorted.
