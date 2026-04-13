@@ -41,6 +41,7 @@ dependencies:
   hive_ce_flutter: ^2.3.4
   hive_ce: ^2.18.0
   device_info_plus: ^12.3.0
+  package_info_plus: ^9.0.1
 
 dev_dependencies:
   flutter_test:

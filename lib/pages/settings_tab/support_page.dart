@@ -2,6 +2,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/main.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SupportPage extends StatefulWidget {
   const SupportPage({super.key});
@@ -104,8 +105,10 @@ class _SupportPageState extends State<SupportPage> {
   /// Submits the form to database.
   Future<void> onSubmit() async {
     final deviceInfoPlugin = DeviceInfoPlugin();
+    final pubspecInfo = await PackageInfo.fromPlatform();
     final deviceInfo = await deviceInfoPlugin.deviceInfo;
     final allInfo = deviceInfo.data;
+    allInfo['appVersion'] = '${pubspecInfo.version}+${pubspecInfo.buildNumber}';
 
     setState(() {
       _isSending = true;

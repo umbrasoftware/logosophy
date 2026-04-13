@@ -6,6 +6,7 @@ import 'package:logosophy/providers/settings/settings_model.dart';
 import 'package:logosophy/providers/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/settings_tab/utils.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -32,58 +33,90 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
     return Scaffold(
       appBar: AppBar(title: Text(t.settingsPage.settings)),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
+      body: Column(
         children: [
-          Card(
-            color: colorScheme.surfaceContainer,
-            child: ListTile(
-              textColor: colorScheme.onSurface,
-              iconColor: colorScheme.onSurface,
-              leading: const Icon(Icons.language),
-              title: Text(t.settingsPage.language),
-              subtitle: Text(SettingsUtils.getLocaleName(ref), style: TextStyle(color: colorScheme.onSurfaceVariant)),
-              trailing: Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
-              onTap: _showLanguageDialog,
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16.0),
+              children: [
+                Card(
+                  color: colorScheme.surfaceContainer,
+                  child: ListTile(
+                    textColor: colorScheme.onSurface,
+                    iconColor: colorScheme.onSurface,
+                    leading: const Icon(Icons.language),
+                    title: Text(t.settingsPage.language),
+                    subtitle: Text(
+                      SettingsUtils.getLocaleName(ref),
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
+                    ),
+                    trailing: Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
+                    onTap: _showLanguageDialog,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Card(
+                  color: colorScheme.surfaceContainer,
+                  child: ListTile(
+                    textColor: colorScheme.onSurface,
+                    iconColor: colorScheme.onSurface,
+                    leading: const Icon(Icons.brightness_4),
+                    title: Text(t.settingsPage.theme),
+                    subtitle: Text(
+                      SettingsUtils.getThemeName(ref),
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
+                    ),
+                    trailing: Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
+                    onTap: _showThemeDialog,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Card(
+                  color: colorScheme.surfaceContainer,
+                  child: ListTile(
+                    textColor: colorScheme.onSurface,
+                    iconColor: colorScheme.onSurface,
+                    leading: const Icon(Icons.font_download),
+                    title: Text(t.settingsPage.fontSize),
+                    subtitle: Text(
+                      t.settingsPage.changeFontSize,
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
+                    ),
+                    trailing: Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
+                    onTap: _showFontSizeDialog,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Card(
+                  color: colorScheme.surfaceContainer,
+                  child: ListTile(
+                    textColor: colorScheme.onSurface,
+                    iconColor: colorScheme.onSurface,
+                    leading: const Icon(Icons.contact_support),
+                    title: Text(t.feedbackPage.contactUs),
+                    subtitle: Text(t.feedbackPage.desc, style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                    trailing: Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
+                    onTap: () => GoRouter.of(context).push('/support'),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-          Card(
-            color: colorScheme.surfaceContainer,
-            child: ListTile(
-              textColor: colorScheme.onSurface,
-              iconColor: colorScheme.onSurface,
-              leading: const Icon(Icons.brightness_4),
-              title: Text(t.settingsPage.theme),
-              subtitle: Text(SettingsUtils.getThemeName(ref), style: TextStyle(color: colorScheme.onSurfaceVariant)),
-              trailing: Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
-              onTap: _showThemeDialog,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Card(
-            color: colorScheme.surfaceContainer,
-            child: ListTile(
-              textColor: colorScheme.onSurface,
-              iconColor: colorScheme.onSurface,
-              leading: const Icon(Icons.font_download),
-              title: Text(t.settingsPage.fontSize),
-              subtitle: Text(t.settingsPage.changeFontSize, style: TextStyle(color: colorScheme.onSurfaceVariant)),
-              trailing: Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
-              onTap: _showFontSizeDialog,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Card(
-            color: colorScheme.surfaceContainer,
-            child: ListTile(
-              textColor: colorScheme.onSurface,
-              iconColor: colorScheme.onSurface,
-              leading: const Icon(Icons.contact_support),
-              title: Text(t.feedbackPage.contactUs),
-              subtitle: Text(t.feedbackPage.desc, style: TextStyle(color: colorScheme.onSurfaceVariant)),
-              trailing: Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
-              onTap: () => GoRouter.of(context).push('/support'),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: FutureBuilder(
+              future: PackageInfo.fromPlatform(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final data = snapshot.data!;
+                  return Text(
+                    "Version: ${data.version}+${data.buildNumber}",
+                    style: TextStyle(color: colorScheme.onSurfaceVariant),
+                  );
+                } else {
+                  return const SizedBox.shrink();
+                }
+              },
             ),
           ),
         ],

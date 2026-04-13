@@ -84,6 +84,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             decoration: InputDecoration(
               labelText: t.searchPage.typeYourSearch,
               labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+              prefixIcon: IconButton(
+                icon: Icon(Icons.clear, color: colorScheme.onSurfaceVariant),
+                onPressed: () {
+                  _searchController.clear();
+                },
+              ),
               suffixIcon: IconButton(
                 icon: Icon(Icons.search, color: colorScheme.onSurface),
                 onPressed: () => _performSearch(_searchController.text),
