@@ -34,6 +34,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     return Scaffold(
       appBar: AppBar(title: Text(t.settingsPage.settings)),
       body: Column(
+        crossAxisAlignment: .start,
         children: [
           Expanded(
             child: ListView(
@@ -103,7 +104,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
+            padding: const EdgeInsets.only(bottom: 16.0, left: 16.0),
             child: FutureBuilder(
               future: PackageInfo.fromPlatform(),
               builder: (context, snapshot) {
@@ -111,7 +112,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   final data = snapshot.data!;
                   return Text(
                     "Version: ${data.version}+${data.buildNumber}",
-                    style: TextStyle(color: colorScheme.onSurfaceVariant),
+                    style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 10),
                   );
                 } else {
                   return const SizedBox.shrink();

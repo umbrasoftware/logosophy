@@ -38,12 +38,12 @@ class HistoryNotifier extends _$HistoryNotifier {
     final modifiableState = [...state.requireValue];
     while (_box.length >= maxHistory) {
       // Sort to find the oldest
-      final historyInBox = _box.values.toList();
-      historyInBox.sort((a, b) => a.timestamp.compareTo(b.timestamp)); // Oldest first
-      final oldestItem = historyInBox.first;
+      final entries = _box.toMap().entries.toList();
+      entries.sort((a, b) => a.value.timestamp.compareTo(b.value.timestamp)); // Oldest first
+      final oldestEntry = entries.first;
 
-      await _box.delete(oldestItem.timestamp.toIso8601String());
-      modifiableState.removeWhere((e) => e.timestamp == oldestItem.timestamp);
+      await _box.delete(oldestEntry.key);
+      modifiableState.removeWhere((e) => e.timestamp == oldestEntry.value.timestamp);
     }
 
     await _box.put(result.timestamp.toIso8601String(), result);
@@ -55,7 +55,15 @@ class HistoryNotifier extends _$HistoryNotifier {
 
   /// Delete a [History] from the history.
   Future<void> deleteHistoryItem(DateTime timestamp) async {
-    await _box.delete(timestamp.toIso8601String());
+    final entries = _box.toMap().entries;
+    final entryToDelete = entries.where((e) => e.value.timestamp == timestamp).firstOrNull;
+    
+    if (entryToDelete != null) {
+      await _box.delete(entryToDelete.key);
+    } else {
+      // Fallback in case the exact timestamp wasn't found but we try the string
+      await _box.delete(timestamp.toIso8601String());
+    }
 
     final modifiableState = [...state.requireValue];
     modifiableState.removeWhere((item) => item.timestamp == timestamp);
