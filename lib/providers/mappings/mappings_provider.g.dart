@@ -8,17 +8,17 @@ part of 'mappings_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Provider responsable for holding the mappings file, which contains data for books
+/// Provider responsable for holding the mappings file state, which contains data for books
 /// of all languages.
 
 @ProviderFor(MappingsNotifier)
 const mappingsProvider = MappingsNotifierProvider._();
 
-/// Provider responsable for holding the mappings file, which contains data for books
+/// Provider responsable for holding the mappings file state, which contains data for books
 /// of all languages.
 final class MappingsNotifierProvider
     extends $AsyncNotifierProvider<MappingsNotifier, Map<String, dynamic>> {
-  /// Provider responsable for holding the mappings file, which contains data for books
+  /// Provider responsable for holding the mappings file state, which contains data for books
   /// of all languages.
   const MappingsNotifierProvider._()
     : super(
@@ -39,9 +39,9 @@ final class MappingsNotifierProvider
   MappingsNotifier create() => MappingsNotifier();
 }
 
-String _$mappingsNotifierHash() => r'4217f00afc1ac23c223ac0b8b2c44bd2a7942b0f';
+String _$mappingsNotifierHash() => r'66877916565dbc5ed2f9f5f6da2825bc93148590';
 
-/// Provider responsable for holding the mappings file, which contains data for books
+/// Provider responsable for holding the mappings file state, which contains data for books
 /// of all languages.
 
 abstract class _$MappingsNotifier extends $AsyncNotifier<Map<String, dynamic>> {

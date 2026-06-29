@@ -39,7 +39,7 @@ final class HistoryNotifierProvider
   HistoryNotifier create() => HistoryNotifier();
 }
 
-String _$historyNotifierHash() => r'c2f626c3fee0158e73dff72ab4736428f6ed2114';
+String _$historyNotifierHash() => r'2ff1f1677d337045625a60bae3198ddf6b002eaa';
 
 /// Provider responsable for holding the search history. The state is always sorted by
 /// the most recent.
