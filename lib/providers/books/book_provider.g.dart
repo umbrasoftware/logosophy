@@ -16,8 +16,7 @@ const bookProvider = BookNotifierProvider._();
 
 /// Provider responsable for holding the book status. The state is always sorted by
 /// the most recent. The Provider state is always sorted.
-final class BookNotifierProvider
-    extends $AsyncNotifierProvider<BookNotifier, List<BookData>> {
+final class BookNotifierProvider extends $AsyncNotifierProvider<BookNotifier, List<BookData>> {
   /// Provider responsable for holding the book status. The state is always sorted by
   /// the most recent. The Provider state is always sorted.
   const BookNotifierProvider._()

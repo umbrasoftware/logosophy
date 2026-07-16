@@ -13,9 +13,7 @@ class BookDataAdapter extends TypeAdapter<BookData> {
   @override
   BookData read(BinaryReader reader) {
     final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
+    final fields = <int, dynamic>{for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read()};
     return BookData(
       bookId: fields[0] as String,
       coverPath: fields[1] as String,
@@ -55,10 +53,7 @@ class BookDataAdapter extends TypeAdapter<BookData> {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is BookDataAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+      identical(this, other) || other is BookDataAdapter && runtimeType == other.runtimeType && typeId == other.typeId;
 }
 
 // **************************************************************************

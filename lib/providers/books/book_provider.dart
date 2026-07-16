@@ -96,11 +96,15 @@ class BookNotifier extends _$BookNotifier {
     final List<BookData> newState = [];
 
     for (final book in _box.values) {
+      // The absolute paths stored in Hive can become stale: on iOS/macOS the
+      // app's documents directory lives inside a container whose UUID is not
+      // stable across reinstalls or app updates. Rebuild the paths from the
+      // current documents directory so covers and PDFs keep resolving.
       newState.add(
         BookData(
           bookId: book.bookId,
-          bookPath: book.bookPath,
-          coverPath: book.coverPath,
+          bookPath: p.join(_langDir.path, '${book.bookId}.pdf'),
+          coverPath: p.join(_langDir.path, '${book.bookId}_cover.png'),
           title: book.title,
           lastOpened: book.lastOpened,
           x: book.x,
