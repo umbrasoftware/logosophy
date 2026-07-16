@@ -16,8 +16,7 @@ const historyProvider = HistoryNotifierProvider._();
 
 /// Provider responsable for holding the search history. The state is always sorted by
 /// the most recent.
-final class HistoryNotifierProvider
-    extends $AsyncNotifierProvider<HistoryNotifier, List<History>> {
+final class HistoryNotifierProvider extends $AsyncNotifierProvider<HistoryNotifier, List<History>> {
   /// Provider responsable for holding the search history. The state is always sorted by
   /// the most recent.
   const HistoryNotifierProvider._()

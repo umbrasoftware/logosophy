@@ -14,8 +14,7 @@ part of 'settings_provider.dart';
 const settingsProvider = SettingsNotifierProvider._();
 
 /// Provider responsible for holding the state of the app settings.
-final class SettingsNotifierProvider
-    extends $AsyncNotifierProvider<SettingsNotifier, Settings> {
+final class SettingsNotifierProvider extends $AsyncNotifierProvider<SettingsNotifier, Settings> {
   /// Provider responsible for holding the state of the app settings.
   const SettingsNotifierProvider._()
     : super(

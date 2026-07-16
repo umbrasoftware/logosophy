@@ -16,8 +16,7 @@ const mappingsProvider = MappingsNotifierProvider._();
 
 /// Provider responsable for holding the mappings file state, which contains data for books
 /// of all languages.
-final class MappingsNotifierProvider
-    extends $AsyncNotifierProvider<MappingsNotifier, Map<String, dynamic>> {
+final class MappingsNotifierProvider extends $AsyncNotifierProvider<MappingsNotifier, Map<String, dynamic>> {
   /// Provider responsable for holding the mappings file state, which contains data for books
   /// of all languages.
   const MappingsNotifierProvider._()
@@ -50,16 +49,11 @@ abstract class _$MappingsNotifier extends $AsyncNotifier<Map<String, dynamic>> {
   @override
   void runBuild() {
     final created = build();
-    final ref =
-        this.ref
-            as $Ref<AsyncValue<Map<String, dynamic>>, Map<String, dynamic>>;
+    final ref = this.ref as $Ref<AsyncValue<Map<String, dynamic>>, Map<String, dynamic>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<
-                AsyncValue<Map<String, dynamic>>,
-                Map<String, dynamic>
-              >,
+              AnyNotifier<AsyncValue<Map<String, dynamic>>, Map<String, dynamic>>,
               AsyncValue<Map<String, dynamic>>,
               Object?,
               Object?

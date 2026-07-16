@@ -13,9 +13,7 @@ class SearchResultAdapter extends TypeAdapter<SearchResult> {
   @override
   SearchResult read(BinaryReader reader) {
     final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
+    final fields = <int, dynamic>{for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read()};
     return SearchResult(
       similarity: (fields[0] as num).toDouble(),
       content: fields[1] as String,
@@ -44,27 +42,23 @@ class SearchResultAdapter extends TypeAdapter<SearchResult> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SearchResultAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+      other is SearchResultAdapter && runtimeType == other.runtimeType && typeId == other.typeId;
 }
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_SearchResult _$SearchResultFromJson(Map<String, dynamic> json) =>
-    _SearchResult(
-      similarity: (json['similarity'] as num).toDouble(),
-      content: json['content'] as String,
-      page: (_readFromMetadata(json, 'page') as num).toInt(),
-      bookId: _readFromMetadata(json, 'book_id') as String,
-    );
+_SearchResult _$SearchResultFromJson(Map<String, dynamic> json) => _SearchResult(
+  similarity: (json['similarity'] as num).toDouble(),
+  content: json['content'] as String,
+  page: (_readFromMetadata(json, 'page') as num).toInt(),
+  bookId: _readFromMetadata(json, 'book_id') as String,
+);
 
-Map<String, dynamic> _$SearchResultToJson(_SearchResult instance) =>
-    <String, dynamic>{
-      'similarity': instance.similarity,
-      'content': instance.content,
-      'page': instance.page,
-      'book_id': instance.bookId,
-    };
+Map<String, dynamic> _$SearchResultToJson(_SearchResult instance) => <String, dynamic>{
+  'similarity': instance.similarity,
+  'content': instance.content,
+  'page': instance.page,
+  'book_id': instance.bookId,
+};

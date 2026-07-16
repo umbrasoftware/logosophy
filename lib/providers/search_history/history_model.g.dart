@@ -13,15 +13,11 @@ class HistoryAdapter extends TypeAdapter<History> {
   @override
   History read(BinaryReader reader) {
     final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
+    final fields = <int, dynamic>{for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read()};
     return History(
       query: fields[0] as String,
       timestamp: fields[1] as DateTime,
-      results: fields[2] == null
-          ? []
-          : (fields[2] as List).cast<SearchResult>(),
+      results: fields[2] == null ? [] : (fields[2] as List).cast<SearchResult>(),
       wasFiltered: fields[3] == null ? false : fields[3] as bool,
     );
   }
@@ -45,10 +41,7 @@ class HistoryAdapter extends TypeAdapter<History> {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is HistoryAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+      identical(this, other) || other is HistoryAdapter && runtimeType == other.runtimeType && typeId == other.typeId;
 }
 
 // **************************************************************************
@@ -59,9 +52,7 @@ _History _$HistoryFromJson(Map<String, dynamic> json) => _History(
   query: json['query'] as String,
   timestamp: DateTime.parse(json['timestamp'] as String),
   results:
-      (json['results'] as List<dynamic>?)
-          ?.map((e) => SearchResult.fromJson(e as Map<String, dynamic>))
-          .toList() ??
+      (json['results'] as List<dynamic>?)?.map((e) => SearchResult.fromJson(e as Map<String, dynamic>)).toList() ??
       const [],
   wasFiltered: json['wasFiltered'] as bool? ?? false,
 );

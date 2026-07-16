@@ -13,9 +13,7 @@ class SettingsAdapter extends TypeAdapter<Settings> {
   @override
   Settings read(BinaryReader reader) {
     final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
+    final fields = <int, dynamic>{for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read()};
     return Settings(
       language: fields[0] as String,
       theme: fields[1] == null ? 'system' : fields[1] as String,
@@ -40,10 +38,7 @@ class SettingsAdapter extends TypeAdapter<Settings> {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SettingsAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+      identical(this, other) || other is SettingsAdapter && runtimeType == other.runtimeType && typeId == other.typeId;
 }
 
 // **************************************************************************

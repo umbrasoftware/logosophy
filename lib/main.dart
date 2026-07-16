@@ -36,7 +36,10 @@ Future<void> main() async {
     return true;
   };
 
-  supabase = await Supabase.initialize(url: dotenv.env['SUPABASE_URL']!, publishableKey: dotenv.env['SUPABASE_SERVICE_KEY']!);
+  supabase = await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL']!,
+    publishableKey: dotenv.env['SUPABASE_SERVICE_KEY']!,
+  );
   await Hive.initFlutter();
   runApp(ProviderScope(child: TranslationProvider(child: App())));
 }

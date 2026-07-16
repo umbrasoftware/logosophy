@@ -57,7 +57,7 @@ class HistoryNotifier extends _$HistoryNotifier {
   Future<void> deleteHistoryItem(DateTime timestamp) async {
     final entries = _box.toMap().entries;
     final entryToDelete = entries.where((e) => e.value.timestamp == timestamp).firstOrNull;
-    
+
     if (entryToDelete != null) {
       await _box.delete(entryToDelete.key);
     } else {
