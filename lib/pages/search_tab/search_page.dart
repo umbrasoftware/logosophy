@@ -16,6 +16,7 @@ import 'package:logosophy/pages/books_tab/pdf_reader.dart';
 import 'package:logosophy/providers/search_history/search_model.dart';
 import 'package:logosophy/pages/search_tab/filter_sheet.dart';
 import 'package:logosophy/pages/search_tab/utils.dart';
+import 'package:logosophy/theme.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -31,10 +32,24 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   List<SearchResult> _searchResults = [];
   bool _isLoading = false;
   bool _isFilterActive = false;
+  int _filterCount = 0;
   String? _errorMessage;
   late Map<String, dynamic> _mappings;
   late List<History> _history;
   late Settings _settings;
+
+  @override
+  void initState() {
+    super.initState();
+    // Rebuild so the clear button appears only while there is text.
+    _searchController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,19 +69,22 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
     final filter = ref.watch(searchFilterProvider);
     _isFilterActive = filter.includeOnlyIds.isNotEmpty || filter.excludeOnlyIds.isNotEmpty;
+    _filterCount = filter.includeOnlyIds.length + filter.excludeOnlyIds.length;
 
-    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: Text(t.navBar.search),
         actions: [
-          IconButton(
-            onPressed: _buildFilterSheet,
-            icon: Icon(Icons.filter_list_alt, color: _isFilterActive ? colorScheme.primary : null),
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.history),
+              tooltip: t.searchPage.searchHistory,
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            ),
           ),
         ],
       ),
-      drawer: _buildDrawer(),
+      endDrawer: _buildDrawer(),
       body: _buildBody(),
     );
   }
@@ -81,30 +99,45 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         children: [
           TextField(
             controller: _searchController,
+            textInputAction: TextInputAction.search,
             decoration: InputDecoration(
-              labelText: t.searchPage.typeYourSearch,
-              labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
-              prefixIcon: IconButton(
-                icon: Icon(Icons.clear, color: colorScheme.onSurfaceVariant),
-                onPressed: () {
-                  _searchController.clear();
-                },
+              hintText: t.searchPage.typeYourSearch,
+              filled: true,
+              fillColor: colorScheme.surfaceContainerLowest,
+              prefixIcon: Icon(Icons.search, color: colorScheme.primary),
+              suffixIcon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_searchController.text.isNotEmpty)
+                    IconButton(icon: const Icon(Icons.clear), onPressed: _searchController.clear),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6.0),
+                    child: IconButton(
+                      tooltip: t.filter.activateFilters,
+                      icon: Badge(
+                        isLabelVisible: _isFilterActive,
+                        label: Text('$_filterCount'),
+                        backgroundColor: colorScheme.primary,
+                        textColor: colorScheme.onPrimary,
+                        child: Icon(
+                          Icons.tune,
+                          color: _isFilterActive ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      onPressed: _buildFilterSheet,
+                    ),
+                  ),
+                ],
               ),
-              suffixIcon: IconButton(
-                icon: Icon(Icons.search, color: colorScheme.onSurface),
-                onPressed: () => _performSearch(_searchController.text),
-              ),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-                borderSide: BorderSide(color: colorScheme.outline),
+                borderRadius: BorderRadius.circular(28.0),
+                borderSide: BorderSide(color: colorScheme.outlineVariant),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
+                borderRadius: BorderRadius.circular(28.0),
                 borderSide: BorderSide(color: colorScheme.primary, width: 2),
               ),
             ),
-            style: TextStyle(color: colorScheme.onSurface),
             onSubmitted: (value) => _performSearch(value),
           ),
           const SizedBox(height: 20),
@@ -202,38 +235,51 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             color: colorScheme.surfaceContainer,
             margin: const EdgeInsets.only(bottom: 12.0),
             child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(14.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    bookTitle,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16 + _settings.fontSize,
-                      color: colorScheme.onSurface,
-                    ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          bookTitle,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15 + _settings.fontSize,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 3.0),
+                        decoration: BoxDecoration(
+                          color: colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          t.bookPage.page(page: result.page),
+                          style: TextStyle(
+                            fontSize: 11 + _settings.fontSize,
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.onPrimaryContainer,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    t.bookPage.page(page: result.page),
-                    style: TextStyle(fontSize: 12 + _settings.fontSize, color: colorScheme.onSurfaceVariant),
-                  ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.only(left: 10.0),
                     decoration: BoxDecoration(
-                      color: colorScheme.surfaceDim,
-                      borderRadius: BorderRadius.circular(6.0),
-                      border: Border.all(color: colorScheme.outlineVariant),
+                      border: Border(left: BorderSide(color: colorScheme.primary, width: 2)),
                     ),
                     child: Text(
                       result.content,
-                      style: TextStyle(
-                        fontSize: 13 + _settings.fontSize,
-                        color: colorScheme.onSurface,
-                        fontStyle: FontStyle.italic,
-                      ),
+                      style: AuroraTheme.passage(fontSize: 13 + _settings.fontSize, color: colorScheme.onSurface),
                     ),
                   ),
                 ],
@@ -255,35 +301,44 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         children: [
           Container(
             width: double.infinity,
-            height: 100,
-            decoration: BoxDecoration(color: colorScheme.surfaceContainer),
-            padding: const EdgeInsets.fromLTRB(16, 50, 16, 16),
+            color: colorScheme.surfaceContainer,
+            padding: EdgeInsets.fromLTRB(16, MediaQuery.paddingOf(context).top + 12, 4, 12),
             child: Row(
-              mainAxisAlignment: .spaceBetween,
-              crossAxisAlignment: .end,
               children: [
-                Icon(Icons.history, color: colorScheme.primary),
-                const SizedBox(width: 4.0),
-                Text(
-                  t.searchPage.searchHistory,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: colorScheme.onSurface),
+                CircleAvatar(
+                  radius: 16,
+                  backgroundColor: colorScheme.primaryContainer,
+                  foregroundColor: colorScheme.onPrimaryContainer,
+                  child: const Icon(Icons.history, size: 18),
                 ),
-                Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  iconSize: 28,
-                  color: Colors.red,
-                  onPressed: () async {
-                    await ref.read(historyProvider.notifier).clear();
-                  },
+                const SizedBox(width: 10.0),
+                Expanded(
+                  child: Text(
+                    t.searchPage.searchHistory,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: colorScheme.onSurface),
+                  ),
                 ),
+                if (_history.isNotEmpty)
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline),
+                    color: colorScheme.error,
+                    tooltip: t.btnActions.delete,
+                    onPressed: _confirmClearHistory,
+                  ),
               ],
             ),
           ),
           Expanded(
             child: _history.isEmpty
                 ? Center(
-                    child: Text(t.searchPage.noHistoryYet, style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.history, size: 48, color: colorScheme.outlineVariant),
+                        const SizedBox(height: 8.0),
+                        Text(t.searchPage.noHistoryYet, style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                      ],
+                    ),
                   )
                 : _buildSearchWidgets(colorScheme),
           ),
@@ -292,30 +347,62 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
+  /// Asks for confirmation before clearing the whole search history.
+  Future<void> _confirmClearHistory() async {
+    final colorScheme = Theme.of(context).colorScheme;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(t.btnActions.confirmDelete),
+        content: Text(t.searchPage.searchHistory),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.btnActions.cancel)),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: colorScheme.error, foregroundColor: colorScheme.onError),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(t.btnActions.delete),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await ref.read(historyProvider.notifier).clear();
+    }
+  }
+
   /// Build the search history widgets.
   ListView _buildSearchWidgets(ColorScheme colorScheme) {
-    return ListView.builder(
-      padding: EdgeInsets.zero,
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
       itemCount: _history.length,
+      separatorBuilder: (context, index) =>
+          Divider(height: 1, indent: 16, endIndent: 16, color: colorScheme.outlineVariant),
       itemBuilder: (context, index) {
         final item = _history[index];
         return ListTile(
-          title: Text(
-            _formatDate(item),
-            style: TextStyle(fontSize: 11 + _settings.fontSize, color: colorScheme.outline),
+          leading: Icon(
+            item.wasFiltered ? Icons.tune : Icons.search,
+            size: 20,
+            color: item.wasFiltered ? colorScheme.primary : colorScheme.onSurfaceVariant,
           ),
-          subtitle: Text(
+          title: Text(
             item.query,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 15 + _settings.fontSize,
-              color: colorScheme.onSurface,
               fontWeight: FontWeight.w500,
+              color: colorScheme.onSurface,
             ),
-            overflow: .clip,
           ),
-          leading: item.wasFiltered ? Icon(Icons.filter_list_alt, color: colorScheme.primary) : null,
+          subtitle: Text(
+            _formatDate(item),
+            style: TextStyle(fontSize: 11 + _settings.fontSize, color: colorScheme.onSurfaceVariant),
+          ),
           trailing: IconButton(
-            icon: Icon(Icons.close, size: 20, color: Colors.red),
+            icon: Icon(Icons.close, size: 18, color: colorScheme.onSurfaceVariant),
+            tooltip: t.btnActions.delete,
             onPressed: () async {
               await ref.read(historyProvider.notifier).deleteHistoryItem(item.timestamp);
             },

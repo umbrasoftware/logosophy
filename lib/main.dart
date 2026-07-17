@@ -1,6 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -19,6 +18,7 @@ import 'package:logosophy/providers/search_history/search_model.dart';
 import 'package:logosophy/pages/settings_tab/utils.dart';
 import 'package:logosophy/pages/splash_pages/animated_logo.dart';
 import 'package:logosophy/router.dart';
+import 'package:logosophy/theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 late Supabase supabase;
@@ -36,10 +36,7 @@ Future<void> main() async {
     return true;
   };
 
-  supabase = await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    publishableKey: dotenv.env['SUPABASE_SERVICE_KEY']!,
-  );
+  supabase = await Supabase.initialize(url: dotenv.env['SUPABASE_URL']!, anonKey: dotenv.env['SUPABASE_SERVICE_KEY']!);
   await Hive.initFlutter();
   runApp(ProviderScope(child: TranslationProvider(child: App())));
 }
@@ -71,8 +68,8 @@ class _AppState extends ConsumerState<App> {
         return MaterialApp.router(
           title: 'Logosofia',
           debugShowCheckedModeBanner: false,
-          theme: FlexThemeData.light(scheme: FlexScheme.amber),
-          darkTheme: FlexThemeData.dark(scheme: FlexScheme.amber),
+          theme: AuroraTheme.light,
+          darkTheme: AuroraTheme.dark,
           themeMode: SettingsUtils.getThemeMode(ref),
           locale: TranslationProvider.of(context).flutterLocale,
           supportedLocales: AppLocaleUtils.supportedLocales,

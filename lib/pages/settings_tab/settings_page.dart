@@ -6,6 +6,7 @@ import 'package:logosophy/providers/settings/settings_model.dart';
 import 'package:logosophy/providers/settings/settings_provider.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/pages/settings_tab/utils.dart';
+import 'package:logosophy/theme.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
@@ -34,85 +35,51 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     return Scaffold(
       appBar: AppBar(title: Text(t.settingsPage.settings)),
       body: Column(
-        crossAxisAlignment: .start,
         children: [
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(16.0),
               children: [
-                Card(
-                  color: colorScheme.surfaceContainer,
-                  child: ListTile(
-                    textColor: colorScheme.onSurface,
-                    iconColor: colorScheme.onSurface,
-                    leading: const Icon(Icons.language),
-                    title: Text(t.settingsPage.language),
-                    subtitle: Text(
-                      SettingsUtils.getLocaleName(ref),
-                      style: TextStyle(color: colorScheme.onSurfaceVariant),
-                    ),
-                    trailing: Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
-                    onTap: _showLanguageDialog,
-                  ),
+                _buildSettingTile(
+                  icon: Icons.translate,
+                  title: t.settingsPage.language,
+                  subtitle: SettingsUtils.getLocaleName(ref),
+                  onTap: _showLanguageDialog,
                 ),
                 const SizedBox(height: 12),
-                Card(
-                  color: colorScheme.surfaceContainer,
-                  child: ListTile(
-                    textColor: colorScheme.onSurface,
-                    iconColor: colorScheme.onSurface,
-                    leading: const Icon(Icons.brightness_4),
-                    title: Text(t.settingsPage.theme),
-                    subtitle: Text(
-                      SettingsUtils.getThemeName(ref),
-                      style: TextStyle(color: colorScheme.onSurfaceVariant),
-                    ),
-                    trailing: Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
-                    onTap: _showThemeDialog,
-                  ),
+                _buildSettingTile(
+                  icon: Icons.brightness_6_outlined,
+                  title: t.settingsPage.theme,
+                  subtitle: SettingsUtils.getThemeName(ref),
+                  onTap: _showThemeDialog,
                 ),
                 const SizedBox(height: 12),
-                Card(
-                  color: colorScheme.surfaceContainer,
-                  child: ListTile(
-                    textColor: colorScheme.onSurface,
-                    iconColor: colorScheme.onSurface,
-                    leading: const Icon(Icons.font_download),
-                    title: Text(t.settingsPage.fontSize),
-                    subtitle: Text(
-                      t.settingsPage.changeFontSize,
-                      style: TextStyle(color: colorScheme.onSurfaceVariant),
-                    ),
-                    trailing: Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
-                    onTap: _showFontSizeDialog,
-                  ),
+                _buildSettingTile(
+                  icon: Icons.format_size,
+                  title: t.settingsPage.fontSize,
+                  subtitle: t.settingsPage.changeFontSize,
+                  onTap: _showFontSizeDialog,
                 ),
                 const SizedBox(height: 12),
-                Card(
-                  color: colorScheme.surfaceContainer,
-                  child: ListTile(
-                    textColor: colorScheme.onSurface,
-                    iconColor: colorScheme.onSurface,
-                    leading: const Icon(Icons.contact_support),
-                    title: Text(t.feedbackPage.contactUs),
-                    subtitle: Text(t.feedbackPage.desc, style: TextStyle(color: colorScheme.onSurfaceVariant)),
-                    trailing: Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
-                    onTap: () => GoRouter.of(context).push('/support'),
-                  ),
+                _buildSettingTile(
+                  icon: Icons.support_agent,
+                  title: t.feedbackPage.contactUs,
+                  subtitle: t.feedbackPage.desc,
+                  onTap: () => GoRouter.of(context).push('/support'),
                 ),
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 16.0, left: 16.0),
+            padding: const EdgeInsets.only(bottom: 12.0),
             child: FutureBuilder(
               future: PackageInfo.fromPlatform(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final data = snapshot.data!;
                   return Text(
-                    "Version: ${data.version}+${data.buildNumber}",
-                    style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 10),
+                    "Logosofia · v${data.version}+${data.buildNumber}",
+                    style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11),
                   );
                 } else {
                   return const SizedBox.shrink();
@@ -121,6 +88,36 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// A settings card in the Aurora style: tinted icon circle, title,
+  /// current value as subtitle, chevron affordance.
+  Widget _buildSettingTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Card(
+      color: colorScheme.surfaceContainer,
+      margin: EdgeInsets.zero,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 4.0),
+        leading: CircleAvatar(
+          backgroundColor: colorScheme.primaryContainer,
+          foregroundColor: colorScheme.onPrimaryContainer,
+          child: Icon(icon, size: 22),
+        ),
+        title: Text(
+          title,
+          style: TextStyle(fontWeight: FontWeight.w600, color: colorScheme.onSurface),
+        ),
+        subtitle: Text(subtitle, style: TextStyle(color: colorScheme.onSurfaceVariant)),
+        trailing: Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
+        onTap: onTap,
       ),
     );
   }
@@ -202,41 +199,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               content: SingleChildScrollView(
                 child: Column(
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          t.settingsPage.bookTitle,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16 + fontSize,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                        Text(
-                          t.bookPage.page(page: 1),
-                          style: TextStyle(fontSize: 12 + fontSize, color: colorScheme.onSurfaceVariant),
-                        ),
-                        const SizedBox(height: 12),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(10.0),
-                          decoration: BoxDecoration(
-                            color: colorScheme.surfaceDim,
-                            borderRadius: BorderRadius.circular(6.0),
-                            border: Border.all(color: colorScheme.outlineVariant),
-                          ),
-                          child: Text(
-                            t.settingsPage.fontBookSnippet,
-                            style: TextStyle(
-                              fontSize: 13 + fontSize,
-                              color: colorScheme.onSurface,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    _buildFontPreview(colorScheme, fontSize),
                     Slider(
                       value: fontSize,
                       min: -2.0,
@@ -273,6 +236,51 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           },
         );
       },
+    );
+  }
+
+  /// Builds the book title/page badge/passage preview shown in the font size dialog.
+  Widget _buildFontPreview(ColorScheme colorScheme, double fontSize) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                t.settingsPage.bookTitle,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15 + fontSize, color: colorScheme.onSurface),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 3.0),
+              decoration: BoxDecoration(color: colorScheme.primaryContainer, borderRadius: BorderRadius.circular(999)),
+              child: Text(
+                t.bookPage.page(page: 1),
+                style: TextStyle(
+                  fontSize: 11 + fontSize,
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onPrimaryContainer,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.only(left: 10.0),
+          decoration: BoxDecoration(
+            border: Border(left: BorderSide(color: colorScheme.primary, width: 2)),
+          ),
+          child: Text(
+            t.settingsPage.fontBookSnippet,
+            style: AuroraTheme.passage(fontSize: 13 + fontSize, color: colorScheme.onSurface),
+          ),
+        ),
+      ],
     );
   }
 

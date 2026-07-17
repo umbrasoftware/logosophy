@@ -100,6 +100,8 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                         avatar: const Icon(Icons.add, size: 18),
                         label: Text(t.btnActions.add),
                         onPressed: () async => await chooseBook(false),
+                        backgroundColor: colorScheme.primaryContainer,
+                        side: BorderSide.none,
                       ),
                       ...filter.excludeOnlyIds.map(
                         (bookId) => Chip(

@@ -39,23 +39,63 @@ class _SupportPageState extends State<SupportPage> {
     return Scaffold(
       appBar: AppBar(title: Text(t.feedbackPage.contactUs)),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(border: const OutlineInputBorder(), labelText: t.feedbackPage.name),
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(
+                labelText: t.feedbackPage.name,
+                filled: true,
+                fillColor: colorScheme.surfaceContainerLowest,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                  borderSide: BorderSide(color: colorScheme.outlineVariant),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                ),
+              ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(border: const OutlineInputBorder(), labelText: t.btnActions.email),
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: t.btnActions.email,
+                filled: true,
+                fillColor: colorScheme.surfaceContainerLowest,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                  borderSide: BorderSide(color: colorScheme.outlineVariant),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                ),
+              ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             TextField(
               maxLines: 8,
               controller: _messageController,
-              decoration: InputDecoration(border: const OutlineInputBorder(), labelText: t.feedbackPage.message),
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(
+                labelText: t.feedbackPage.message,
+                alignLabelWithHint: true,
+                filled: true,
+                fillColor: colorScheme.surfaceContainerLowest,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                  borderSide: BorderSide(color: colorScheme.outlineVariant),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                ),
+              ),
               onChanged: (value) {
                 setState(() {
                   final length = _messageController.text.trim().length;
@@ -63,7 +103,11 @@ class _SupportPageState extends State<SupportPage> {
                 });
               },
             ),
-            _isMessage ? Text(t.feedbackPage.typeMore, style: TextStyle(color: Colors.red)) : SizedBox.shrink(),
+            if (_isMessage)
+              Padding(
+                padding: const EdgeInsets.only(top: 6.0, left: 12.0),
+                child: Text(t.feedbackPage.typeMore, style: TextStyle(color: colorScheme.error)),
+              ),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: .spaceBetween,
@@ -91,10 +135,12 @@ class _SupportPageState extends State<SupportPage> {
               ],
             ),
             const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: _isMessage ? null : onSubmit,
-              style: ElevatedButton.styleFrom(backgroundColor: colorScheme.surfaceContainer),
-              child: _isSending ? CircularProgressIndicator() : Text(t.btnActions.send),
+            FilledButton(
+              onPressed: (_isMessage || _isSending) ? null : onSubmit,
+              style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14.0)),
+              child: _isSending
+                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2.5))
+                  : Text(t.btnActions.send),
             ),
           ],
         ),
@@ -133,8 +179,8 @@ class _SupportPageState extends State<SupportPage> {
 
     final wasOk = id != null && id["id"] as int > 0;
     final message = wasOk ? t.feedbackPage.okMessage : t.feedbackPage.errorMessage;
-    final color = wasOk ? Colors.green : Colors.red;
     if (!mounted) return;
+    final color = wasOk ? Colors.green.shade700 : Theme.of(context).colorScheme.error;
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: (Text(message)), backgroundColor: color));
     if (wasOk) Navigator.of(context).pop();

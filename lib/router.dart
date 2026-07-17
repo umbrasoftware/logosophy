@@ -131,17 +131,22 @@ class _ScaffoldWithNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: navigationShell,
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: const Icon(Icons.book), label: t.navBar.books),
-          BottomNavigationBarItem(icon: const Icon(Icons.search), label: t.navBar.search),
-          BottomNavigationBarItem(icon: const Icon(Icons.settings), label: t.navBar.settings),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: navigationShell.currentIndex,
+        onDestinationSelected: _onTap,
+        destinations: <NavigationDestination>[
+          NavigationDestination(
+            icon: const Icon(Icons.menu_book_outlined),
+            selectedIcon: const Icon(Icons.menu_book),
+            label: t.navBar.books,
+          ),
+          NavigationDestination(icon: const Icon(Icons.search), label: t.navBar.search),
+          NavigationDestination(
+            icon: const Icon(Icons.settings_outlined),
+            selectedIcon: const Icon(Icons.settings),
+            label: t.navBar.settings,
+          ),
         ],
-        currentIndex: navigationShell.currentIndex,
-        onTap: _onTap,
       ),
     );
   }

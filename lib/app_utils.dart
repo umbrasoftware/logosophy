@@ -12,8 +12,10 @@ class AppUtils {
 
     return err.isNotEmpty
         ? Scaffold(
-            body: Center(
-              child: Text(err, style: TextStyle(color: Colors.red)),
+            body: Builder(
+              builder: (context) => Center(
+                child: Text(err, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+              ),
             ),
           )
         : null;
