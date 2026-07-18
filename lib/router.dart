@@ -131,24 +131,81 @@ class _ScaffoldWithNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       body: navigationShell,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: navigationShell.currentIndex,
-        onDestinationSelected: _onTap,
-        destinations: <NavigationDestination>[
-          NavigationDestination(
-            icon: const Icon(Icons.menu_book_outlined),
-            selectedIcon: const Icon(Icons.menu_book),
-            label: t.navBar.books,
+      bottomNavigationBar: ColoredBox(
+        color: colorScheme.surfaceContainer,
+        child: SizedBox(
+          height: 55,
+          child: Row(
+            children: [
+              Expanded(
+                child: _NavBarItem(
+                  icon: Icons.menu_book_outlined,
+                  selectedIcon: Icons.menu_book,
+                  selected: navigationShell.currentIndex == 0,
+                  tooltip: t.navBar.books,
+                  onTap: () => _onTap(0),
+                ),
+              ),
+              Expanded(
+                child: _NavBarItem(
+                  icon: Icons.search,
+                  selectedIcon: Icons.search,
+                  selected: navigationShell.currentIndex == 1,
+                  tooltip: t.navBar.search,
+                  onTap: () => _onTap(1),
+                ),
+              ),
+              Expanded(
+                child: _NavBarItem(
+                  icon: Icons.settings_outlined,
+                  selectedIcon: Icons.settings,
+                  selected: navigationShell.currentIndex == 2,
+                  tooltip: t.navBar.settings,
+                  onTap: () => _onTap(2),
+                ),
+              ),
+            ],
           ),
-          NavigationDestination(icon: const Icon(Icons.search), label: t.navBar.search),
-          NavigationDestination(
-            icon: const Icon(Icons.settings_outlined),
-            selectedIcon: const Icon(Icons.settings),
-            label: t.navBar.settings,
+        ),
+      ),
+    );
+  }
+}
+
+class _NavBarItem extends StatelessWidget {
+  const _NavBarItem({
+    required this.icon,
+    required this.selectedIcon,
+    required this.selected,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final IconData selectedIcon;
+  final bool selected;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        child: Center(
+          child: Icon(
+            selected ? selectedIcon : icon,
+            size: 28,
+            color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
           ),
-        ],
+        ),
       ),
     );
   }
