@@ -137,38 +137,41 @@ class _ScaffoldWithNavBar extends StatelessWidget {
       body: navigationShell,
       bottomNavigationBar: ColoredBox(
         color: colorScheme.surfaceContainer,
-        child: SizedBox(
-          height: 55,
-          child: Row(
-            children: [
-              Expanded(
-                child: _NavBarItem(
-                  icon: Icons.menu_book_outlined,
-                  selectedIcon: Icons.menu_book,
-                  selected: navigationShell.currentIndex == 0,
-                  tooltip: t.navBar.books,
-                  onTap: () => _onTap(0),
+        child: SafeArea(
+          top: false,
+          child: SizedBox(
+            height: 40,
+            child: Row(
+              children: [
+                Expanded(
+                  child: _NavBarItem(
+                    icon: Icons.menu_book_outlined,
+                    selectedIcon: Icons.menu_book,
+                    selected: navigationShell.currentIndex == 0,
+                    tooltip: t.navBar.books,
+                    onTap: () => _onTap(0),
+                  ),
                 ),
-              ),
-              Expanded(
-                child: _NavBarItem(
-                  icon: Icons.search,
-                  selectedIcon: Icons.search,
-                  selected: navigationShell.currentIndex == 1,
-                  tooltip: t.navBar.search,
-                  onTap: () => _onTap(1),
+                Expanded(
+                  child: _NavBarItem(
+                    icon: Icons.search,
+                    selectedIcon: Icons.search,
+                    selected: navigationShell.currentIndex == 1,
+                    tooltip: t.navBar.search,
+                    onTap: () => _onTap(1),
+                  ),
                 ),
-              ),
-              Expanded(
-                child: _NavBarItem(
-                  icon: Icons.settings_outlined,
-                  selectedIcon: Icons.settings,
-                  selected: navigationShell.currentIndex == 2,
-                  tooltip: t.navBar.settings,
-                  onTap: () => _onTap(2),
+                Expanded(
+                  child: _NavBarItem(
+                    icon: Icons.settings_outlined,
+                    selectedIcon: Icons.settings,
+                    selected: navigationShell.currentIndex == 2,
+                    tooltip: t.navBar.settings,
+                    onTap: () => _onTap(2),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
