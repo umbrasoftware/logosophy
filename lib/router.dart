@@ -91,6 +91,7 @@ class _SlidingBranchContainerState extends State<_SlidingBranchContainer> {
       physics: const ClampingScrollPhysics(),
       onPageChanged: (index) {
         if (index != widget.navigationShell.currentIndex) {
+          FocusManager.instance.primaryFocus?.unfocus();
           widget.navigationShell.goBranch(index, initialLocation: false);
         }
       },
@@ -124,6 +125,7 @@ class _ScaffoldWithNavBar extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
   void _onTap(int index) {
+    FocusManager.instance.primaryFocus?.unfocus();
     navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex);
   }
 

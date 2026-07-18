@@ -75,6 +75,13 @@ class _AppState extends ConsumerState<App> {
           supportedLocales: AppLocaleUtils.supportedLocales,
           localizationsDelegates: GlobalMaterialLocalizations.delegates,
           routerConfig: router,
+          builder: (context, child) {
+            return GestureDetector(
+              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+              behavior: HitTestBehavior.opaque,
+              child: child,
+            );
+          },
         );
       },
     );
