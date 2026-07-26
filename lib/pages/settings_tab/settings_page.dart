@@ -71,7 +71,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 12.0),
+            // The bottom inset carries the floating nav bar's extent, so the
+            // version line clears it instead of sitting behind the pill.
+            padding: EdgeInsets.only(bottom: 12.0 + MediaQuery.paddingOf(context).bottom),
             child: FutureBuilder(
               future: PackageInfo.fromPlatform(),
               builder: (context, snapshot) {

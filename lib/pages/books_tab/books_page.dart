@@ -37,7 +37,9 @@ class _BooksPageState extends ConsumerState<BooksPage> {
     return Scaffold(
       appBar: AppBar(title: Text(t.navBar.books)),
       body: GridView.builder(
-        padding: const EdgeInsets.all(12.0),
+        // The bottom inset carries the floating nav bar's extent, so the last
+        // row clears it instead of ending underneath.
+        padding: EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0 + MediaQuery.paddingOf(context).bottom),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           crossAxisSpacing: 12.0,
