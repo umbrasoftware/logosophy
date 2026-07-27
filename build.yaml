@@ -7,3 +7,9 @@ targets:
         options:
           # Gera chamadas .toJson() para objetos aninhados
           explicit_to_json: true
+
+      # Desabilitado: entra em conflito com lib/gen/strings.g.dart
+      # ("Asset already exists") e depois passa a pular a geração sem recriar
+      # os arquivos. As traduções são geradas com `dart run slang`.
+      slang_build_runner:
+        enabled: false

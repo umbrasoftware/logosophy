@@ -1,5 +1,6 @@
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:logosophy/gen/strings.g.dart';
 import 'package:logosophy/main.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -12,6 +13,8 @@ class SupportPage extends StatefulWidget {
 }
 
 class _SupportPageState extends State<SupportPage> {
+  static final _logger = Logger('SupportPage');
+
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _messageController = TextEditingController();
@@ -160,26 +163,31 @@ class _SupportPageState extends State<SupportPage> {
       _isSending = true;
     });
 
-    final id = await supabase.client
-        .from('feedback')
-        .insert({
-          "name": _nameController.text.trim(),
-          "email": _emailController.text.trim(),
-          "message": _messageController.text.trim(),
-          "is_problem": _isProblem,
-          "can_contact": _canContact,
-          "device_info": allInfo.toString(),
-        })
-        .select('id')
-        .maybeSingle();
+    // No .select() on the insert: anon holds INSERT on feedback but not SELECT,
+    // since a SELECT policy wide enough for a RETURNING clause would also expose
+    // every submission. An insert that completes without throwing is the success
+    // signal instead.
+    var wasOk = true;
+    try {
+      await supabase.client.from('feedback').insert({
+        "name": _nameController.text.trim(),
+        "email": _emailController.text.trim(),
+        "message": _messageController.text.trim(),
+        "is_problem": _isProblem,
+        "can_contact": _canContact,
+        "device_info": allInfo.toString(),
+      });
+    } catch (e) {
+      _logger.warning('Error submitting feedback: $e');
+      wasOk = false;
+    }
 
+    if (!mounted) return;
     setState(() {
       _isSending = false;
     });
 
-    final wasOk = id != null && id["id"] as int > 0;
     final message = wasOk ? t.feedbackPage.okMessage : t.feedbackPage.errorMessage;
-    if (!mounted) return;
     final color = wasOk ? Colors.green.shade700 : Theme.of(context).colorScheme.error;
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: (Text(message)), backgroundColor: color));

@@ -162,9 +162,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     });
 
     try {
-      final embeddings = await SearchUtils.createEmbedding(query);
-      final queryResults = await SearchUtils.similaritySearch(embeddings!, 20, ref);
-      final data = List<Map<String, dynamic>>.from(queryResults!);
+      final data = await SearchUtils.search(query, 20, ref);
       final results = data.map((item) => SearchResult.fromJson(item)).toList();
 
       final history = History(query: query, timestamp: DateTime.now(), results: results, wasFiltered: _isFilterActive);
@@ -174,8 +172,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         _searchResults = results;
       });
     } catch (e) {
+      // Only SearchException carries a message meant for users; anything else
+      // would put a raw Dart error on screen.
       setState(() {
-        _errorMessage = e.toString();
+        _errorMessage = e is SearchException ? e.message : t.searchPage.searchError;
       });
     } finally {
       setState(() {
@@ -189,9 +189,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     if (_isLoading) {
       return Center(
         child: Column(
-          mainAxisAlignment: .spaceEvenly,
+          mainAxisSize: .min,
           children: [
-            _isFilterActive ? Text(t.filter.activateFilters) : SizedBox.shrink(),
+            if (_isFilterActive) ...[Text(t.filter.activateFilters), const SizedBox(height: 20)],
             CircularProgressIndicator(color: colorScheme.primary),
           ],
         ),

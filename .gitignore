@@ -7,7 +7,14 @@
 .buildlog/
 .history
 .env
+.env.*
 /books/
+
+# Code generation output. Regenerate with BOTH:
+#   dart run build_runner build --delete-conflicting-outputs
+#   dart run slang
+*.g.dart
+*.freezed.dart
 output.json
 firebase_options.dart
 firebase.json

@@ -79,7 +79,9 @@
         "noResultFound": "No results found",
         "searchHistory": "Search history",
         "noHistoryYet": "No search history yet",
-        "search": "Search..."
+        "search": "Search...",
+        "searchError": "Something went wrong with the search. Please check your connection and try again.",
+        "tooManyRequests": "Too many searches in a short time. Please wait a moment and try again."
     },
     "feedbackPage": {
         "contactUs": "Contact Us",

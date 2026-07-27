@@ -79,7 +79,9 @@
         "noResultFound": "Nenhum resultado encontrado",
         "searchHistory": "Histórico de pesquisa",
         "noHistoryYet": "Sem histórico de pesquisa ainda",
-        "search": "Pesquisar..."
+        "search": "Pesquisar...",
+        "searchError": "Algo deu errado com a busca. Verifique sua conexão e tente novamente.",
+        "tooManyRequests": "Muitas buscas em pouco tempo. Aguarde um momento e tente novamente."
     },
     "feedbackPage": {
         "contactUs": "Fale Conosco",
